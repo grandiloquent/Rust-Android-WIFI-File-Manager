@@ -150,11 +150,7 @@ public class DownloaderService extends Service implements RequestListener {
 
     private void showNotification(String title) {
         Builder builder;
-        if (VERSION.SDK_INT >= VERSION_CODES.O) {
-            builder = new Builder(this, DOWNLOAD_VIDEO);
-        } else {
-            builder = new Builder(this);
-        }
+        builder = new Builder(this, DOWNLOAD_VIDEO);
         builder.setSmallIcon(android.R.drawable.stat_sys_download)
                 .setContentTitle(title);
         mNotificationManager.notify(1, builder.build());
@@ -168,11 +164,8 @@ public class DownloaderService extends Service implements RequestListener {
     @Override
     public void onCreate() {
         super.onCreate();
-        if (VERSION.SDK_INT >= VERSION_CODES.O) {
-            createNotificationChannel(this, DOWNLOAD_VIDEO, getString(R.string.download_video_channel));
-        }
+        createNotificationChannel(this, DOWNLOAD_VIDEO, getString(R.string.download_video_channel));
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
     }
 
     @Override
@@ -205,11 +198,6 @@ public class DownloaderService extends Service implements RequestListener {
             Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
             Pair<String, String> info = Pair.create(intent.getStringExtra(EXTRA_VIDEO_TITLE),videoAddress);//getVideoInformation(videoAddress);
             if (info != null && info.second != null) {
-                if (info.second.contains(".mp4")) {
-                    mHandler.post(() -> Shared.downloadFile(DownloaderService.this,
-                            (info.first == null ? Shared.toHex(info.second.getBytes(StandardCharsets.UTF_8)) : info.first) + ".mp4", info.second, USER_AGENT));
-                    return;
-                }
                 try {
                     createTask(info);
                 } catch (IOException e) {

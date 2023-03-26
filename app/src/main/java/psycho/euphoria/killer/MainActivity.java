@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import psycho.euphoria.killer.lib.RustLog;
+import psycho.euphoria.killer.tasks.DownloaderService;
 
 public class MainActivity extends Activity {
     public static final int ITEM_ID_REFRESH = 1;
@@ -61,7 +62,6 @@ public class MainActivity extends Activity {
 
     private void open() {
         CharSequence url = Shared.getText(this);
-
         if (url != null)
             mWebView.loadUrl(url.toString());
     }
@@ -126,6 +126,7 @@ public class MainActivity extends Activity {
         menu.add(0, 1, 0, "刷新");
         menu.add(0, 2, 0, "打开");
         menu.add(0, 3, 0, "保存页面");
+        menu.add(0, 4, 0, "下载视频");
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -141,9 +142,22 @@ public class MainActivity extends Activity {
             case 3:
                 saveRenderedWebPage();
                 break;
+            case 4:
+                downloadM3u8Video();
+                break;
 
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void downloadM3u8Video() {
+        CharSequence url = Shared.getText(this);
+        if (url == null) return;
+        Intent service = new Intent(this, DownloaderService.class);
+        service.putExtra(DownloaderService.EXTRA_VIDEO_TITLE,
+                Shared.substringAfterLast(url.toString(), "."));
+        service.putExtra(DownloaderService.EXTRA_VIDEO_ADDRESS, url.toString());
+        startService(service);
     }
 
     private void saveRenderedWebPage() {
