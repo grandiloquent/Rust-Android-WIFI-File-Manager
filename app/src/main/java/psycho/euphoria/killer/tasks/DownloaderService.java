@@ -2,24 +2,19 @@ package psycho.euphoria.killer.tasks;
 
 import android.app.Notification.Builder;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Process;
-import android.util.Log;
-import android.util.Pair;
-import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.annotation.Native;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -28,8 +23,6 @@ import java.util.concurrent.Executors;
 import psycho.euphoria.killer.R;
 import psycho.euphoria.killer.Shared;
 
-import static psycho.euphoria.killer.MainActivity.USER_AGENT;
-import static psycho.euphoria.killer.tasks.DownloadUtils.background;
 import static psycho.euphoria.killer.tasks.DownloadUtils.createNotificationChannel;
 
 
@@ -44,38 +37,6 @@ public class DownloaderService extends Service implements RequestListener {
     private ExecutorService mExecutor = Executors.newFixedThreadPool(3);
     private List<DownloaderRequest> mRequests = new ArrayList<>();
 
-    private void checkTask() {
-        File[] directories = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).listFiles(File::isDirectory);
-        if (directories == null) return;
-        for (File dir : directories) {
-            File database = new File(dir, "data.db");
-            String dbName = database.getAbsolutePath();
-            Database db = new Database(getApplicationContext(), dbName);
-            TaskInfo taskInfo = db.getTaskInfo();
-            if (taskInfo == null) {
-                continue;
-            }
-            if (taskInfo.status == 5 || new File(taskInfo.fileName).exists()) {
-                continue;
-            }
-            DownloaderRequest downloaderRequest = new DownloaderRequest(db, this);
-            boolean found = false;
-            for (int i = 0; i < mRequests.size(); i++) {
-                if (mRequests.get(i).getTaskInfo().fileName.equals(taskInfo.fileName)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (found) continue;
-            synchronized (this) {
-                mRequests.add(downloaderRequest);
-            }
-            mExecutor.submit(downloaderRequest);
-        }
-        if (checkFinished()) return;
-        mHandler.post(() -> showNotification(getString(R.string.downloading_video, mRequests.size())));
-
-    }
 
     private boolean checkFinished() {
         if (mRequests.size() == 0) {
@@ -86,51 +47,8 @@ public class DownloaderService extends Service implements RequestListener {
         return false;
     }
 
-    private void checkUncompletedTasks() {
-        background(() -> {
-            checkTask();
-            return null;
-        });
-    }
 
-    private void createDatabase(DatabaseParameter databaseParameter) {
-        File database = new File(databaseParameter.dir, "data.db");
-        if (database.exists()) {
-            return;
-        }
-        List<Task> tasks = createTasks(databaseParameter.response);
-        String dbName = database.getAbsolutePath();
-        Database db = new Database(getApplicationContext(), dbName);
-        db.insertTasks(tasks);
-        TaskInfo taskInfo = new TaskInfo();
-        taskInfo.segmentSize = tasks.size();
-        taskInfo.uri = databaseParameter.downloadLink;
-        taskInfo.fileName = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),
-                Shared.getValidFileName(databaseParameter.title) + ".mp4").getAbsolutePath();
-        taskInfo.directory = databaseParameter.dir.getAbsolutePath();
-        db.insertTaskInfo(taskInfo);
-    }
-
-    private File createDirectory(String contents) {
-        String directoryName = Shared.md5(contents);
-        File dir = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), directoryName);
-        if (!dir.isDirectory()) {
-            dir.mkdir();
-        }
-        return dir;
-    }
-
-    private void createTask(Pair<String, String> info) throws IOException {
-        String response = DownloadUtils.getString(info.second);
-        if (response == null) {
-            throw new NullPointerException();
-        }
-        File dir = createDirectory(response);
-        createDatabase(new DatabaseParameter(info.first, info.second, response, dir));
-        mHandler.post(() -> Toast.makeText(DownloaderService.this, "成功 " + info.first, Toast.LENGTH_SHORT).show());
-    }
-
-    private List<Task> createTasks(String response) {
+    private List<Task> createTasks(String response, String uri, String dir) {
         String[] segments = response.split("\n");
         int sequence = 0;
         List<Task> tasks = new ArrayList<>();
@@ -138,8 +56,10 @@ public class DownloaderService extends Service implements RequestListener {
             if (segments[i].startsWith("#EXTINF:")) {
                 String segment = segments[i + 1];
                 Task task = new Task();
-                task.uri = segment;
+                task.uri = uri + segment;
                 task.sequence = sequence++;
+                task.directory = dir;
+                task.filename = Shared.substringAfterLast(segment, "/");
                 tasks.add(task);
                 i++;
             }
@@ -147,6 +67,10 @@ public class DownloaderService extends Service implements RequestListener {
         return tasks;
     }
 
+    @Override
+    public void onProgress(DownloaderRequest downloaderRequest) {
+        mHandler.post(() -> showNotification(downloaderRequest.getMessage()));
+    }
 
     private void showNotification(String title) {
         Builder builder;
@@ -168,61 +92,119 @@ public class DownloaderService extends Service implements RequestListener {
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     }
 
-    @Override
-    public void onProgress(DownloaderRequest rquest) {
-        int status = rquest.getStatus();
-        if (status == 5 || status < 0) {
-            rquest.getTaskDatabase().updateTaskStatus(rquest.getTaskInfo().uid, rquest.getStatus());
-            if (status == 5) {
-            }
-            synchronized (this) {
-                for (int i = 0; i < mRequests.size(); i++) {
-                    if (mRequests.get(i).getTaskInfo().fileName.equals(rquest.getTaskInfo().fileName)) {
-                        mRequests.remove(i);
-                    }
-                }
-            }
-            if (checkFinished()) return;
-            mHandler.post(() -> showNotification(getString(R.string.downloading_video, mRequests.size())));
-        }
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String videoAddress = intent.getStringExtra(EXTRA_VIDEO_ADDRESS);
-        if (videoAddress == null) {
-            checkUncompletedTasks();
-            return super.onStartCommand(intent, flags, startId);
+        String url = intent.getStringExtra(EXTRA_VIDEO_ADDRESS);
+        String title = intent.getStringExtra(EXTRA_VIDEO_TITLE);
+        File dir = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), title);
+        if (!dir.isDirectory()) {
+            dir.mkdir();
         }
+        showNotification("创建目录：" + dir);
         new Thread(() -> {
-            Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-            Pair<String, String> info = Pair.create(intent.getStringExtra(EXTRA_VIDEO_TITLE),videoAddress);//getVideoInformation(videoAddress);
-            if (info != null && info.second != null) {
-                try {
-                    createTask(info);
-                } catch (IOException e) {
-                    mHandler.post(() -> Toast.makeText(DownloaderService.this, "失败 " + info.first, Toast.LENGTH_SHORT).show());
-                }
-                checkTask();
-            } else {
-                mHandler.post(() -> Toast.makeText(DownloaderService.this, "失败 " + videoAddress, Toast.LENGTH_SHORT).show());
+            String response = null;
+            try {
+                response = DownloadUtils.getString(url);
+            } catch (IOException e) {
+                mHandler.post(() -> {
+                    showNotification("创建目录：" + e.getMessage());
+                });
+            }
+            if (response == null) {
+                return;
+            }
+            List<Task> tasks = createTasks(response,
+                    Shared.substringBeforeLast(url, "/") + "/", dir.getAbsolutePath());
+            mHandler.post(() -> {
+                showNotification("下载任务数量：" + tasks.size());
+            });
+            for (Task task : tasks) {
+                DownloaderRequest downloaderRequest = new DownloaderRequest(task, this);
+                mExecutor.submit(downloaderRequest);
             }
         }).start();
         return super.onStartCommand(intent, flags, startId);
     }
 
+    public static class DownloaderRequest implements Runnable {
+        private RequestListener mListener;
+        private Task mTask;
+        private String mMessage;
 
-    private static class DatabaseParameter {
-        public String title;
-        public String downloadLink;
-        public String response;
-        public File dir;
+        public DownloaderRequest(Task task, RequestListener listener) {
+            mTask = task;
+            mListener = listener;
+        }
 
-        public DatabaseParameter(String title, String downloadLink, String response, File dir) {
-            this.title = title;
-            this.downloadLink = downloadLink;
-            this.response = response;
-            this.dir = dir;
+        public String getMessage() {
+            return mMessage;
+        }
+
+        @Override
+        public void run() {
+            Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+            File d = new File(mTask.directory, mTask.filename);
+            mMessage = "待下载文件: " + d.getName();
+            mListener.onProgress(this);
+            if (d.exists()) {
+                mMessage = "已下载文件: " + d.getName();
+                mListener.onProgress(this);
+                return;
+            }
+            File tmp = new File(mTask.directory, mTask.filename + ".tmp");
+            if (tmp.exists()) {
+                tmp.delete();
+                mMessage = "删除临时文件: " + d.getName() + ".tmp";
+                mListener.onProgress(this);
+            }
+            try {
+                URL url = new URL(mTask.uri);
+                HttpURLConnection c = (HttpURLConnection) url.openConnection();
+                int status = c.getResponseCode();
+                if (status < 200 || status >= 400) {
+                    mMessage = "下载文件错误: " + d.getName() + ".tmp";
+                    mListener.onProgress(this);
+                    return;
+                }
+                long totalSize = c.getContentLengthLong();
+                mMessage = "临时文件大小: " + d.getName() + ".tmp " + totalSize;
+                mListener.onProgress(this);
+                InputStream in = c.getInputStream();
+                FileOutputStream out = new FileOutputStream(tmp);
+                final byte[] buffer = new byte[8192];
+                while (true) {
+                    int len;
+                    try {
+                        len = in.read(buffer);
+                    } catch (IOException e) {
+                        mMessage = "下载文件错误: " + d.getName() + ".tmp";
+                        mListener.onProgress(this);
+                        return;
+                    }
+                    if (len == -1) {
+                        break;
+                    }
+                    try {
+                        out.write(buffer, 0, len);
+                        //mVideoTask.DownloadedSize += len;
+                        //updateProgress(fileName);
+                    } catch (IOException e) {
+                        mMessage = "下载文件错误: " + d.getName() + ".tmp";
+                        mListener.onProgress(this);
+                        return;
+                    }
+                }
+
+            } catch (Exception exc) {
+                mMessage = "下载文件错误: " + d.getName() + ".tmp";
+                mListener.onProgress(this);
+                return;
+            }
+            mMessage = "下载文件: " + d.getName();
+            mListener.onProgress(this);
+            tmp.renameTo(d);
         }
     }
+
 }

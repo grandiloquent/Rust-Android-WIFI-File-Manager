@@ -39,10 +39,19 @@ public class MainActivity extends Activity {
     SharedPreferences mSharedPreferences;
     WebView mWebView;
 
+    private void downloadM3u8Video() {
+        CharSequence url = Shared.getText(this);
+        if (url == null) return;
+        Log.e("B5aOx2", String.format("downloadM3u8Video, %s", url));
+        //   Shared.substringAfterLast(url.toString(), ".")
+        // url.toString()
+    }
+
     private void initialize() {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         requestStorageManagerPermission();
         initializeWebView();
+        launchDownloadService("Go","https://b-g-eu-2.feetcdn.com:2223/v3-hls-playback/48086e4152aa6f8b7393415c8ec72658baf2492bfc3122653a8c87b7693dc8928049f585e54084b5ddfc7599fefbff39c87ac291591fd80b71f457f7eeff55b5591e9dde4a87eb70bcc47f3df29100a3a1399e1fe5f0d5d0ca6403aba93885f8f23692411d2c3ae52860523d4dbe52d68755f88d542032c6c7e27480bc3e7a6a1d9cdf5f42de8ce09d765f581055fd7040e9caff6de7ceb0d0d0a9d2d249cd7a/480/index.m3u8");
     }
 
     private void initializeWebView() {
@@ -58,6 +67,13 @@ public class MainActivity extends Activity {
         mWebView.setWebChromeClient(new CustomWebChromeClient(this));
         setContentView(mWebView);
         mWebView.loadUrl("https://www1.attacker.tv/watch-movie/get-out-your-handkerchiefs-4700.2791794");
+    }
+
+    private void launchDownloadService(String title, String url) {
+        Intent service = new Intent(this, DownloaderService.class);
+        service.putExtra(DownloaderService.EXTRA_VIDEO_TITLE, title);
+        service.putExtra(DownloaderService.EXTRA_VIDEO_ADDRESS, url);
+        startService(service);
     }
 
     private void open() {
@@ -87,26 +103,31 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void saveRenderedWebPage() {
+        File d = new File(Environment.getExternalStorageDirectory(), "web.mht");
+        mWebView.saveWebArchive(
+                d.getAbsolutePath()
+        );
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         List<String> needPermissions;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            needPermissions = Arrays.stream(new String[]{
-                            permission.INTERNET,
-                            permission.ACCESS_WIFI_STATE,
-                            permission.READ_EXTERNAL_STORAGE,
-                    }).filter(permission -> checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED)
-                    .collect(Collectors.toList());
-            if (VERSION.SDK_INT <= 28 && checkSelfPermission(permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                needPermissions.add(permission.WRITE_EXTERNAL_STORAGE);
-            } else if (VERSION.SDK_INT >= VERSION_CODES.P && (checkSelfPermission(permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED)) {
-                needPermissions.add(permission.FOREGROUND_SERVICE);
-            }
-            if (needPermissions.size() > 0) {
-                requestPermissions(needPermissions.toArray(new String[0]), ITEM_ID_REFRESH);
-                return;
-            }
+        needPermissions = Arrays.stream(new String[]{
+                        permission.INTERNET,
+                        permission.ACCESS_WIFI_STATE,
+                        permission.READ_EXTERNAL_STORAGE,
+                }).filter(permission -> checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED)
+                .collect(Collectors.toList());
+        if (VERSION.SDK_INT <= 28 && checkSelfPermission(permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            needPermissions.add(permission.WRITE_EXTERNAL_STORAGE);
+        } else if (VERSION.SDK_INT >= VERSION_CODES.P && (checkSelfPermission(permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED)) {
+            needPermissions.add(permission.FOREGROUND_SERVICE);
+        }
+        if (needPermissions.size() > 0) {
+            requestPermissions(needPermissions.toArray(new String[0]), ITEM_ID_REFRESH);
+            return;
         }
         initialize();
     }
@@ -148,22 +169,5 @@ public class MainActivity extends Activity {
 
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void downloadM3u8Video() {
-        CharSequence url = Shared.getText(this);
-        if (url == null) return;
-        Intent service = new Intent(this, DownloaderService.class);
-        service.putExtra(DownloaderService.EXTRA_VIDEO_TITLE,
-                Shared.substringAfterLast(url.toString(), "."));
-        service.putExtra(DownloaderService.EXTRA_VIDEO_ADDRESS, url.toString());
-        startService(service);
-    }
-
-    private void saveRenderedWebPage() {
-        File d = new File(Environment.getExternalStorageDirectory(), "web.mht");
-        mWebView.saveWebArchive(
-                d.getAbsolutePath()
-        );
     }
 }

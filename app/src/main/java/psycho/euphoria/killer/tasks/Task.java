@@ -4,5 +4,7 @@ public class Task {
     public String uri;
     public long totalSize;
     public int sequence;
+    public String directory;
+    public String filename;
 }
 
