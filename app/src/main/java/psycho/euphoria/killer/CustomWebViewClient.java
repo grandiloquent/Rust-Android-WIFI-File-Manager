@@ -20,13 +20,17 @@ import java.util.Arrays;
 
 public class CustomWebViewClient extends WebViewClient {
     private final String[] mBlocks = new String[]{
-            "://a.realsrv.com/",
+            ":.realsrv.com/",
             "://fans.91p20.space/",
             "://rpc-php.trafficfactory.biz/",
-            "://ssl.google-analytics.com/",
-            "://syndication.realsrv.com/",
+            "google-analytics.com/",
             "://www.gstatic.com/",
-            "/ads/"
+            "://widgets.pinterest.com/",
+            ".addthis.com/",
+            "/ads/",
+            "://i.imgur.com/",
+            "://onclickgenius.com/",
+            "://inpagepush.com/"
     };
     private final WebResourceResponse mEmptyResponse = new WebResourceResponse(
             "text/plain",
@@ -55,7 +59,7 @@ public class CustomWebViewClient extends WebViewClient {
 //        if (url.startsWith("https://www.xvideos.com/") && (cookie = CookieManager.getInstance().getCookie(url)) != null) {
 //            mContext.setString(MainActivity.KEY_XVIDEOS_COOKIE, cookie);
 //        }
-        view.evaluateJavascript(mJsCode, null);
+        //view.evaluateJavascript(mJsCode, null);
     }
 
 
@@ -65,6 +69,8 @@ public class CustomWebViewClient extends WebViewClient {
         if (Arrays.stream(mBlocks).anyMatch(url::contains)) {
             return mEmptyResponse;
         }
+        Log.e("B5aOx2", String.format("shouldInterceptRequest, %s",
+                url));
         return super.shouldInterceptRequest(view, url);
     }
 

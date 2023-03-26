@@ -56,10 +56,12 @@ public class MainActivity extends Activity {
         mWebView.setWebViewClient(new CustomWebViewClient(this));
         mWebView.setWebChromeClient(new CustomWebChromeClient(this));
         setContentView(mWebView);
+        mWebView.loadUrl("https://www1.attacker.tv/watch-movie/get-out-your-handkerchiefs-4700.2791794");
     }
 
     private void open() {
         CharSequence url = Shared.getText(this);
+
         if (url != null)
             mWebView.loadUrl(url.toString());
     }
