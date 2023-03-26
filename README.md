@@ -1,15 +1,17 @@
 # Rust Android Example
 
+添加 arm64 工具链
+
 ```
 rustup target add aarch64-linux-android
-rustup default  nightly-x86_64-pc-windows-gnu
+rustup default nightly-x86_64-pc-windows-gnu
 ```
 
 ## Troubleshooting
 
 ### failed to run custom build command for `ring v0.16.20`
 
-1. 修改 `rust_lib\.cargo\config.toml` 添加环境参数
+修改 `rust_lib\.cargo\config.toml` 添加环境参数
 
 ```toml
 [env]
