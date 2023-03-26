@@ -2,13 +2,16 @@ package psycho.euphoria.killer;
 
 import android.Manifest.permission;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,6 +38,7 @@ public class MainActivity extends Activity {
 
     private void initialize() {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        requestStorageManagerPermission();
         initializeWebView();
     }
 
@@ -52,9 +56,31 @@ public class MainActivity extends Activity {
         setContentView(mWebView);
     }
 
+    private void open() {
+        CharSequence url = Shared.getText(this);
+        if (url != null)
+            mWebView.loadUrl(url.toString());
+    }
+
     private void refresh() {
         mWebView.clearCache(true);
         mWebView.reload();
+    }
+
+    private void requestStorageManagerPermission() {
+        if (VERSION.SDK_INT >= VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                try {
+                    Uri uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID);
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri);
+                    startActivity(intent);
+                } catch (Exception ex) {
+                    Intent intent = new Intent();
+                    intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                    startActivity(intent);
+                }
+            }
+        }
     }
 
     @Override
@@ -111,11 +137,5 @@ public class MainActivity extends Activity {
 
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void open() {
-        CharSequence url = Shared.getText(this);
-        if (url != null)
-            mWebView.loadUrl(url.toString());
     }
 }
