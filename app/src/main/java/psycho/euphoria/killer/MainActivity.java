@@ -19,6 +19,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -121,7 +123,7 @@ public class MainActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, 1, 0, "刷新");
         menu.add(0, 2, 0, "打开");
-        menu.add(0, 3, 0, "打开");
+        menu.add(0, 3, 0, "保存页面");
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -134,8 +136,18 @@ public class MainActivity extends Activity {
             case 2:
                 open();
                 break;
+            case 3:
+                saveRenderedWebPage();
+                break;
 
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void saveRenderedWebPage() {
+        File d = new File(Environment.getExternalStorageDirectory(), "web.mht");
+        mWebView.saveWebArchive(
+                d.getAbsolutePath()
+        );
     }
 }
