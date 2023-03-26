@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="video.css">
+    <script src="video.js"></script>
+    <script src="custom-bottom-sheet.js"></script>
+
+</head>
+
+<body>
+<script src="toast.js"></script>
+<custom-toast bind="toast"></custom-toast>
+<div class="layout" bind="layout" @click="onLayout">
+    <video bind="video"
+           @timeupdate="onTimeupdate"
+           @durationChange="onDurationChange"
+           @progress="onProgress"
+           @pause="onPause"
+           @ended="onEnded"
+           @play="onPlay"
+           class="video"></video>
+    <div class="controller">
+        <div style="
+     flex-grow: 1;
+     "></div>
+        <div bind="middle" class="middle">
+            <div bind="previous" @click="onPrevious" class="button previous">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="36" height="36">
+                    <path d="M19,6L9,12l10,6V6L19,6z M7,6H5v12h2V6z"></path>
+                </svg>
+            </div>
+
+            <div bind="buttonPlay" @click="onPlayButton" class="button-play">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="56" height="56">
+                    <path d="M6,4l12,8L6,20V4z"></path>
+                </svg>
+            </div>
+            <div bind="next" @click="onNext" class="button next">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="36" height="36">
+                    <path d="M5,18l10-6L5,6V18L5,18z M19,6h-2v12h2V6z"></path>
+                </svg>
+            </div>
+        </div>
+
+
+        <div bind="bottom" @click="onBottom" class="bottom">
+            <div class="wrapper">
+                <div class="time-display">
+                    <div bind="timeFirst" class="time-first">0:00</div>
+                    <div style="opacity: .7;margin: 0 4px;">/</div>
+                    <div bind="timeSecond" class="time-second">0:00</div>
+                </div>
+                <div bind="buttonFullscreen" @click="onFullscreen" class="button-fullscreen">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                        <path
+                                d="M7,11H6V6h5v1H7V11z M18,6h-5v1h4v4h1V6z M18,13h-1v4h-4v1h5V13z M11,17H7v-4H6v5h5V17z">
+                        </path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div bind="progressBarBackground" class="progress-bar-background"></div>
+                <div bind="progressBarLoaded" class="progress-bar-loaded"></div>
+                <div bind="progressBarPlayed" class="progress-bar-played"></div>
+                <div bind="progressBarPlayhead" class="progress-bar-playhead"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div style="display: flex;
+    padding: 12px;
+    ">
+    <div style="flex-grow: 1;">
+        <h2 bind="title"></h2>
+        <div style="font-size: 12px;
+            line-height: 16px;
+            color: #606060;
+            "></div>
+    </div>
+
+    <div style="width: 24px;height: 24px;color: rgb(3, 3, 3);fill: currentColor;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+            <path d="M18 9.28l-6.35 6.35-6.37-6.35.72-.71 5.64 5.65 5.65-5.65z"></path>
+        </svg>
+    </div>
+</div>
+
+<div style="display: flex;
+    padding: 0 12px 12px;
+    ">
+    <div bind class="download" @click="onDownload">
+
+
+        <div
+                style="width: 40px;height: 24px;color: #030303;fill: currentColor;display:flex;align-items: center;justify-content: center;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24">
+                <path
+                        d="M4,20h14v1H3V6h1V20z M18,10h-4V6h-1v4H9v1h4v4h1v-4h4V10z M21,3v15H6V3H21z M20,4H7v13h13V4z">
+                </path>
+            </svg>
+        </div>
+        <div style="font-size: 12px;
+                                        line-height: 12px;
+                                        color: #030303;
+                                        margin-top: 7px;
+                                        ">
+            下载
+        </div>
+    </div>
+</div>
+<custom-time-picker bind="customTimePicker" @click="onCustomTimePickerClick"
+                    @submit="onCustomTimePickerSubmit"></custom-time-picker>
+
+<custom-bottom-sheet bind="customBottomSheet" @submit="onCustomBottomSheetSubmit"
+                     style="display: none;"></custom-bottom-sheet>
+
+<script>
+    (() => {
+        class CustomTimePicker extends HTMLElement {
+
+            constructor() {
+                super();
+                this.attachShadow({
+                    mode: 'open'
+                });
+                const wrapper = document.createElement("div");
+                wrapper.setAttribute("class", "wrapper");
+                const style = document.createElement('style');
+                style.textContent = `
+                    .wrapper{
+                        width:100%;
+                        height:56px;
+                        background:red;
+                        color:#fff;
+                        text-align:center;
+                        line-height:56px;
+                    }
+                    `;
+                this.wrapper = wrapper;
+                this.shadowRoot.append(style, wrapper);
+            }
+
+            submit() {
+                this.dispatchEvent(new CustomEvent('submit', {
+                    detail: this.number
+                }));
+            }
+
+            set min(value) {
+                this._min = value
+                this.number = value;
+                this.wrapper.textContent = formatDuration(this.number);
+            }
+
+            set max(value) {
+                this._max = value
+            }
+
+            formatDuration(ms) {
+                if (isNaN(ms)) return '0:00';
+                if (ms < 0) ms = -ms;
+                const time = {
+                    hour: Math.floor(ms / 3600) % 24,
+                    minute: Math.floor(ms / 60) % 60,
+                    second: Math.floor(ms) % 60,
+                };
+                return Object.entries(time)
+                    .filter((val, index) => index || val[1])
+                    .map(val => (val[1] + '').padStart(2, '0'))
+                    .join(':');
+            }
+
+            connectedCallback() {
+                this.number = 1;
+                this.wrapper.textContent = formatDuration(this.number);
+                this.x = 0;
+                this.wrapper.addEventListener('touchstart', evt => {
+                    this.x = evt.touches[0].pageX;
+                })
+                this.wrapper.addEventListener('touchmove', evt => {
+                    const diffX = evt.touches[0].pageX - this.x;
+                    console.log(this._max)
+                    if (diffX > 0) {
+                        if (this.number < this._max)
+                            this.number++;
+                    } else {
+                        if (this.number > this._min)
+                            this.number--;
+                    }
+                    this.wrapper.textContent = formatDuration(this.number);
+                    this.submit();
+                })
+                this.wrapper.addEventListener('touchend', evt => {
+                    this.x = 0;
+                })
+            }
+
+            static get observedAttributes() {
+                return ['title'];
+            }
+
+            attributeChangedCallback(name, oldValue, newValue) {
+            }
+        }
+
+        customElements.define('custom-time-picker', CustomTimePicker);
+
+    })();
+</script>
+<script>
+    bind();
+
+
+    layout.style.height = `${window.innerWidth * 0.5625}px`;
+    let timer, items;
+
+
+    video.preload = "auto"
+    let path = getPath();
+    video.src = `/api/file?path=${encodeURIComponent(path)}&isDir=0`;
+    document.title = substringAfterLast(path, '\\')
+    appendSubtitle(video);
+
+
+    const width = progressBarBackground.getBoundingClientRect().width;
+    const left = parseInt(window.getComputedStyle(bottom, null).getPropertyValue('padding-left'));
+
+
+</script>
+</body>
+
+</html>
+ 

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文档</title>
+    <style>
+        html {
+            color: #0f0f0f;
+            background-color: #fff;
+            font-size: 10px;
+            font-family: Roboto, Arial, sans-serif
+        }
+
+        html[darker-dark-theme] {
+            background-color: #fff
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            font-size: 1.2rem;
+            overflow-x: hidden
+        }
+
+    </style>
+    <script src="toast.js"></script>
+</head>
+
+<body>
+<div style="margin: 12px;font-size: 1.4rem;padding-bottom: 49px">
+
+</div>
+<div style="display: flex;justify-content: space-around;position: fixed;bottom: 0;left: 0;right: 0;padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);z-index: 3;height: 48px;border-top: 1px solid rgba(0,0,0,0.1);color: #0f0f0f;font-size: 1.1rem;background: #fff">
+    <div id="previous"
+         style="color: #0f0f0f;font-size: 1.1rem;display: flex;-webkit-box-flex: 1;flex: 1 1 0%;min-width: 0">
+        <div style="font-size: 1.1rem;display: flex;-webkit-box-flex: 1;flex: 1 1 0%;-webkit-box-orient: vertical;-webkit-box-direction: normal;flex-direction: column;-webkit-box-align: center;align-items: center;-webkit-box-pack: center;justify-content: center;overflow: hidden;color: #0f0f0f">
+            <div style="font-size: 1.1rem;-webkit-box-direction: normal;flex-shrink: 0;width: 24px;height: 24px;fill: currentColor;stroke: none;color: #0f0f0f;display: block">
+                <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24"
+                     viewBox="0 0 24 24" width="24">
+                    <path d="M11.672 3.891l-8.109 8.109 8.109 8.109-1.781 1.781-9.891-9.891 9.891-9.891z"></path>
+                </svg>
+            </div>
+            <div style="font-size: 1.1rem;-webkit-box-direction: normal;max-width: 100%;padding: 0 4px;box-sizing: border-box;display: block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;color: #0f0f0f">
+                上一页
+            </div>
+        </div>
+    </div>
+    <div id="next" style="color: #0f0f0f;font-size: 1.1rem;display: flex;-webkit-box-flex: 1;flex: 1 1 0%;min-width: 0">
+        <div style="font-size: 1.1rem;display: flex;-webkit-box-flex: 1;flex: 1 1 0%;-webkit-box-orient: vertical;-webkit-box-direction: normal;flex-direction: column;-webkit-box-align: center;align-items: center;-webkit-box-pack: center;justify-content: center;overflow: hidden;color: #0f0f0f">
+            <div style="font-size: 1.1rem;-webkit-box-direction: normal;flex-shrink: 0;width: 24px;height: 24px;fill: currentColor;stroke: none;color: #0f0f0f;display: block">
+                <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24"
+                     viewBox="0 0 24 24" width="24">
+                    <path d="M5.859 4.125l2.156-2.109 9.984 9.984-9.984 9.984-2.156-2.109 7.922-7.875z"></path>
+                </svg>
+            </div>
+            <div style="font-size: 1.1rem;-webkit-box-direction: normal;max-width: 100%;padding: 0 4px;box-sizing: border-box;display: block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;color: #0f0f0f">
+                下一页
+            </div>
+        </div>
+    </div>
+
+</div>
+<custom-toast id="toast"></custom-toast>
+<script>
+    async function loadData(path) {
+        const res = await fetch(`/api/file?path=${path}`)
+        let s = await res.text();
+        s = s.replace(/WEBVTT\s+/, "").replaceAll(/\s*\d{2}:\d{2}:\d{2}\.\d{3} --> \d{2}:\d{2}:\d{2}\.\d{3}[\s]+/g, ' ');
+        //strings = strings.replaceAll(/\./g, ".<br><br>");
+        let strings = [];
+        const buf = s.split('.');
+        let line = "";
+        for (let i = 0; i < buf.length; i++) {
+            if (line.length + buf[i].length > 2000) {
+                strings.push(line);
+                line = "";
+            }
+            line += buf[i] + ".";
+        }
+        if (line.length > 0)
+            strings.push(line);
+        document.querySelector('div').innerHTML = strings.join("<br><br>");
+    }
+
+    function substringBeforeLast(string, delimiter, missingDelimiterValue) {
+        const index = string.lastIndexOf(delimiter);
+        if (index === -1) {
+            return missingDelimiterValue || string;
+        } else {
+            return string.substring(0, index);
+        }
+    }
+
+    function substringAfterLast(string, delimiter, missingDelimiterValue) {
+        const index = string.lastIndexOf(delimiter);
+        if (index === -1) {
+            return missingDelimiterValue || string;
+        } else {
+            return string.substring(index + delimiter.length);
+        }
+    }
+
+    async function loadFiles(path) {
+        const res = await fetch(`/api/files?path=${path}`);
+        let files = await res.json();
+        files = files.filter(x => x.filename.endsWith(".srt"));
+        return files;
+    }
+
+    function findIndex(files, filename) {
+        for (let i = 0; i < files.length; i++) {
+            if (files[i].filename === filename) return i;
+        }
+        return -1;
+    }
+
+    const path = new URL(window.location).searchParams.get('path');
+
+    let files, index;
+
+
+    async function initialize() {
+        files = await loadFiles(substringBeforeLast(decodeURIComponent(path), "\\"));
+        index = findIndex(files, filename);
+        document.getElementById('previous')
+            .addEventListener('click', ev => {
+                if (index - 1 > -1) index--;
+                document.getElementById('toast').setAttribute('message', substringAfterLast(files[index].path, "\\"));
+                loadData(files[index].path);
+            })
+        document.getElementById('next')
+            .addEventListener('click', ev => {
+                if (index + 1 < files.length) index++;
+                document.getElementById('toast').setAttribute('message', substringAfterLast(files[index].path, "\\"));
+                loadData(files[index].path);
+            })
+    }
+
+    initialize();
+    const filename = substringAfterLast(path, "\\");
+
+    loadData(path);
+
+</script>
+</body>
+
+</html>

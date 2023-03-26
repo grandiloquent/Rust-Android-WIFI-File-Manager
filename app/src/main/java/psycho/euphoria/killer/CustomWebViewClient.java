@@ -11,6 +11,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
@@ -33,6 +35,7 @@ public class CustomWebViewClient extends WebViewClient {
     );
     private String mJavaScript;
     private final MainActivity mContext;
+    String mJsCode;
 
     public CustomWebViewClient(MainActivity context) {
 //        mClientInterface = clientInterface;
@@ -42,15 +45,17 @@ public class CustomWebViewClient extends WebViewClient {
 //            e.printStackTrace();
 //        }
         mContext = context;
+        mJsCode=Shared.readAssetAsString(context,"adblock.js");
     }
 
 
     @Override
     public void onPageFinished(WebView view, String url) {
-      //  String cookie;
+        //  String cookie;
 //        if (url.startsWith("https://www.xvideos.com/") && (cookie = CookieManager.getInstance().getCookie(url)) != null) {
 //            mContext.setString(MainActivity.KEY_XVIDEOS_COOKIE, cookie);
 //        }
+        view.evaluateJavascript(mJsCode, null);
     }
 
 
