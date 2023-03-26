@@ -10,6 +10,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
@@ -28,7 +31,6 @@ public class MainActivity extends Activity {
     }
 
     SharedPreferences mSharedPreferences;
-    // 初始化Web组件
     WebView mWebView;
 
     private void initialize() {
@@ -48,6 +50,11 @@ public class MainActivity extends Activity {
         mWebView.setWebViewClient(new CustomWebViewClient(this));
         mWebView.setWebChromeClient(new CustomWebChromeClient(this));
         setContentView(mWebView);
+    }
+
+    private void refresh() {
+        mWebView.clearCache(true);
+        mWebView.reload();
     }
 
     @Override
@@ -82,5 +89,33 @@ public class MainActivity extends Activity {
             return;
         }
         super.onBackPressed();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(0, 1, 0, "刷新");
+        menu.add(0, 2, 0, "打开");
+        menu.add(0, 3, 0, "打开");
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case 1:
+                refresh();
+                break;
+            case 2:
+                open();
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void open() {
+        CharSequence url = Shared.getText(this);
+        if (url != null)
+            mWebView.loadUrl(url.toString());
     }
 }
