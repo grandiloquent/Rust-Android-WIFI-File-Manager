@@ -49,7 +49,7 @@ public class CustomWebViewClient extends WebViewClient {
 //            e.printStackTrace();
 //        }
         mContext = context;
-        mJsCode=Shared.readAssetAsString(context,"adblock.js");
+        mJsCode = Shared.readAssetAsString(context, "adblock.js");
     }
 
 
@@ -69,8 +69,9 @@ public class CustomWebViewClient extends WebViewClient {
         if (Arrays.stream(mBlocks).anyMatch(url::contains)) {
             return mEmptyResponse;
         }
-        Log.e("B5aOx2", String.format("shouldInterceptRequest, %s",
-                url));
+        if (url.endsWith(".m3u8")) {
+            Shared.setText(mContext, url);
+        }
         return super.shouldInterceptRequest(view, url);
     }
 

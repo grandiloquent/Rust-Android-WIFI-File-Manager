@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Killer</string>
+    <string name="downloading_video">Downloading  %1$d videos</string>
+    <string name="download_video_channel">Download video channel</string>
 </resources>

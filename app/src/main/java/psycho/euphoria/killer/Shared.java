@@ -3,8 +3,10 @@ package psycho.euphoria.killer;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.app.DownloadManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -16,6 +18,7 @@ import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.storage.StorageManager;
@@ -23,7 +26,10 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.CookieManager;
+import android.webkit.MimeTypeMap;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -59,6 +65,7 @@ import java.util.zip.GZIPInputStream;
 
 import psycho.euphoria.killer.PublicFileProvider;
 
+import static android.content.Context.DOWNLOAD_SERVICE;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -174,6 +181,30 @@ public class Shared {
             }
         }
         return null;
+    }
+
+    public static void downloadFile(Context context, String fileName, String url, String userAgent) {
+        try {
+            DownloadManager downloadManager = (DownloadManager) context.getSystemService(DOWNLOAD_SERVICE);
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+            String cookie = CookieManager.getInstance().getCookie(url);
+            request.allowScanningByMediaScanner();
+            request.setTitle(fileName)
+                    .setDescription("正在下载")
+                    .addRequestHeader("cookie", cookie)
+                    .addRequestHeader("User-Agent", userAgent)
+                    .setMimeType(getFileType(context, url))
+                    .setAllowedOverMetered(true)
+                    .setAllowedOverRoaming(true)
+                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE | DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                    .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
+            downloadManager.enqueue(request);
+            Toast.makeText(context, "开始下载", Toast.LENGTH_SHORT).show();
+        } catch (Exception exception) {
+            Toast.makeText(context, "下载错误", Toast.LENGTH_SHORT).show();
+
+
+        }
     }
 
     public static CommandResult execCmd(final String[] commands, final boolean isRoot, final boolean isNeedResultMsg) {
@@ -301,6 +332,12 @@ public class Shared {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static String getFileType(Context context, String url) {
+        ContentResolver contentResolver = context.getContentResolver();
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(Uri.parse(url)));
     }
 
     public static int getNavigationBarHeight(Context context, int orientation) {
@@ -669,6 +706,26 @@ public class Shared {
         int index = string.lastIndexOf(delimiter);
         if (index != -1) return string.substring(0, index);
         return string;
+    }
+
+    public static String toHex(byte[] data) {
+        if (null == data) {
+            return null;
+        }
+        if (data.length <= 0) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < data.length; i++) {
+            String hv = Integer.toHexString(data[i]);
+            if (hv.length() < 2) {
+                sb.append("0");
+            } else if (hv.length() == 8) {
+                hv = hv.substring(6);
+            }
+            sb.append(hv);
+        }
+        return sb.toString().toLowerCase(Locale.getDefault());
     }
 
     private static Bitmap.Config getConfig(Bitmap bitmap) {
