@@ -1,5 +1,7 @@
 # Rust Android Example
 
+使用 Rust 的 warp 框架编写一个在 Android 上运行的 Web 服务器。 
+
 1. 添加工具链
 
     rustup target add aarch64-linux-android

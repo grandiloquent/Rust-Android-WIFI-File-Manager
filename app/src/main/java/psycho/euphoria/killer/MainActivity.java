@@ -62,7 +62,7 @@ public class MainActivity extends Activity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                startServer(MainActivity.this.getAssets(), Shared.getDeviceIP(MainActivity.this) + ":8000");
+                startServer(MainActivity.this.getAssets(), Shared.getDeviceIP(MainActivity.this) + ":3000");
             }
         }).start();
     }

@@ -17,7 +17,11 @@ use ndk::asset::{Asset, AssetManager};
 use tokio::sync::RwLock;
 use std::{ffi::CString, io::Error, ptr::NonNull};
 use std::borrow::Borrow;
-use std::cell::Cell;
+use std::ffi::CStr;
+use std::io::Read;
+use std::ptr::null;
+use serde::__private::de::Content::String;
+use tokio::io::AsyncWriteExt;
 
 fn get_asset_manager(env: JNIEnv, asset_manager_object: JObject) -> AssetManager {
     let aasset_manager_pointer = unsafe {
@@ -46,13 +50,13 @@ async fn return_error(r: Rejection) -> Result<impl Reply, Rejection> {
 }
 
 #[derive(Clone)]
-struct Store  {
-    cache: Arc<RwLock<HashMap<String, String>>>,
-    ass: Arc<AssetManager> ,
+struct Store {
+    cache: Arc<RwLock<HashMap<std::string::String, std::string::String>>>,
+    ass: Arc<AssetManager>,
 }
 
 #[tokio::main]
-async unsafe fn run_server (host: &str, ass:AssetManager) {
+async unsafe fn run_server(host: &str, ass: AssetManager) {
     let cors = warp::cors()
         .allow_any_origin()
         .allow_header("content-type")
@@ -60,7 +64,7 @@ async unsafe fn run_server (host: &str, ass:AssetManager) {
 
     let store: Store = Store {
         cache: Arc::new(RwLock::new(HashMap::new())),
-        ass:  Arc::new(ass),
+        ass: Arc::new(ass),
     };
     let store_filter = warp::any().map(move || store.clone());
 
@@ -75,9 +79,33 @@ async unsafe fn run_server (host: &str, ass:AssetManager) {
     warp::serve(routes).run(server).await;
 }
 
+fn read_resource_file(store: Store, n: &str) -> std::string::String {
+    match store.ass.open(&CString::new("index.html").unwrap()) {
+        Some(mut a) => {
+            let mut text = std::string::String::new();
+            a.read_to_string(&mut text).expect("TODO: panic message");
+            return text;
+        }
+        None => {
+            return std::string::String::new();
+        }
+    }
+}
 
-async fn get_home(params: HashMap<String, String>, store: Store) -> Result<impl warp::Reply, warp::Rejection> {
-    return Ok(warp::reply::with_status("Question updated", StatusCode::OK));
+async fn get_home(params: HashMap<std::string::String, std::string::String>, store: Store) -> Result<impl warp::Reply, warp::Rejection> {
+    let mut founded = true;
+    let s = match store.cache.write().await.get("index.html") {
+        Some(v) => v.to_string(),
+        None => {
+            let s = read_resource_file(store.clone(), "index.html");
+            founded = false;
+            s
+        }
+    };
+    if !founded {
+        store.cache.write().await.insert("index.html".to_string(), s.clone());
+    }
+    return Ok(warp::reply::html(s));
 }
 
 #[no_mangle]
@@ -87,7 +115,7 @@ pub extern "C" fn Java_psycho_euphoria_killer_MainActivity_startServer(
     _class: jni::objects::JClass,
     asset_manager: JObject, host: JString,
 ) {
-    let _host: String =
+    let _host: std::string::String =
         env.get_string(host).expect("Couldn't get java string!").into();
 
     #[cfg(target_os = "android")]
