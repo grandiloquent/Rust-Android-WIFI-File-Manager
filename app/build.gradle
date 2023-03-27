@@ -16,11 +16,6 @@ android {
         
     }
 
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['libs']
-        }
-    }
     buildTypes {
         release {
             minifyEnabled false
@@ -44,7 +39,6 @@ cargoNdk {
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
     def sdkDir = properties.getProperty('sdk.dir')
     def ndkDir = properties.getProperty('ndk.dir')
-
 
     targets = ["arm64"]
     librariesNames = ["librust.so"]

@@ -3,7 +3,6 @@ use std::{ffi::CString, io::Error, ptr::NonNull};
 use jni::{objects::JObject, JNIEnv};
 use ndk::asset::{Asset, AssetManager};
 
-pub(crate) const FILTERS_VOCAB_GEN_BIN: &str = "filters_vocab_gen.bin";
 
 fn load_asset_buffer(asset_name: &str, asset_manager: &AssetManager) -> anyhow::Result<Asset> {
     let asset_cstring = CString::new(asset_name)?;
@@ -29,11 +28,12 @@ fn get_asset_manager(env: JNIEnv, asset_manager_object: JObject) -> AssetManager
     asset_manager
 }
 
-pub(crate) fn obtain_filters_vocab_binary_data(
+pub(crate) fn obtain_data(
     env: JNIEnv,
+    asset_name: &str,
     asset_manager: JObject,
 ) -> anyhow::Result<Asset> {
     let asset_manager = get_asset_manager(env, asset_manager);
-    let asset = load_asset_buffer(FILTERS_VOCAB_GEN_BIN, &asset_manager)?;
+    let asset = load_asset_buffer(asset_name, &asset_manager)?;
     Ok(asset)
 }

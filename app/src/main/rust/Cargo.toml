@@ -10,9 +10,12 @@ crate-type = ["cdylib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# https://github.com/jni-rs/jni-rs
 jni = { version = "0.20.0"}
 ndk = { version= "0.7.0", features = ["api-level-30", "audio"]}
 ndk-sys = "0.4.1"
+# https://github.com/dtolnay/anyhow
+anyhow= "1.0.66"
 #logging
 log = "*"
 log-panics="*"
@@ -20,7 +23,7 @@ android_logger = "*"
 serde = "1.0.158"
 # see https://github.com/tokio-rs/tokio
 tokio = { version = "1.26.0", features = ["full"] }
-# see https://github.com/seanmonstar/warp
+# see v
 warp = "0.3.3"
 # https://docs.rs/crate/reqwest/latest
 reqwest = { version = "0.11.15", default-features = false, features = ["blocking", "json", "rustls-tls"] }

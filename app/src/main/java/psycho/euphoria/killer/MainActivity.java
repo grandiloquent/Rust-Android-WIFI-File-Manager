@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
@@ -36,17 +37,18 @@ public class MainActivity extends Activity {
         System.loadLibrary("rust");
     }
 
+    public static native void startServer(AssetManager assetManager, String host);
+
     SharedPreferences mSharedPreferences;
     WebView mWebView;
 
     private void downloadM3u8Video() {
         CharSequence url = Shared.getText(this);
         if (url == null) return;
-
         Shared.openTextContentDialog(this, "Download", new Listener() {
             @Override
             public void onSuccess(String value) {
-                launchDownloadService(value.trim(),url.toString());
+                launchDownloadService(value.trim(), url.toString());
             }
         });
     }
@@ -55,8 +57,14 @@ public class MainActivity extends Activity {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         requestStorageManagerPermission();
         initializeWebView();
-        Intent service = new Intent(this, DownloaderService.class);
-        startService(service);
+//        Intent service = new Intent(this, DownloaderService.class);
+//        startService(service);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                startServer(MainActivity.this.getAssets(), Shared.getDeviceIP(MainActivity.this) + ":8000");
+            }
+        }).start();
     }
 
     private void initializeWebView() {
