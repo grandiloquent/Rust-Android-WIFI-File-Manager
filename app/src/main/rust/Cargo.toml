@@ -24,6 +24,7 @@ warp = "0.3.3"
 # https://docs.rs/crate/reqwest/latest
 reqwest = { version = "0.11.15", default-features = false, features = ["blocking", "json", "rustls-tls"] }
 ndk = "0.7.0"
+ndk-sys = "0.4.1"
 
 [build-dependencies]
 flapigen = { git = "https://github.com/Dushistov/flapigen-rs", rev = "d79a34f22e73d90fe9f2423148a7421d39b8ed69" }

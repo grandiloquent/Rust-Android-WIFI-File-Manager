@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.application'
 }
-
+apply plugin: "com.github.willir.rust.cargo-ndk-android"
 android {
     namespace 'psycho.euphoria.killer'
     compileSdk 32
@@ -31,47 +31,32 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    ndkVersion '23.1.7779620'
 }
 
 dependencies {}
 
-// add the following
-def rustBasePath = "../rust_lib"
-def archTriplets = [
-        'arm64-v8a': 'aarch64-linux-android',
-]
 
-archTriplets.each { arch, target ->
-    project.ext.cargo_target_directory = rustBasePath + "/target"
-    // Build with cargo
-    tasks.create(name: "cargo-build-${arch}", type: Exec, description: "Building core for ${arch}") {
-        workingDir rustBasePath
-        commandLine 'cargo', 'build', "--target=${target}", '--release'
-    }
-    // Sync shared native dependencies
-    tasks.create(name: "sync-rust-deps-${arch}", type: Sync, dependsOn: "cargo-build-${arch}") {
-        from "${rustBasePath}/src/libs/${arch}"
-        include "*.so"
-        into "libs/${arch}"
-    }
-    // Copy build libs into this app's libs directory
-    tasks.create(name: "rust-deploy-${arch}", type: Copy, dependsOn: "sync-rust-deps-${arch}", description: "Copy rust libs for (${arch}) to jniLibs") {
-        from "${project.ext.cargo_target_directory}/${target}/release"
-        include "*.so"
-        into "libs/${arch}"
-    }
+cargoNdk {
 
-    // Hook up tasks to execute before building java
-    tasks.withType(JavaCompile) {
-        compileTask -> compileTask.dependsOn "rust-deploy-${arch}"
-    }
-    preBuild.dependsOn "rust-deploy-${arch}"
+    int apiLevel = 32
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    def sdkDir = properties.getProperty('sdk.dir')
+    def ndkDir = properties.getProperty('ndk.dir')
 
-    // Hook up clean tasks
-    tasks.create(name: "clean-${arch}", type: Delete, description: "Deleting built libs for ${arch}", dependsOn: "cargo-output-dir-${arch}") {
-        delete fileTree("${project.ext.cargo_target_directory}/${target}/release") {
-            include '*.so'
-        }
-    }
-    clean.dependsOn "clean-${arch}"
+
+    targets = ["arm64"]
+    librariesNames = ["librust.so"]
+    extraCargoEnv = [
+            "ANDROID_SDK_HOME"                        : "${sdkDir}/",
+            "ANDROID_NDK_HOME"                        : "${ndkDir}/",
+            "ANDROID_NDK_API_LEVEL"                   : apiLevel,
+            "ANDROID_SDK_VERSION"                     : apiLevel,
+            "ANDROID_API_LEVEL"                       : apiLevel,
+            "ANDROID_BUILD_TOOLS_VERSION"             : "31.0.0",
+            "ANDROID_HOME"                            : "${sdkDir}/build-tools/31.0.0"
+    ]
+
+
 }

@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import psycho.euphoria.killer.lib.RustLog;
+import psycho.euphoria.killer.Shared.Listener;
 import psycho.euphoria.killer.tasks.DownloaderService;
 
 public class MainActivity extends Activity {
@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36";
 
     static {
-        System.loadLibrary("rust_lib");
+        System.loadLibrary("rust");
     }
 
     SharedPreferences mSharedPreferences;
@@ -42,16 +42,21 @@ public class MainActivity extends Activity {
     private void downloadM3u8Video() {
         CharSequence url = Shared.getText(this);
         if (url == null) return;
-        Log.e("B5aOx2", String.format("downloadM3u8Video, %s", url));
-        //   Shared.substringAfterLast(url.toString(), ".")
-        // url.toString()
+
+        Shared.openTextContentDialog(this, "Download", new Listener() {
+            @Override
+            public void onSuccess(String value) {
+                launchDownloadService(value.trim(),url.toString());
+            }
+        });
     }
 
     private void initialize() {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         requestStorageManagerPermission();
         initializeWebView();
-        launchDownloadService("Go","https://b-g-eu-2.feetcdn.com:2223/v3-hls-playback/48086e4152aa6f8b7393415c8ec72658baf2492bfc3122653a8c87b7693dc8928049f585e54084b5ddfc7599fefbff39c87ac291591fd80b71f457f7eeff55b5591e9dde4a87eb70bcc47f3df29100a3a1399e1fe5f0d5d0ca6403aba93885f8f23692411d2c3ae52860523d4dbe52d68755f88d542032c6c7e27480bc3e7a6a1d9cdf5f42de8ce09d765f581055fd7040e9caff6de7ceb0d0d0a9d2d249cd7a/480/index.m3u8");
+        Intent service = new Intent(this, DownloaderService.class);
+        startService(service);
     }
 
     private void initializeWebView() {
@@ -66,13 +71,18 @@ public class MainActivity extends Activity {
         mWebView.setWebViewClient(new CustomWebViewClient(this));
         mWebView.setWebChromeClient(new CustomWebChromeClient(this));
         setContentView(mWebView);
-        mWebView.loadUrl("https://www1.attacker.tv/watch-movie/get-out-your-handkerchiefs-4700.2791794");
     }
 
     private void launchDownloadService(String title, String url) {
         Intent service = new Intent(this, DownloaderService.class);
         service.putExtra(DownloaderService.EXTRA_VIDEO_TITLE, title);
         service.putExtra(DownloaderService.EXTRA_VIDEO_ADDRESS, url);
+        startService(service);
+    }
+
+    private void mergeVideo() {
+        Intent service = new Intent(this, DownloaderService.class);
+        service.setAction("merge");
         startService(service);
     }
 
@@ -101,6 +111,12 @@ public class MainActivity extends Activity {
                 }
             }
         }
+    }
+
+    private void restartService() {
+        Intent service = new Intent(this, DownloaderService.class);
+        service.setAction("stop");
+        startService(service);
     }
 
     private void saveRenderedWebPage() {
@@ -148,6 +164,8 @@ public class MainActivity extends Activity {
         menu.add(0, 2, 0, "打开");
         menu.add(0, 3, 0, "保存页面");
         menu.add(0, 4, 0, "下载视频");
+        menu.add(0, 6, 0, "合并");
+        menu.add(0, 5, 0, "退出");
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -166,8 +184,16 @@ public class MainActivity extends Activity {
             case 4:
                 downloadM3u8Video();
                 break;
+            case 5:
+                restartService();
+                break;
+            case 6:
+                mergeVideo();
+                break;
 
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 }
