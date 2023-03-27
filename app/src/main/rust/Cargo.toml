@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "rust_lib"
+name = "rust"
 crate-type = ["cdylib"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -12,7 +12,7 @@ crate-type = ["cdylib"]
 [dependencies]
 jni = { version = "0.20.0"}
 ndk = { version= "0.7.0", features = ["api-level-30", "audio"]}
-ndk-sys = "0.4.1+23.1.7779620"
+ndk-sys = "0.4.1"
 #logging
 log = "*"
 log-panics="*"
