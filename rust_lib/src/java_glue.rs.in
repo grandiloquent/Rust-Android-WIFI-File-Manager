@@ -3,6 +3,6 @@ use crate::*;
 use jni_sys::*;
 foreign_class!(
 	class RustLog {
-		fn RustLog::initialise_logging(); alias initialiseLogging;
+		fn RustLog::start_server(host : & str); alias startServer;
 	}
 );
