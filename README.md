@@ -1,11 +1,13 @@
 # Rust Android Example
 
-添加 arm64 工具链
+1. 添加工具链
 
-```
-rustup target add aarch64-linux-android
-rustup default nightly-x86_64-pc-windows-gnu
-```
+    rustup target add aarch64-linux-android
+2. 安装 **cargo-ndk** 工具
+
+    cargo install cargo-ndk
+
+更多信息可参阅 https://github.com/willir/cargo-ndk-android-gradle
 
 ## Troubleshooting
 
@@ -19,6 +21,3 @@ TARGET_CC = "C:\\Users\\Administrator\\AppData\\Local\\Android\\Sdk\\ndk\\23.1.7
 TARGET_AR= "C:\\Users\\Administrator\\AppData\\Local\\Android\\Sdk\\ndk\\23.1.7779620\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\llvm-ar.exe"
 ```
 
-## 工具
-
-- https://github.com/willir/cargo-ndk-android-gradle
