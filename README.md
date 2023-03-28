@@ -9,8 +9,6 @@
 
     cargo install cargo-ndk
 
-    cargo install cargo-limit
-
 更多信息可参阅 https://github.com/willir/cargo-ndk-android-gradle
 
 ## Troubleshooting
