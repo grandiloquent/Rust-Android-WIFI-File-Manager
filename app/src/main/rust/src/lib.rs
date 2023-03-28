@@ -30,84 +30,11 @@ use tokio::io::AsyncWriteExt;
 use warp::path::FullPath;
 
 use urlencoding::decode;
+use crate::routes::assets::{assets, home};
+use crate::routes::utils::get_asset_manager;
 use crate::store::Store;
 use crate::types::fileItem::FileItem;
 
-fn get_asset_manager(env: JNIEnv, asset_manager_object: JObject) -> AssetManager {
-    let aasset_manager_pointer = unsafe {
-        ndk_sys::AAssetManager_fromJava(env.get_native_interface(), *asset_manager_object)
-    };
-    let asset_manager = unsafe {
-        ndk::asset::AssetManager::from_ptr(NonNull::<ndk_sys::AAssetManager>::new_unchecked(
-            aasset_manager_pointer,
-        ))
-    };
-    asset_manager
-}
-
-async fn return_error(r: Rejection) -> Result<impl Reply, Rejection> {
-    if let Some(error) = r.find::<CorsForbidden>() {
-        Ok(warp::reply::with_status(
-            error.to_string(),
-            StatusCode::FORBIDDEN,
-        ))
-    } else {
-        Ok(warp::reply::with_status(
-            "Route not found".to_string(),
-            StatusCode::NOT_FOUND,
-        ))
-    }
-}
-
-fn read_resource_file(store: Store, n: &str) -> std::string::String {
-    match store.ass.open(&CString::new(n).unwrap()) {
-        Some(mut a) => {
-            let mut text = std::string::String::new();
-            a.read_to_string(&mut text).expect("TODO: panic message");
-            return text;
-        }
-        None => {
-            return std::string::String::new();
-        }
-    }
-}
-
-async fn response_asset(name: &str, store: Store) -> Result<impl warp::Reply, warp::Rejection>
-{
-    let mut founded = true;
-    let s = match store.cache.write().await.get(name) {
-        Some(v) => v.to_string(),
-        None => {
-            let s = read_resource_file(store.clone(), name);
-            founded = false;
-            s
-        }
-    };
-    if !founded {
-        store.cache.write().await.insert(name.to_string(), s.clone());
-    }
-    // 根据文件名后缀设置 MIME TYPE
-    let mut content_type = "text/html";
-    if name.ends_with(".js") {
-        content_type = "text/javascript";
-    } else if name.ends_with(".css") {
-        content_type = "text/css";
-    }
-    return Ok(warp::http::response::Builder::new()
-        .header("content-type", content_type)
-        .body(s.to_string()));
-}
-
-async fn get_home(
-    store: Store) -> Result<impl warp::Reply, warp::Rejection> {
-    return response_asset("index.html", store).await;
-}
-
-async fn get_assets(
-    name: String,
-    store: Store) -> Result<impl warp::Reply, warp::Rejection> {
-    return response_asset(name.as_str(), store).await;
-}
 
 
 #[tokio::main]
@@ -128,13 +55,13 @@ async unsafe fn run_server(host: &str, ass: AssetManager) {
 
         //.and(warp::header::<String>("Referrer"))
         .and(store_filter.clone())
-        .and_then(get_home);
+        .and_then(home);
 
     let assets = warp::get()
         .and(warp::path("assets"))
         .and(warp::path::param())
         .and(store_filter.clone())
-        .and_then(get_assets);
+        .and_then(assets);
 
     let api_files = warp::get()
         .and(warp::path("api"))
