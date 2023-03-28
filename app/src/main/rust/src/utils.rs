@@ -1,20 +1,16 @@
 use std::collections::HashMap;
 use std::fs;
 use std::fs::File;
-use std::str::FromStr;
 use std::time::SystemTime;
 
-use ascii::AsciiString;
 use regex::Regex;
 use rusqlite::{Connection, Error};
 use serde::{Deserialize, Serialize};
-use serde::de::Unexpected::Str;
 use serde_json::Value;
-use tiny_http::{Header, HeaderField, Request, Response};
+use tiny_http::{Header, Request, Response};
 use urlencoding::decode;
 use crate::headers::{get_content_disposition, get_header};
 
-use crate::mimetypes::extension_to_mime;
 use crate::StringExt;
 
 pub

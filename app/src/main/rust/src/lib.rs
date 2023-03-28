@@ -2,20 +2,13 @@
 
 use std::collections::HashMap;
 use std::fs;
-use std::fs::File;
-use std::io::Read;
-use std::path::Path;
-use std::ptr::NonNull;
-use std::time::SystemTime;
 
-use ascii::AsciiChar::f;
 use jni::JNIEnv;
 use jni::objects::{JObject, JString};
 use ndk::asset::AssetManager;
 use regex::Regex;
 use rusqlite::{Connection, Error};
-use serde_json::Value;
-use tiny_http::{Header, HeaderField, Request, Response, Server, StatusCode};
+use tiny_http::{Header, HeaderField,  Response, Server};
 use urlencoding::decode;
 
 use crate::assets::{get_asset_manager, read_asset};
