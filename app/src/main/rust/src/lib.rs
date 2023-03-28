@@ -4,37 +4,21 @@ mod store;
 mod types;
 mod routes;
 
-use jni::{
-    objects::JObject,
-    JNIEnv,
-};
-
-use std::{net::SocketAddr, collections::HashMap, fs, io};
-// https://docs.rs/android_logger/0.13.1/android_logger/
-use android_logger::Config;
-use jni::objects::JString;
-use log::{LevelFilter, log};
-use warp::{
-    filters::cors::CorsForbidden, http::Method, http::StatusCode, reject::Reject, Filter,
-    Rejection, Reply,
-};
+use std::collections::HashMap;
+use std::net::SocketAddr;
 use std::sync::Arc;
-use ndk::asset::{Asset, AssetManager};
+use jni::JNIEnv;
+use jni::objects::{JObject, JString};
+use ndk::asset::AssetManager;
 use tokio::sync::RwLock;
-use std::{ffi::CString, io::Error, ptr::NonNull};
-use std::borrow::Borrow;
-use std::ffi::CStr;
-use std::io::Read;
-use std::ptr::null;
-use tokio::io::AsyncWriteExt;
-use warp::path::FullPath;
+use warp::Filter;
+use warp::http::Method;
 
-use urlencoding::decode;
 use crate::routes::assets::{assets, home};
+use crate::routes::errors::return_error;
 use crate::routes::utils::get_asset_manager;
 use crate::store::Store;
 use crate::types::fileItem::FileItem;
-
 
 
 #[tokio::main]
@@ -91,8 +75,8 @@ pub extern "C" fn Java_psycho_euphoria_killer_MainActivity_startServer(
 
     #[cfg(target_os = "android")]
     android_logger::init_once(
-        Config::default()
-            .with_max_level(LevelFilter::Trace)
+        android_logger::Config::default()
+            .with_max_level(log::LevelFilter::Trace)
             .with_tag("Rust"),
     );
     let ass = get_asset_manager(env, asset_manager);
