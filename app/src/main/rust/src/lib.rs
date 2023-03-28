@@ -9,11 +9,26 @@ use jni::JNIEnv;
 use jni::objects::{JObject, JString};
 use ndk::asset::AssetManager;
 use regex::Regex;
+use rusqlite::{Connection, Error};
 use tiny_http::{Server, Response, Header, Request, HeaderField};
 use urlencoding::decode;
 
 use crate::utils::{extension_to_mime, get_asset_manager, get_content_disposition, get_file_list, get_header, read_asset, read_resource_file, response_file, StringExt};
 
+fn get_notes(conn:&Connection,limit: &str) -> Result<Vec<HashMap<String, String>>, Error> {
+    let mut stmt = conn.prepare("select _id,title,update_at from notes ORDER by update_at DESC LIMIT ?1")?;
+    let mut rows = stmt.query([limit])?;
+    let mut notes: Vec<HashMap<String, String>> = Vec::new();
+    while let Some(row) = rows.next()? {
+        let mut note: HashMap<String, String> = HashMap::new();
+        note.insert("id".to_string(), row.get("0")?);
+        note.insert("title".to_string(), row.get("1")?);
+        note.insert("update_at".to_string(), row.get("2")?);
+
+        notes.push(note);
+    }
+    Ok(notes)
+}
 
 fn run_server(host: &str, ass: AssetManager) {
     let server = Server::http(host).unwrap();
@@ -21,7 +36,13 @@ fn run_server(host: &str, ass: AssetManager) {
     let headers: HashMap<String, Header> = HashMap::new();
     let re = Regex::new(r"^/[^/]+(?:js|css)").unwrap();
     let files_opened_directly = Regex::new(r".+(?:html|jpeg|png|jpg|xhtml|txt|gif)").unwrap();
-    let static_pages = Regex::new(r"^/(editor|video)$").unwrap();
+    let static_pages = Regex::new(r"^/(editor|video|markdown|notes)$").unwrap();
+    let conn = Connection::open("/storage/emulated/0/Books/notes.db")
+        .unwrap();
+    let _ = conn.execute(
+        "CREATE TABLE IF NOT EXISTS notes(_id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT,content TEXT,create_at INTEGER NOT NULL,update_at  INTEGER NOT NULL)",
+        (), // empty list of parameters.
+    );
     for request in server.incoming_requests() {
         let original_url = request.url().to_owned();
         let path = original_url.substring_before("?");
@@ -48,6 +69,11 @@ fn run_server(host: &str, ass: AssetManager) {
             let query = original_url.substring_after("path=").substring_before("&");
             let file_path = decode(query.as_str()).unwrap().to_string();
             response_file(file_path, request, files_opened_directly.clone(), headers.clone());
+        } else if path == "/api/note" {
+            let list = get_notes(&conn,"50").unwrap();
+            let data = serde_json::to_string(&list).unwrap();
+            let _ = request.respond(Response::from_string(data)
+                .with_header(get_header(".json", &headers)));
         } else if path.starts_with("/api/") {
             let referer = request
                 .headers()
