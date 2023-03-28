@@ -16,7 +16,7 @@ use serde_json::Value;
 use tiny_http::{Server, Response, Header, Request, HeaderField, StatusCode};
 use urlencoding::decode;
 
-use crate::utils::{extension_to_mime, get_asset_manager, get_content_disposition, get_file_list, get_header, get_notes, read_asset, read_resource_file, response_file, StringExt};
+use crate::utils::{extension_to_mime, get_asset_manager, get_content_disposition, get_file_list, get_header, get_notes, read_asset, read_resource_file, response_file, StringExt, update_note};
 
 
 fn run_server(host: &str, ass: AssetManager) {
@@ -62,6 +62,13 @@ fn run_server(host: &str, ass: AssetManager) {
             if request.method().to_string() == "GET" {
                 if original_url.contains("action=") {
                     let action = original_url.substring_after("action=").substring_before("&");
+                    if action == "1" {
+                        let id = original_url.substring_after("id=").substring_before("&");
+                        let list = get_note(&conn, &id).unwrap();
+                        let data = serde_json::to_string(&list).unwrap();
+                        let _ = request.respond(Response::from_string(data)
+                            .with_header(get_header(".json", &headers)));
+                    }
                 } else {
                     let list = get_notes(&conn, "50").unwrap();
                     let data = serde_json::to_string(&list).unwrap();
@@ -88,25 +95,19 @@ fn run_server(host: &str, ass: AssetManager) {
         }
     }
 }
-
-fn update_note(conn: &Connection, content: String) {
-    let json: Value = serde_json::from_str(content.as_str()).unwrap();
-    match json.get("id") {
-        Some(v) => {
-            let mut stmt = conn.prepare("UPDATE notes SET title=?1,content=?2,update_at=?3 where _id =?4").unwrap();
-        }
-        None => {
-            let mut stmt = conn.prepare("INSERT INTO notes (title,content,create_at,update_at) VALUES(?1,?2,?3,?4)").unwrap();
-            let duration_since_epoch = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap();
-            let timestamp_secs = duration_since_epoch.as_secs();
-            let _ = stmt.execute([
-                json.get("title").unwrap().as_str().unwrap(),
-                json.get("content").unwrap().as_str().unwrap(),
-                timestamp_secs.to_string().as_str(),
-                timestamp_secs.to_string().as_str()
-            ]);
-        }
+fn get_note(conn: &Connection, id: &str) -> Result<HashMap<String, String>, Error> {
+    let mut stmt = conn.prepare("select title,content,update_at from notes where _id=?1")?;
+    let mut rows = stmt.query([id])?;
+    let mut note: HashMap<String, String> = HashMap::new();
+    if let Some(row) = rows.next()? {
+        let title: String = row.get(0)?;
+        let content: String = row.get(1)?;
+        let update_at: u64 = row.get(2)?;
+        note.insert("title".to_string(), title);
+        note.insert("content".to_string(), content);
+        note.insert("update_at".to_string(), update_at.to_string());
     }
+    Ok(note)
 }
 
 #[no_mangle]

@@ -5,6 +5,7 @@ use std::fs::File;
 use std::io::Read;
 use std::ptr::NonNull;
 use std::str::FromStr;
+use std::time::SystemTime;
 use ascii::AsciiString;
 use jni::JNIEnv;
 use jni::objects::JObject;
@@ -15,6 +16,7 @@ use tiny_http::{Header, HeaderField, Request, Response};
 use urlencoding::decode;
 use serde::{Deserialize, Serialize};
 use serde::de::Unexpected::Str;
+use serde_json::Value;
 
 pub fn get_asset_manager(env: JNIEnv, asset_manager_object: JObject) -> AssetManager {
     let aasset_manager_pointer = unsafe {
@@ -695,7 +697,26 @@ pub fn get_notes(conn: &Connection, limit: &str) -> Result<Vec<HashMap<String, S
     }
     Ok(notes)
 }
-
+pub
+fn update_note(conn: &Connection, content: String) {
+    let json: Value = serde_json::from_str(content.as_str()).unwrap();
+    match json.get("id") {
+        Some(v) => {
+            let mut stmt = conn.prepare("UPDATE notes SET title=?1,content=?2,update_at=?3 where _id =?4").unwrap();
+        }
+        None => {
+            let mut stmt = conn.prepare("INSERT INTO notes (title,content,create_at,update_at) VALUES(?1,?2,?3,?4)").unwrap();
+            let duration_since_epoch = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap();
+            let timestamp_secs = duration_since_epoch.as_secs();
+            let _ = stmt.execute([
+                json.get("title").unwrap().as_str().unwrap(),
+                json.get("content").unwrap().as_str().unwrap(),
+                timestamp_secs.to_string().as_str(),
+                timestamp_secs.to_string().as_str()
+            ]);
+        }
+    }
+}
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct FileItem {
     pub path: String,
