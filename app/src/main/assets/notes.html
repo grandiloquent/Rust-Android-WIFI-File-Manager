@@ -181,7 +181,7 @@ left: 20px;">
             div.innerHTML = `<span>${note.title}</span><span>${timeago.format(parseInt(note.update_at) * 1000, 'zh_CN')}</span>`
             container.appendChild(div);
             div.addEventListener('click', evt => {
-                location.href = `/editor.html?id=${note.id}`;
+                location.href = `/editor?id=${note.id}`;
             })
         }
     }

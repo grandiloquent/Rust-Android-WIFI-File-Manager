@@ -6,31 +6,18 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
 use std::ptr::NonNull;
+use std::time::SystemTime;
 use jni::JNIEnv;
 use jni::objects::{JObject, JString};
 use ndk::asset::AssetManager;
 use regex::Regex;
 use rusqlite::{Connection, Error};
 use serde_json::Value;
-use tiny_http::{Server, Response, Header, Request, HeaderField};
+use tiny_http::{Server, Response, Header, Request, HeaderField, StatusCode};
 use urlencoding::decode;
 
-use crate::utils::{extension_to_mime, get_asset_manager, get_content_disposition, get_file_list, get_header, read_asset, read_resource_file, response_file, StringExt};
+use crate::utils::{extension_to_mime, get_asset_manager, get_content_disposition, get_file_list, get_header, get_notes, read_asset, read_resource_file, response_file, StringExt};
 
-fn get_notes(conn: &Connection, limit: &str) -> Result<Vec<HashMap<String, String>>, Error> {
-    let mut stmt = conn.prepare("select _id,title,update_at from notes ORDER by update_at DESC LIMIT ?1")?;
-    let mut rows = stmt.query([limit])?;
-    let mut notes: Vec<HashMap<String, String>> = Vec::new();
-    while let Some(row) = rows.next()? {
-        let mut note: HashMap<String, String> = HashMap::new();
-        note.insert("id".to_string(), row.get("0")?);
-        note.insert("title".to_string(), row.get("1")?);
-        note.insert("update_at".to_string(), row.get("2")?);
-
-        notes.push(note);
-    }
-    Ok(notes)
-}
 
 fn run_server(host: &str, ass: AssetManager) {
     let server = Server::http(host).unwrap();
@@ -84,8 +71,8 @@ fn run_server(host: &str, ass: AssetManager) {
             } else {
                 let mut content = String::new();
                 request.as_reader().read_to_string(&mut content).unwrap();
-                let json: Value  = serde_json::from_str(content.as_str()).unwrap();
-                log::error!("{}",content);
+                update_note(&conn, content);
+                let _ = request.respond(Response::from_string("Ok").with_status_code(200));
             }
         } else if path.starts_with("/api/") {
             let referer = request
@@ -98,6 +85,26 @@ fn run_server(host: &str, ass: AssetManager) {
             let file_path = decode(query.as_str()).unwrap().to_string().substring_before_last("/");
 
             response_file(file_path + path.substring_after_last("/api").as_str(), request, files_opened_directly.clone(), headers.clone());
+        }
+    }
+}
+
+fn update_note(conn: &Connection, content: String) {
+    let json: Value = serde_json::from_str(content.as_str()).unwrap();
+    match json.get("id") {
+        Some(v) => {
+            let mut stmt = conn.prepare("UPDATE notes SET title=?1,content=?2,update_at=?3 where _id =?4").unwrap();
+        }
+        None => {
+            let mut stmt = conn.prepare("INSERT INTO notes (title,content,create_at,update_at) VALUES(?1,?2,?3,?4)").unwrap();
+            let duration_since_epoch = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap();
+            let timestamp_secs = duration_since_epoch.as_secs();
+            let _ = stmt.execute([
+                json.get("title").unwrap().as_str().unwrap(),
+                json.get("content").unwrap().as_str().unwrap(),
+                timestamp_secs.to_string().as_str(),
+                timestamp_secs.to_string().as_str()
+            ]);
         }
     }
 }

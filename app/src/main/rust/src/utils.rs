@@ -10,9 +10,11 @@ use jni::JNIEnv;
 use jni::objects::JObject;
 use ndk::asset::AssetManager;
 use regex::Regex;
+use rusqlite::{Connection, Error};
 use tiny_http::{Header, HeaderField, Request, Response};
 use urlencoding::decode;
 use serde::{Deserialize, Serialize};
+use serde::de::Unexpected::Str;
 
 pub fn get_asset_manager(env: JNIEnv, asset_manager_object: JObject) -> AssetManager {
     let aasset_manager_pointer = unsafe {
@@ -659,6 +661,7 @@ pub fn get_content_disposition(filename: &str) -> Header {
         value: AsciiString::from_str(format!("attachment; filename=\"{}\"", filename).as_str()).unwrap(),
     }
 }
+
 pub
 fn response_file(file_path: String, req: Request, files_opened_directly: Regex, headers: HashMap<String, Header>) {
     match File::open(file_path.clone()) {
@@ -674,6 +677,25 @@ fn response_file(file_path: String, req: Request, files_opened_directly: Regex, 
         Err(_) => {}
     }
 }
+
+pub fn get_notes(conn: &Connection, limit: &str) -> Result<Vec<HashMap<String, String>>, Error> {
+    let mut stmt = conn.prepare("select _id,title,update_at from notes ORDER by update_at DESC LIMIT ?1")?;
+    let mut rows = stmt.query([limit])?;
+    let mut notes: Vec<HashMap<String, String>> = Vec::new();
+    while let Some(row) = rows.next()? {
+        let mut note: HashMap<String, String> = HashMap::new();
+        let id:u32  = row.get(0)?;
+        let title: String = row.get(1)?;
+        let update_at: u64 = row.get(2)?;
+        note.insert("id".to_string(), id.to_string());
+        note.insert("title".to_string(), title);
+        note.insert("update_at".to_string(), update_at.to_string());
+
+        notes.push(note);
+    }
+    Ok(notes)
+}
+
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct FileItem {
     pub path: String,
