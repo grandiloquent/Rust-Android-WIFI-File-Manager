@@ -37,10 +37,10 @@ public class MainActivity extends Activity {
         System.loadLibrary("rust");
     }
 
-    public static native void startServer(AssetManager assetManager, String host);
-
     SharedPreferences mSharedPreferences;
     WebView mWebView;
+
+    public static native void startServer(AssetManager assetManager, String host);
 
     private void downloadM3u8Video() {
         CharSequence url = Shared.getText(this);
@@ -96,6 +96,16 @@ public class MainActivity extends Activity {
         CharSequence url = Shared.getText(this);
         if (url != null)
             mWebView.loadUrl(url.toString());
+    }
+
+    private void openHomePage() {
+        mWebView.loadUrl("http://" + Shared.getDeviceIP(this) + ":3000");
+    }
+
+    private void playVideo() {
+        CharSequence url = Shared.getText(this);
+        if (url == null) return;
+        PlayerActivity.launchActivity(this, url.toString(), null);
     }
 
     private void refresh() {
@@ -154,6 +164,14 @@ public class MainActivity extends Activity {
         initialize();
     }
 
+    @Override
+    protected void onPause() {
+        if (mWebView != null) {
+            mSharedPreferences.edit().putString("address", mWebView.getUrl()).apply();
+        }
+        super.onPause();
+    }
+
     // 在用户单击返回按键时，先尝试返回上次打开的页面
     @Override
     public void onBackPressed() {
@@ -170,7 +188,7 @@ public class MainActivity extends Activity {
         menu.add(0, 2, 0, "打开");
         menu.add(0, 3, 0, "保存页面");
         menu.add(0, 4, 0, "播放视频");
-        menu.add(0, 6, 0, "合并");
+        menu.add(0, 6, 0, "首页");
         menu.add(0, 5, 0, "退出");
         return super.onCreateOptionsMenu(menu);
     }
@@ -194,24 +212,10 @@ public class MainActivity extends Activity {
                 restartService();
                 break;
             case 6:
-                //mergeVideo();
+                openHomePage();
                 break;
 
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void playVideo() {
-        CharSequence url = Shared.getText(this);
-        if (url == null) return;
-        PlayerActivity.launchActivity(this, url.toString(), null);
-    }
-
-    @Override
-    protected void onPause() {
-        if (mWebView != null) {
-            mSharedPreferences.edit().putString("address", mWebView.getUrl()).apply();
-        }
-        super.onPause();
     }
 }
