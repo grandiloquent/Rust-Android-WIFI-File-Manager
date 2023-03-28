@@ -9,7 +9,7 @@ use jni::JNIEnv;
 use jni::objects::{JObject, JString};
 use ndk::asset::AssetManager;
 use regex::Regex;
-use tiny_http::{Server, Response, Header, Request};
+use tiny_http::{Server, Response, Header, Request, HeaderField};
 use urlencoding::decode;
 
 use crate::utils::{extension_to_mime, get_asset_manager, get_content_disposition, get_file_list, get_header, read_asset, read_resource_file, response_file, StringExt};
@@ -19,7 +19,7 @@ fn run_server(host: &str, ass: AssetManager) {
     let server = Server::http(host).unwrap();
     let cache: HashMap<String, String> = HashMap::new();
     let headers: HashMap<String, Header> = HashMap::new();
-    let re = Regex::new(r"/[^/]+(?:js|css)").unwrap();
+    let re = Regex::new(r"^/[^/]+(?:js|css)").unwrap();
     let files_opened_directly = Regex::new(r".+(?:html|jpeg|png|jpg|xhtml|txt|gif)").unwrap();
     for request in server.incoming_requests() {
         let original_url = request.url().to_owned();
@@ -41,8 +41,19 @@ fn run_server(host: &str, ass: AssetManager) {
         } else if path == "/api/file" {
             let query = original_url.substring_after("path=").substring_before("&");
             let file_path = decode(query.as_str()).unwrap().to_string();
-            response_file(file_path,request,files_opened_directly.clone(),headers.clone());
-        } else if path.starts_with("/api/") {}
+            response_file(file_path, request, files_opened_directly.clone(), headers.clone());
+        } else if path.starts_with("/api/") {
+            let referer = request
+                .headers()
+                .iter()
+                .find(|header| header.field == HeaderField::from_bytes("Referer").unwrap())
+                .map(|header| header.value.as_str());
+
+            let query = referer.unwrap().to_string().substring_after("path=").substring_before("&");
+            let file_path = decode(query.as_str()).unwrap().to_string().substring_before_last("/");
+
+            response_file(file_path + path.substring_after_last("/api").as_str(), request, files_opened_directly.clone(), headers.clone());
+        }
     }
 }
 
