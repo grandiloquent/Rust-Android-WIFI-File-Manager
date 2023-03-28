@@ -75,11 +75,11 @@ async function render(path) {
     document.title = substringAfterLast(decodeURIComponent(path), "\\")
     const res = await loadData(path);
     this.wrapper.innerHTML = res.sort((x, y) => {
-        if (x.isDirectory !== y.isDirectory) if (x.isDirectory) return -1; else return 1;
+        if (x.is_directory !== y.is_directory) if (x.is_directory) return -1; else return 1;
         return x.path.localeCompare(y.path)
     })
         .map(x => {
-            return `<custom-item bind @submit="submit" ${x.isDirectory ? 'folder' : ''} title="${x.filename}" path="${encodeURIComponent(x.path)}" isDirectory="${x.isDirectory}"></custom-item>`
+            return `<custom-item bind @submit="submit" ${x.is_directory ? 'folder' : ''} title="${substringAfterLast(x.path,"/")}" path="${encodeURIComponent(x.path)}" isDirectory="${x.is_directory}"></custom-item>`
         }).join('');
     bind(this.wrapper);
 }
@@ -99,12 +99,12 @@ function submit(evt) {
             } else if (evt.detail.path.endsWith(".srt")) {
                 window.location = `/srt?path=${encodeURIComponent(evt.detail.path)}`
             }
-                // else if (evt.detail.path.endsWith(".md")) {
-                //     window.location = `/markdown?path=${encodeURIComponent(evt.detail.path)}`
+            // else if (evt.detail.path.endsWith(".md")) {
+            //     window.location = `/markdown?path=${encodeURIComponent(evt.detail.path)}`
             // }
-//            else if (decodeURIComponent(evt.detail.path).indexOf("\\Books\\") === -1 && /\.(?:md|js|c|cpp|h|cs|css|html|java|txt|srt|vtt|cc|sql)$/.test(evt.detail.path)) {
-//                window.location = `/editor.html?path=${encodedPath}`
-//            }
+            //            else if (decodeURIComponent(evt.detail.path).indexOf("\\Books\\") === -1 && /\.(?:md|js|c|cpp|h|cs|css|html|java|txt|srt|vtt|cc|sql)$/.test(evt.detail.path)) {
+            //                window.location = `/editor.html?path=${encodedPath}`
+            //            }
             else {
                 window.location = `/api/file?path=${encodedPath}`
             }
@@ -139,7 +139,7 @@ function onFavSubmit(evt) {
             path = "http://192.168.8.189:8080/?path=D%3A%5CResources%5CVideos"
             break;
     }
-    window.location =path;
+    window.location = path;
 }
 
 async function onPaste() {
