@@ -1,7 +1,5 @@
 #![allow(unused_qualifications)]
 
-mod utils;
-
 use std::collections::HashMap;
 use std::fs;
 use std::fs::File;
@@ -9,6 +7,7 @@ use std::io::Read;
 use std::path::Path;
 use std::ptr::NonNull;
 use std::time::SystemTime;
+
 use ascii::AsciiChar::f;
 use jni::JNIEnv;
 use jni::objects::{JObject, JString};
@@ -16,11 +15,23 @@ use ndk::asset::AssetManager;
 use regex::Regex;
 use rusqlite::{Connection, Error};
 use serde_json::Value;
-use tiny_http::{Server, Response, Header, Request, HeaderField, StatusCode};
+use tiny_http::{Header, HeaderField, Request, Response, Server, StatusCode};
 use urlencoding::decode;
 
-use crate::utils::{extension_to_mime, get_asset_manager, get_content_disposition, get_file_list, get_header, get_notes, read_asset, read_resource_file, response_file, StringExt, update_note};
+use crate::assets::{get_asset_manager, read_asset};
+use crate::headers::get_header;
+use crate::strings::StringExt;
+use crate::utils::{get_file_list, get_notes, response_file, update_note};
 
+mod utils;
+mod assets;
+mod mimetypes;
+mod strings;
+mod headers;
+
+fn get_query_parameters(original_url: &str, name: String) -> String {
+    original_url.to_string().substring_after((name + "=").as_str()).substring_before("&")
+}
 
 fn run_server(host: &str, ass: AssetManager) {
     let server = Server::http(host).unwrap();
