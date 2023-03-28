@@ -30,6 +30,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true">
         </activity>
+        <service android:name=".ServerService" />
     </application>
 
 

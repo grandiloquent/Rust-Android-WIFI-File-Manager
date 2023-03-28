@@ -61,14 +61,8 @@ public class MainActivity extends Activity {
         if (lastedAddress != null) {
             mWebView.loadUrl(lastedAddress);
         }
-//        Intent service = new Intent(this, DownloaderService.class);
-//        startService(service);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                startServer(MainActivity.this.getAssets(), Shared.getDeviceIP(MainActivity.this) + ":3000");
-            }
-        }).start();
+        Intent intent = new Intent(this, ServerService.class);
+        startService(intent);
     }
 
     private void initializeWebView() {
@@ -209,10 +203,8 @@ public class MainActivity extends Activity {
 
     private void playVideo() {
         CharSequence url = Shared.getText(this);
-        Log.e("B5aOx2", String.format("playVideo, %s", url));
         if (url == null) return;
-        String address = String.format("http://%s:3000/video?path=%s", Shared.getDeviceIP(this), Uri.encode(url.toString()));
-        mWebView.loadUrl(address);
+        PlayerActivity.launchActivity(this, url.toString(), null);
     }
 
     @Override
