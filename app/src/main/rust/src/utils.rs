@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::ffi::CString;
 use std::fs;
+use std::fs::File;
 use std::io::Read;
 use std::ptr::NonNull;
 use std::str::FromStr;
@@ -8,7 +9,8 @@ use ascii::AsciiString;
 use jni::JNIEnv;
 use jni::objects::JObject;
 use ndk::asset::AssetManager;
-use tiny_http::{Header, HeaderField};
+use regex::Regex;
+use tiny_http::{Header, HeaderField, Request, Response};
 use urlencoding::decode;
 use serde::{Deserialize, Serialize};
 
@@ -651,6 +653,27 @@ fn get_header(name: &str, headers: &HashMap<String, Header>) -> Header {
     }
 }
 
+pub fn get_content_disposition(filename: &str) -> Header {
+    Header {
+        field: HeaderField::from_str("Content-Disposition").unwrap(),
+        value: AsciiString::from_str(format!("attachment; filename=\"{}\"", filename).as_str()).unwrap(),
+    }
+}
+pub
+fn response_file(file_path: String, req: Request, files_opened_directly: Regex, headers: HashMap<String, Header>) {
+    match File::open(file_path.clone()) {
+        Ok(f) => {
+            let header = get_header(file_path.as_str(), &headers);
+            let mut response = Response::from_file(f)
+                .with_header(header);
+            if !files_opened_directly.is_match(file_path.as_str()) {
+                response = response.with_header(get_content_disposition(file_path.substring_after_last("/").as_str()));
+            }
+            let _ = req.respond(response);
+        }
+        Err(_) => {}
+    }
+}
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct FileItem {
     pub path: String,
