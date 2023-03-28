@@ -618,7 +618,7 @@ pub fn read_asset(name: &str, cache: HashMap<String, String>, ass: &AssetManager
     let data: String = match cache.get(name) {
         Some(v) => v.clone(),
         None => {
-            let s = read_resource_file(&ass, "index.html");
+            let s = read_resource_file(&ass, name);
             cache.clone().insert(name.to_string(), s.clone());
             s
         }
@@ -634,7 +634,6 @@ fn get_header(name: &str, headers: &HashMap<String, Header>) -> Header {
         }
         None => { "." }
     };
-    log::error!("{}",ext);
     match headers.get(ext) {
         Some(header) => header.clone(),
         None => {
