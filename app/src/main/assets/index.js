@@ -30,12 +30,11 @@ function onCustomBottomSheetSubmit(evt) {
         fetch(`/api/file?action=10&path=${detail.path}`);
     }
 }
-
-async function onDialogDeleteSubmit() {
-    await fetch(`/api/file?path=${encodeURIComponent(detail.path)}&action=3`);
-    location.reload();
+async function onDialogDeleteSubmit(evt) {
+    await fetch(`/api/file?path=${evt.detail.value}&action=3`);
+    evt.detail.element.remove();
+    dialogDelete.innerHTML = '';
 }
-
 async function onDialogSubmit() {
     const dst = input.value.trim();
     if (!dst) return;
@@ -109,7 +108,14 @@ function submit(evt) {
                 window.location = `/api/file?path=${encodedPath}`
             }
         }
-    } else {
+    } else if (evt.detail.id === '2') {
+        dialogDelete.style.display = 'block';
+        const div = document.createElement('div');
+        div.textContent = decodeURIComponent(evt.detail.path);
+        dialogDelete.value = evt.detail.path;
+        dialogDelete.element = evt.target;
+        dialogDelete.appendChild(div);
+    }  else {
         detail = evt.detail;
         customBottomSheet.style.display = "block";
     }

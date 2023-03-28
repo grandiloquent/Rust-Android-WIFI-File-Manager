@@ -3,10 +3,13 @@
 mod utils;
 
 use std::collections::HashMap;
+use std::fs;
 use std::fs::File;
 use std::io::Read;
+use std::path::Path;
 use std::ptr::NonNull;
 use std::time::SystemTime;
+use ascii::AsciiChar::f;
 use jni::JNIEnv;
 use jni::objects::{JObject, JString};
 use ndk::asset::AssetManager;
@@ -55,9 +58,22 @@ fn run_server(host: &str, ass: AssetManager) {
             let _ = request.respond(Response::from_string(data)
                 .with_header(get_header(".json", &headers)));
         } else if path == "/api/file" {
-            let query = original_url.substring_after("path=").substring_before("&");
-            let file_path = decode(query.as_str()).unwrap().to_string();
-            response_file(file_path, request, files_opened_directly.clone(), headers.clone());
+            if original_url.contains("action=") {
+                let action = original_url.substring_after("action=").substring_before("&");
+                if action == "3" {
+                    let query = original_url.substring_after("path=").substring_before("&");
+                    let file_path = decode(query.as_str()).unwrap().to_string();
+                    if std::path::Path::new(file_path.as_str()).is_dir() {
+                        let _ = fs::remove_dir_all(file_path);
+                    } else {
+                        fs::remove_file(file_path);
+                    }
+                }
+            } else {
+                let query = original_url.substring_after("path=").substring_before("&");
+                let file_path = decode(query.as_str()).unwrap().to_string();
+                response_file(file_path, request, files_opened_directly.clone(), headers.clone());
+            }
         } else if path == "/api/note" {
             if request.method().to_string() == "GET" {
                 if original_url.contains("action=") {
@@ -95,6 +111,7 @@ fn run_server(host: &str, ass: AssetManager) {
         }
     }
 }
+
 fn get_note(conn: &Connection, id: &str) -> Result<HashMap<String, String>, Error> {
     let mut stmt = conn.prepare("select title,content,update_at from notes where _id=?1")?;
     let mut rows = stmt.query([id])?;
