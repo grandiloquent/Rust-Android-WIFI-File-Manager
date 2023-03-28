@@ -1,3 +1,5 @@
+#![allow(unused_qualifications)]
+
 use jni::{
     objects::JObject,
     JNIEnv,
@@ -20,8 +22,8 @@ use std::borrow::Borrow;
 use std::ffi::CStr;
 use std::io::Read;
 use std::ptr::null;
-use serde::__private::de::Content::String;
 use tokio::io::AsyncWriteExt;
+use warp::path::FullPath;
 
 fn get_asset_manager(env: JNIEnv, asset_manager_object: JObject) -> AssetManager {
     let aasset_manager_pointer = unsafe {
@@ -70,17 +72,29 @@ async unsafe fn run_server(host: &str, ass: AssetManager) {
 
     let home = warp::get()
         .and(warp::path::end())
-        .and(warp::query())
+        //.and(warp::query())
+        //.and(warp::header::<String>("Referrer"))
         .and(store_filter.clone())
         .and_then(get_home);
 
-    let routes = home.with(cors).recover(return_error);
+    let assets = warp::get()
+        .and(warp::path("assets"))
+        .and(warp::path::param())
+        //.and(warp::query())
+        //.and(warp::header::<String>("Referrer"))
+        .and(store_filter.clone())
+        .and_then(get_assets);
+
+    let routes = home
+        .or(assets)
+        .with(cors)
+        .recover(return_error);
     let server: SocketAddr = host.parse().expect("Unable to parse socket address");
     warp::serve(routes).run(server).await;
 }
 
 fn read_resource_file(store: Store, n: &str) -> std::string::String {
-    match store.ass.open(&CString::new("index.html").unwrap()) {
+    match store.ass.open(&CString::new(n).unwrap()) {
         Some(mut a) => {
             let mut text = std::string::String::new();
             a.read_to_string(&mut text).expect("TODO: panic message");
@@ -92,20 +106,42 @@ fn read_resource_file(store: Store, n: &str) -> std::string::String {
     }
 }
 
-async fn get_home(params: HashMap<std::string::String, std::string::String>, store: Store) -> Result<impl warp::Reply, warp::Rejection> {
+async fn response_asset(name: &str, store: Store) -> Result<impl warp::Reply, warp::Rejection>
+{
     let mut founded = true;
-    let s = match store.cache.write().await.get("index.html") {
+    let s = match store.cache.write().await.get(name) {
         Some(v) => v.to_string(),
         None => {
-            let s = read_resource_file(store.clone(), "index.html");
+            log::error!("{}", name);
+            let s = read_resource_file(store.clone(), name);
             founded = false;
             s
         }
     };
     if !founded {
-        store.cache.write().await.insert("index.html".to_string(), s.clone());
+        store.cache.write().await.insert(name.to_string(), s.clone());
     }
-    return Ok(warp::reply::html(s));
+    let mut content_type = "text/html";
+
+    if name.ends_with(".js") {
+        content_type = "text/javascript";
+    } else if name.ends_with(".css") {
+        content_type = "text/css";
+    }
+    return Ok(warp::http::response::Builder::new()
+        .header("content-type", content_type)
+        .body(s.to_string()));
+}
+
+async fn get_home(
+    store: Store) -> Result<impl warp::Reply, warp::Rejection> {
+    return response_asset("index.html", store).await;
+}
+
+async fn get_assets(
+    name: String,
+    store: Store) -> Result<impl warp::Reply, warp::Rejection> {
+    return response_asset(name.as_str(), store).await;
 }
 
 #[no_mangle]
