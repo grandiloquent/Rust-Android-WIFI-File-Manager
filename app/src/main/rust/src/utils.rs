@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::ffi::CString;
+use std::fs;
 use std::io::Read;
 use std::ptr::NonNull;
 use std::str::FromStr;
@@ -8,6 +9,8 @@ use jni::JNIEnv;
 use jni::objects::JObject;
 use ndk::asset::AssetManager;
 use tiny_http::{Header, HeaderField};
+use urlencoding::decode;
+use serde::{Deserialize, Serialize};
 
 pub fn get_asset_manager(env: JNIEnv, asset_manager_object: JObject) -> AssetManager {
     let aasset_manager_pointer = unsafe {
@@ -645,5 +648,103 @@ fn get_header(name: &str, headers: &HashMap<String, Header>) -> Header {
             headers.clone().insert(ext.to_string(), h.clone());
             h
         }
+    }
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct FileItem {
+    pub path: String,
+    pub is_directory: bool,
+}
+
+pub fn get_file_list(query: String, default_path: &str) -> Vec<FileItem> {
+    let mut path = query;
+    if path.is_empty() {
+        path = default_path.to_string();
+    } else {
+        path = decode(path.as_str()).unwrap().to_string();
+    }
+    log::error!("{}", path);
+    match fs::read_dir(path) {
+        Ok(v) => {
+            v.map(|res| res.map(|e| {
+                FileItem {
+                    path: e.path().display().to_string(),
+                    is_directory: e.file_type().unwrap().is_dir(),
+                }
+            }))
+                .collect::<Result<Vec<_>, std::io::Error>>().unwrap()
+        }
+        Err(_) => Vec::new()
+    }
+}
+
+pub trait StringExt {
+    /// Returns the string before the search string.
+    fn substring_before(&self, search: &str) -> String;
+    /// Returns the string after the search string.
+    fn substring_after(&self, search: &str) -> String;
+
+    /// Returns the string before the last match of the search string.
+    fn substring_before_last(&self, search: &str) -> String;
+
+    /// Returns the string after the last match of the search string.
+    fn substring_after_last(&self, search: &str) -> String;
+
+    /// Returns the string between the start and end bookend strings.
+    fn substring_between(&self, start: &str, end: &str) -> String;
+}
+
+impl StringExt for String {
+    fn substring_before(&self, search: &str) -> String {
+        let i_pos = self.find(search);
+        let answer = match i_pos {
+            None => String::from(self),
+            Some(val) => self[..val].to_string()
+        };
+        answer
+    }
+
+    fn substring_before_last(&self, search: &str) -> String {
+        let i_pos = self.rfind(search);
+        let answer = match i_pos {
+            None => String::from(self),
+            Some(val) => self[..val].to_string()
+        };
+        answer
+    }
+
+    fn substring_after(&self, search: &str) -> String {
+        let i_pos = self.find(search);
+        let answer = match i_pos {
+            None => String::new(),
+            Some(val) => self[(val + search.len())..].to_string()
+        };
+        answer
+    }
+
+    fn substring_after_last(&self, search: &str) -> String {
+        let i_pos = self.rfind(search);
+        let answer = match i_pos {
+            None => String::new(),
+            Some(val) => self[(val + search.len())..].to_string()
+        };
+        answer
+    }
+
+    fn substring_between(&self, start: &str, end: &str) -> String {
+        let i_start_pos = self.find(start);
+        let answer = match i_start_pos {
+            None => String::new(),
+            Some(val) => {
+                let rest = self[(val + start.len())..].to_string();
+                let i_end_pos = rest.find(end);
+                match i_end_pos {
+                    None => String::new(),
+                    Some(val2) => rest[0..val2].to_string()
+                }
+            }
+        };
+        answer
     }
 }

@@ -3,7 +3,7 @@ async function loadData(path) {
     //window.history.pushState(null, null, `?path=${encodeURIComponent(path)}`);
 
 
-    const res = await fetch(`/api/files?path=${encodeURIComponent(path)}`);
+    const res = await fetch(`/api/files?path=${path}`);
     return res.json();
 }
 
@@ -85,7 +85,7 @@ async function render(path) {
 }
 
 function submit(evt) {
-    const encodedPath = encodeURIComponent(evt.detail.path);
+    const encodedPath = evt.detail.path;
     if (evt.detail.id === '0') {
         if (evt.detail.isDirectory === "true") {
 

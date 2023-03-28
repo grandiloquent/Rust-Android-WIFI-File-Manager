@@ -8,10 +8,9 @@ use jni::JNIEnv;
 use jni::objects::{JObject, JString};
 use ndk::asset::AssetManager;
 use regex::Regex;
-use serde::{Deserialize, Serialize};
 use tiny_http::{Server, Response, Header, Request};
-use crate::utils::{extension_to_mime, get_asset_manager, get_header, read_asset, read_resource_file};
 
+use crate::utils::{extension_to_mime, get_asset_manager, get_file_list, get_header, read_asset, read_resource_file, StringExt};
 
 fn run_server(host: &str, ass: AssetManager) {
     let server = Server::http(host).unwrap();
@@ -19,15 +18,22 @@ fn run_server(host: &str, ass: AssetManager) {
     let headers: HashMap<String, Header> = HashMap::new();
     let re = Regex::new(r"/[^/]+(?:js|css)").unwrap();
     for request in server.incoming_requests() {
-        let url = request.url().to_owned();
-        if url == "/" {
+        let original_url = request.url().to_owned();
+        let path = original_url.substring_before("?");
+        if path == "/" {
             let data = read_asset("index.html", cache.clone(), &ass);
             let _ = request.respond(Response::from_string(data)
                 .with_header(get_header("index.html", &headers)));
-        } else if re.is_match(url.as_str()) {
-            let data = read_asset(&url[1..], cache.clone(), &ass);
+        } else if re.is_match(path.as_str()) {
+            let data = read_asset(&path[1..], cache.clone(), &ass);
             let _ = request.respond(Response::from_string(data)
-                .with_header(get_header(&url[1..], &headers)));
+                .with_header(get_header(&path[1..], &headers)));
+        } else if path == "/api/files" {
+            let query = original_url.substring_after("path=").substring_before("&");
+            let list = get_file_list(query, "/storage/emulated/0");
+            let data = serde_json::to_string(&list).unwrap();
+            let _ = request.respond(Response::from_string(data)
+                .with_header(get_header(".json", &headers)));
         }
     }
 }
