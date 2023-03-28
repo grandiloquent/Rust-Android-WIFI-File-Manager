@@ -34,12 +34,17 @@ public class MainActivity extends Activity {
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36";
 
     static {
+/*
+加载编译Rust代码后得到共享库。它完整的名称为librust.so
+  */
         System.loadLibrary("rust");
     }
 
     SharedPreferences mSharedPreferences;
     WebView mWebView;
-
+/*
+启动使用 Rust 编写的服务器。host由主机名和端口组成。例如192.168.8.55:3000。其中主机名是设备在局域网中的IP，使用它可以在局域网的设备之间共享数据。例如连接到一个Wi-Fi的电脑和手机
+  */
     public static native void startServer(AssetManager assetManager, String host);
 
     private void downloadM3u8Video() {

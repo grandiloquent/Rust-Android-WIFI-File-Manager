@@ -65,6 +65,11 @@ class CustomItem extends HTMLElement {
   </svg>
 </div>
 <div bind="_title" @click="click" data-id="0" class="title" data-path="${this.getAttribute('path')}" data-is-directory="${this.getAttribute('isDirectory')}">${this.getAttribute('title')}</div>
+<div bind @click="click" data-id="2" data-path="${this.getAttribute('path')}" data-is-directory="${this.getAttribute('isDirectory')}" class="more">
+  <svg viewBox="0 0 24 24">
+  <path d="M18.984 6.422l-5.578 5.578 5.578 5.578-1.406 1.406-5.578-5.578-5.578 5.578-1.406-1.406 5.578-5.578-5.578-5.578 1.406-1.406 5.578 5.578 5.578-5.578z"></path>
+ </svg>
+</div>
 <div bind @click="click" data-id="1" data-path="${this.getAttribute('path')}" data-is-directory="${this.getAttribute('isDirectory')}" class="more">
   <svg viewBox="0 0 24 24">
     <path d="M12 15.984q0.797 0 1.406 0.609t0.609 1.406-0.609 1.406-1.406 0.609-1.406-0.609-0.609-1.406 0.609-1.406 1.406-0.609zM12 9.984q0.797 0 1.406 0.609t0.609 1.406-0.609 1.406-1.406 0.609-1.406-0.609-0.609-1.406 0.609-1.406 1.406-0.609zM12 8.016q-0.797 0-1.406-0.609t-0.609-1.406 0.609-1.406 1.406-0.609 1.406 0.609 0.609 1.406-0.609 1.406-1.406 0.609z"></path>

@@ -1,14 +1,14 @@
 class CustomDialog extends HTMLElement {
 
-    constructor() {
-        super();
-        this.attachShadow({
-            mode: 'open'
-        });
-        const wrapper = document.createElement("div");
-        wrapper.setAttribute("class", "wrapper");
-        const style = document.createElement('style');
-        style.textContent = `.btn {
+  constructor() {
+    super();
+    this.attachShadow({
+      mode: 'open'
+    });
+    const wrapper = document.createElement("div");
+    wrapper.setAttribute("class", "wrapper");
+    const style = document.createElement('style');
+    style.textContent = `.btn {
   font-weight: 500;
   box-sizing: border-box;
   display: flex;
@@ -108,21 +108,31 @@ h2 {
   padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)
 }
 `;
-        this.wrapper = wrapper;
-        this.shadowRoot.append(style, wrapper);
-    }
+    this.wrapper = wrapper;
+    this.shadowRoot.append(style, wrapper);
+  }
+  set value(value) {
+    this._value = value;
+  }
+  set element(element) {
+    this._element = element;
+  }
+  submit(e) {
+    this.style.display = 'none';
+    this.dispatchEvent(new CustomEvent('submit', {
+      detail: {
+        value: this._value,
+        element: this._element
+      }
+    }));
+  }
 
-    submit(e) {
-        this.style.display = 'none';
-        this.dispatchEvent(new CustomEvent('submit'));
-    }
+  close() {
+    this.style.display = 'none';
+  }
 
-    close() {
-        this.style.display = 'none';
-    }
-
-    connectedCallback() {
-        this.wrapper.innerHTML = `<div class="dialog-container">
+  connectedCallback() {
+    this.wrapper.innerHTML = `<div class="dialog-container">
   <div class="dialog">
     <div class="dialog-header">
       <h2 bind="header">${this.getAttribute("title") || '询问'}</h2>
@@ -142,28 +152,28 @@ h2 {
   <div bind @click="close" class="modern-overlay">
   </div>
 </div>`;
-        this.wrapper.querySelectorAll('[bind]').forEach(element => {
-            if (element.getAttribute('bind')) {
-                this[element.getAttribute('bind')] = element;
-            }
-            [...element.attributes].filter(attr => attr.nodeName.startsWith('@')).forEach(attr => {
-                if (!attr.value) return;
-                element.addEventListener(attr.nodeName.slice(1), evt => {
-                    this[attr.value](evt);
-                });
-            });
-        })
-    }
+    this.wrapper.querySelectorAll('[bind]').forEach(element => {
+      if (element.getAttribute('bind')) {
+        this[element.getAttribute('bind')] = element;
+      }
+      [...element.attributes].filter(attr => attr.nodeName.startsWith('@')).forEach(attr => {
+        if (!attr.value) return;
+        element.addEventListener(attr.nodeName.slice(1), evt => {
+          this[attr.value](evt);
+        });
+      });
+    })
+  }
 
-    static get observedAttributes() {
-        return ['title'];
-    }
+  static get observedAttributes() {
+    return ['title'];
+  }
 
-    attributeChangedCallback(attrName, oldVal, newVal) {
-        if (attrName === 'title') {
-            this.header.textContent = newVal;
-        }
+  attributeChangedCallback(attrName, oldVal, newVal) {
+    if (attrName === 'title') {
+      this.header.textContent = newVal;
     }
+  }
 }
 
 customElements.define('custom-dialog', CustomDialog);
