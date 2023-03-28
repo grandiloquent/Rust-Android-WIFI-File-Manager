@@ -57,6 +57,10 @@ public class MainActivity extends Activity {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         requestStorageManagerPermission();
         initializeWebView();
+        String lastedAddress = mSharedPreferences.getString("address", null);
+        if (lastedAddress != null) {
+            mWebView.loadUrl(lastedAddress);
+        }
 //        Intent service = new Intent(this, DownloaderService.class);
 //        startService(service);
         new Thread(new Runnable() {
@@ -171,7 +175,7 @@ public class MainActivity extends Activity {
         menu.add(0, 1, 0, "刷新");
         menu.add(0, 2, 0, "打开");
         menu.add(0, 3, 0, "保存页面");
-        menu.add(0, 4, 0, "下载视频");
+        menu.add(0, 4, 0, "播放视频");
         menu.add(0, 6, 0, "合并");
         menu.add(0, 5, 0, "退出");
         return super.onCreateOptionsMenu(menu);
@@ -190,18 +194,32 @@ public class MainActivity extends Activity {
                 saveRenderedWebPage();
                 break;
             case 4:
-                downloadM3u8Video();
+                playVideo();
                 break;
             case 5:
                 restartService();
                 break;
             case 6:
-                mergeVideo();
+                //mergeVideo();
                 break;
 
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void playVideo() {
+        CharSequence url = Shared.getText(this);
+        Log.e("B5aOx2", String.format("playVideo, %s", url));
+        if (url == null) return;
+        String address = String.format("http://%s:3000/video?path=%s", Shared.getDeviceIP(this), Uri.encode(url.toString()));
+        mWebView.loadUrl(address);
+    }
 
+    @Override
+    protected void onPause() {
+        if (mWebView != null) {
+            mSharedPreferences.edit().putString("address", mWebView.getUrl()).apply();
+        }
+        super.onPause();
+    }
 }

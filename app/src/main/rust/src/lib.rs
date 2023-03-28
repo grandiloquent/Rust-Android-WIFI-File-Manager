@@ -21,6 +21,7 @@ fn run_server(host: &str, ass: AssetManager) {
     let headers: HashMap<String, Header> = HashMap::new();
     let re = Regex::new(r"^/[^/]+(?:js|css)").unwrap();
     let files_opened_directly = Regex::new(r".+(?:html|jpeg|png|jpg|xhtml|txt|gif)").unwrap();
+    let static_pages = Regex::new(r"^/(editor|video)$").unwrap();
     for request in server.incoming_requests() {
         let original_url = request.url().to_owned();
         let path = original_url.substring_before("?");
@@ -28,6 +29,11 @@ fn run_server(host: &str, ass: AssetManager) {
             let data = read_asset("index.html", cache.clone(), &ass);
             let _ = request.respond(Response::from_string(data)
                 .with_header(get_header("index.html", &headers)));
+        } else if static_pages.is_match(path.as_str()) {
+            let filename = (*(&path[1..])).to_string() + ".html";
+            let data = read_asset(filename.as_str(), cache.clone(), &ass);
+            let _ = request.respond(Response::from_string(data)
+                .with_header(get_header(filename.as_str(), &headers)));
         } else if re.is_match(path.as_str()) {
             let data = read_asset(&path[1..], cache.clone(), &ass);
             let _ = request.respond(Response::from_string(data)

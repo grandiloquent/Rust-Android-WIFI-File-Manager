@@ -25,6 +25,11 @@
             </intent-filter>
         </activity>
         <service android:name=".tasks.DownloaderService" />
+        <activity
+            android:name=".PlayerActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="true">
+        </activity>
     </application>
 
 

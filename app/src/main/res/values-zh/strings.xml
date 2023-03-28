@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">秘密花园</string>
+    <string name="download_video_channel">下载视频频道</string>
+    <string name="downloading_video">正在 %1$d 下载视频</string>
+    <string name="select_folder">选择文件夹</string>
+    <string name="create_a_directory">创建目录</string>
+    <string name="share">分享</string>
+    <string name="search">搜索</string>
+    <string name="video">视频</string>
+    <string name="set_up">设置</string>
+    <string name="help">帮助</string>
+    <string name="send_video">发送视频</string>
+    <string name="shop">店铺</string>
+    <string name="sort">排序</string>
+    <string name="video_type">视频类型</string>
+</resources>

@@ -30,7 +30,8 @@ public class CustomWebViewClient extends WebViewClient {
             "/ads/",
             "://i.imgur.com/",
             "://onclickgenius.com/",
-            "://inpagepush.com/"
+            "://inpagepush.com/",
+            ".doppiocdn.com/"
     };
     private final WebResourceResponse mEmptyResponse = new WebResourceResponse(
             "text/plain",
