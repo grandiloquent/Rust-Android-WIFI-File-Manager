@@ -32,3 +32,6 @@ default-features = false
 # regex currently requires the standard library, you must re-enable it.
 features = ["std"]
 
+[dependencies.rusqlite]
+version = "0.29.0"
+features = ["bundled"]
