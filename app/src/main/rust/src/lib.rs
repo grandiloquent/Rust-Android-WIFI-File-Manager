@@ -108,6 +108,8 @@ fn run_server(host: &str, ass: AssetManager) {
             let file_path = decode(query.as_str()).unwrap().to_string().substring_before_last("/");
 
             response_file(file_path + path.substring_after_last("/api").as_str(), request, files_opened_directly.clone(), headers.clone());
+        } else {
+            let _ = request.respond(Response::from_string("Ok").with_status_code(200));
         }
     }
 }
