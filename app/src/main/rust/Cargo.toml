@@ -22,15 +22,7 @@ log-panics="*"
 android_logger = "*"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-# see https://github.com/tokio-rs/tokio
-tokio = { version = "1.26.0", features = ["full"] }
-tokio-util = { version = "0.7.0", features = ["full"] }
-tokio-stream = { version = "0.1"}
-futures = { version = "0.3.0", features = ["thread-pool"]}
-# https://docs.rs/crate/reqwest/latest
-reqwest = { version = "0.11.15", default-features = false, features = ["blocking", "json", "rustls-tls"] }
 urlencoding = "2.1.2"
 tiny_http = "0.12.0"
-http = "0.2.9"
-httparse = "1.8.0"
-bytes = "1.4.0"
+ascii = "1.0"
+
