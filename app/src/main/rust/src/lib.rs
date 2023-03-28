@@ -1,5 +1,9 @@
 #![allow(unused_qualifications)]
 
+mod store;
+mod types;
+mod routes;
+
 use jni::{
     objects::JObject,
     JNIEnv,
@@ -24,8 +28,10 @@ use std::io::Read;
 use std::ptr::null;
 use tokio::io::AsyncWriteExt;
 use warp::path::FullPath;
-use serde::{Deserialize, Serialize};
+
 use urlencoding::decode;
+use crate::store::Store;
+use crate::types::fileItem::FileItem;
 
 fn get_asset_manager(env: JNIEnv, asset_manager_object: JObject) -> AssetManager {
     let aasset_manager_pointer = unsafe {
@@ -103,36 +109,6 @@ async fn get_assets(
     return response_asset(name.as_str(), store).await;
 }
 
-#[derive(Deserialize, Serialize, Debug, Clone)]
-struct FileItem {
-    path: String,
-    is_directory: bool,
-}
-
-async fn get_api_files(
-    params: HashMap<String, String>) -> Result<impl warp::Reply, warp::Rejection> {
-    let mut path = params.get("path").unwrap_or(&"/storage/emulated/0".to_string()).to_string();
-    if path.is_empty() {
-        path = "/storage/emulated/0".to_string();
-    } else {
-        path = decode(path.as_str()).unwrap().to_string();
-    }
-    let entries = fs::read_dir(path).unwrap()
-        .map(|res| res.map(|e| {
-            FileItem {
-                path: e.path().display().to_string(),
-                is_directory: e.file_type().unwrap().is_dir(),
-            }
-        }))
-        .collect::<Result<Vec<_>, std::io::Error>>().unwrap();
-    return Ok(warp::reply::json(&entries));
-}
-
-#[derive(Clone)]
-struct Store {
-    cache: Arc<RwLock<HashMap<std::string::String, std::string::String>>>,
-    ass: Arc<AssetManager>,
-}
 
 #[tokio::main]
 async unsafe fn run_server(host: &str, ass: AssetManager) {
@@ -164,7 +140,7 @@ async unsafe fn run_server(host: &str, ass: AssetManager) {
         .and(warp::path("api"))
         .and(warp::path("files"))
         .and(warp::query())
-        .and_then(get_api_files);
+        .and_then(routes::files::files);
 
     let routes = home
         .or(assets)
