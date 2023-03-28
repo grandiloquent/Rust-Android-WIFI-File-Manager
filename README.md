@@ -15,7 +15,7 @@
 
 ### failed to run custom build command for `ring v0.16.20`
 
-修改 `rust_lib\.cargo\config.toml` 添加环境参数
+修改 `.cargo\config.toml` 添加环境参数
 
 ```toml
 [env]
