@@ -1,24 +1,18 @@
 package psycho.euphoria.killer.video;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.SurfaceTexture;
-import android.graphics.Typeface;
 import android.media.MediaPlayer;
-import android.media.PlaybackParams;
 import android.media.TimedMetaData;
 import android.opengl.GLES20;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.Surface;
@@ -28,22 +22,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewConfiguration;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Formatter;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,6 +50,7 @@ import static psycho.euphoria.killer.Shared.hideSystemUI;
 public class PlayerActivity extends Activity implements OnTouchListener {
 
     public static final int DEFAULT_HIDE_TIME_DELAY = 5000;
+    public static final String KEY_SHUFFLE = "shuffle";
     public static final String KEY_VIDEO_FILE = "VideoFile";
     public static final String KEY_VIDEO_TITLE = "VideoTitle";
     private static final int TOUCH_IGNORE = -1;
@@ -81,7 +68,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
     private SimpleTimeBar mTimeBar;
     private TextView mPosition;
     private LinearLayout mCenterControls;
-    private final Runnable mHideAction = this::hiddenControls;
     private ImageButton mPlayPause;
     private int mScaledTouchSlop;
     private int mDelta = 0;
@@ -89,8 +75,7 @@ public class PlayerActivity extends Activity implements OnTouchListener {
     private float mLastFocusX;
     private int mLastSystemUiVis;
     private PlayerSizeInformation mPlayerSizeInformation;
-
-
+    private final Runnable mHideAction = this::hiddenControls;
 
     public static void launchActivity(Context context, String videoFile, String title) {
         Intent intent = new Intent(context, PlayerActivity.class);
@@ -128,7 +113,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         }
         return 0;
     }
-
 
     private void bindingFullScreenEvent() {
         findViewById(R.id.action_fullscreen)
@@ -172,7 +156,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         egl.eglTerminate(display);
     }
 
-
     private void fullScreen() {
         int orientation = calculateScreenOrientation(this);
         if (orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
@@ -206,7 +189,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         zoomIn();
     }
 
-
     private void initializePlayer() {
         mMediaPlayer = new MediaPlayer();
         try {
@@ -224,7 +206,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
             e.printStackTrace();
         }
     }
-
 
     private void onBufferingUpdate(MediaPlayer mediaPlayer, int i) {
         mTimeBar.setBufferedPosition(i);
@@ -246,7 +227,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
     private boolean onInfo(MediaPlayer mediaPlayer, int i, int i1) {
         return true;
     }
-
 
     private void onPlayPause(View view) {
         if (mMediaPlayer.isPlaying()) {
@@ -271,8 +251,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
 
     }
 
-
-
     private void onSeekComplete(MediaPlayer mediaPlayer) {
     }
 
@@ -288,7 +266,7 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         mMediaPlayer.prepareAsync();
     }
 
-    private void scheduleHideControls() {
+    public void scheduleHideControls() {
         mHandler.removeCallbacks(mHideAction);
         mHandler.postDelayed(mHideAction, DEFAULT_HIDE_TIME_DELAY);
     }
@@ -322,7 +300,7 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         updateProgress();
     }
 
-    private void updateProgress() {
+    public void updateProgress() {
         if (mMediaPlayer == null || mBottomBar.getVisibility() != View.VISIBLE) {
             return;
         }
@@ -403,10 +381,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
 
     }
 
-    public static final String KEY_SHUFFLE = "shuffle";
-
-    private float mSpeed = .5f;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -462,33 +436,12 @@ public class PlayerActivity extends Activity implements OnTouchListener {
             public void onSurfaceTextureUpdated(SurfaceTexture surface) {
             }
         });
-        mTimeBar = findViewById(R.id.timebar);
-        mTimeBar.addListener(new OnScrubListener() {
-            @Override
-            public void onScrubMove(TimeBar timeBar, long position) {
-                mPosition.setText(getStringForTime(mStringBuilder, mFormatter, position));
-            }
-
-            @Override
-            public void onScrubStart(TimeBar timeBar, long position) {
-                mHandler.removeCallbacks(mHideAction);
-                mPosition.setText(getStringForTime(mStringBuilder, mFormatter, position));
-            }
-
-            @Override
-            public void onScrubStop(TimeBar timeBar, long position, boolean canceled) {
-                mMediaPlayer.seekTo((int) position);
-                updateProgress();
-                scheduleHideControls();
-            }
-
-        });
-
+        mTimeBar=findViewById(R.id.timebar);
+        new SeekManager(this);
         mPlayPause = findViewById(R.id.play_pause);
         mPlayPause.setOnClickListener(this::onPlayPause);
         mScaledTouchSlop = ViewConfiguration.get(this).getScaledTouchSlop();
         //mTextureView.setOnTouchListener(this);
-
         if (getIntent().getStringExtra(KEY_VIDEO_TITLE) != null)
             this.setTitle(getIntent().getStringExtra(KEY_VIDEO_TITLE));
         findViewById(R.id.action_speed).setOnClickListener(new OnClickListener() {
@@ -515,7 +468,21 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         });
     }
 
+    public void stopHideAction() {
+        mHandler.removeCallbacks(mHideAction);
+    }
 
+    public void updateCurrentTime(long position) {
+        mPosition.setText(getStringForTime(mStringBuilder, mFormatter, position));
+    }
+
+    public SimpleTimeBar getTimeBar() {
+        return mTimeBar;
+    }
+
+    public MediaPlayer getMediaPlayer() {
+        return mMediaPlayer;
+    }
     @Override
     protected void onStart() {
         super.onStart();
