@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import psycho.euphoria.killer.video.AndroidUtilities;
-import psycho.euphoria.killer.video.DispatchQueue;
 
 
 public class DispatchQueuePool {

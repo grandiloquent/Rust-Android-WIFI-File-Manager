@@ -16,12 +16,10 @@ import java.io.OutputStreamWriter;
 import java.util.Locale;
 
 import psycho.euphoria.killer.video.AndroidUtilities;
-import psycho.euphoria.killer.video.DispatchQueue;
-import psycho.euphoria.killer.video.FastDateFormat;
 
 public class FileLog {
     private OutputStreamWriter streamWriter = null;
-    private psycho.euphoria.killer.video.FastDateFormat dateFormat = null;
+    private FastDateFormat dateFormat = null;
     private DispatchQueue logQueue = null;
     private File currentFile = null;
     private File networkFile = null;

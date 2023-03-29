@@ -32,7 +32,6 @@ import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import psycho.euphoria.killer.video.DatePrinter;
 
 /**
  * <p>FastDatePrinter is a fast and thread-safe version of

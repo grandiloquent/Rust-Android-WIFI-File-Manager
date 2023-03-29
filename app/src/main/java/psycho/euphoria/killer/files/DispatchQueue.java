@@ -15,7 +15,6 @@ import android.os.SystemClock;
 
 import java.util.concurrent.CountDownLatch;
 
-import psycho.euphoria.killer.video.FileLog;
 
 public class DispatchQueue extends Thread {
 
@@ -43,7 +42,6 @@ public class DispatchQueue extends Thread {
                 handler.sendMessageDelayed(msg, delay);
             }
         } catch (Exception ignore) {
-
         }
     }
 
@@ -52,7 +50,7 @@ public class DispatchQueue extends Thread {
             syncLatch.await();
             handler.removeCallbacks(runnable);
         } catch (Exception e) {
-            psycho.euphoria.killer.video.FileLog.e(e);
+            FileLog.e(e);
         }
     }
 
@@ -63,7 +61,7 @@ public class DispatchQueue extends Thread {
                 handler.removeCallbacks(runnables[i]);
             }
         } catch (Exception e) {
-            psycho.euphoria.killer.video.FileLog.e(e);
+            FileLog.e(e);
         }
     }
 
@@ -76,7 +74,7 @@ public class DispatchQueue extends Thread {
         try {
             syncLatch.await();
         } catch (Exception e) {
-            psycho.euphoria.killer.video.FileLog.e(e);
+            FileLog.e(e);
         }
         if (delay <= 0) {
             return handler.post(runnable);
@@ -95,7 +93,6 @@ public class DispatchQueue extends Thread {
     }
 
     public void handleMessage(Message inputMessage) {
-
     }
 
     public long getLastTaskTime() {

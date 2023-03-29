@@ -37,7 +37,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import psycho.euphoria.killer.video.DateParser;
 
 /**
  * <p>FastDateParser is a fast and thread-safe version of
