@@ -1,4 +1,4 @@
-package psycho.euphoria.killer;
+package psycho.euphoria.killer.video;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -53,7 +53,9 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 
-import psycho.euphoria.killer.TimeBar.OnScrubListener;
+import psycho.euphoria.killer.R;
+import psycho.euphoria.killer.Shared;
+import psycho.euphoria.killer.video.TimeBar.OnScrubListener;
 
 import static psycho.euphoria.killer.Shared.getStringForTime;
 import static psycho.euphoria.killer.Shared.hideSystemUI;
@@ -63,7 +65,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
 
     public static final int DEFAULT_HIDE_TIME_DELAY = 5000;
     public static final String KEY_VIDEO_FILE = "VideoFile";
-
     public static final String KEY_VIDEO_TITLE = "VideoTitle";
     private static final int TOUCH_IGNORE = -1;
     private static final int TOUCH_NONE = 0;
@@ -81,8 +82,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
     private TextView mPosition;
     private LinearLayout mCenterControls;
     private final Runnable mHideAction = this::hiddenControls;
-    private List<String> mPlayList;
-    private int mPlayIndex;
     private ImageButton mPlayPause;
     private int mScaledTouchSlop;
     private int mDelta = 0;
@@ -90,15 +89,8 @@ public class PlayerActivity extends Activity implements OnTouchListener {
     private float mLastFocusX;
     private int mLastSystemUiVis;
     private PlayerSizeInformation mPlayerSizeInformation;
-    private boolean mShuffle;
 
 
-    public static void launchActivity(Context context, File videoFile, int sort) {
-        Intent intent = new Intent(context, PlayerActivity.class);
-        intent.putExtra(KEY_VIDEO_FILE, videoFile.getAbsolutePath());
-        intent.putExtra("sort", sort);
-        context.startActivity(intent);
-    }
 
     public static void launchActivity(Context context, String videoFile, String title) {
         Intent intent = new Intent(context, PlayerActivity.class);
@@ -137,39 +129,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         return 0;
     }
 
-    static File[] listVideoFiles(String dir) {
-        File directory = new File(dir);
-        Pattern pattern = Pattern.compile("\\.(?:mp4|vm|crdownload)$");
-        File[] files = directory.listFiles(file ->
-                file.isFile() && pattern.matcher(file.getName()).find());
-        if (files == null || files.length == 0) return null;
-        Arrays.sort(files, (o1, o2) -> {
-            final long result = o2.lastModified() - o1.lastModified();
-            if (result < 0) {
-                return -1;
-            } else if (result > 0) {
-                return 1;
-            } else {
-                return 0;
-            }
-        });
-        return files;
-    }
-
-    private void bindingDeleteVideoEvent() {
-        findViewById(R.id.action_file_download)
-                .setOnClickListener(v -> new AlertDialog.Builder(PlayerActivity.this)
-                        .setTitle("询问")
-                        .setMessage("确定要删除 \"" + Shared.substringAfterLast(mPlayList.get(mPlayIndex), "/") + "\" 视频吗？")
-                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                            deleteVideo();
-                            dialog.dismiss();
-                        })
-                        .setNegativeButton(android.R.string.cancel, (dialog, which) -> {
-                            dialog.dismiss();
-                        })
-                        .show());
-    }
 
     private void bindingFullScreenEvent() {
         findViewById(R.id.action_fullscreen)
@@ -213,31 +172,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         egl.eglTerminate(display);
     }
 
-    private void deleteVideo() {
-        mMediaPlayer.reset();
-        File videoFile = new File(mPlayList.get(mPlayIndex));
-//        File dir = new File(
-//                videoFile.getParentFile(),
-//                "videos"
-//        );
-//        if (!dir.isDirectory()) {
-//            dir.mkdir();
-//        }
-//        videoFile.renameTo(new File(dir, videoFile.getName()));
-        if(videoFile.exists()){
-            videoFile.delete();
-        }
-        loadPlaylist(videoFile.getParentFile().getAbsolutePath());
-        if (mPlayList.size() > 0) {
-            if (mPlayList.size() - 1 < mPlayIndex) mPlayIndex = 0;
-            try {
-                play();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
 
     private void fullScreen() {
         int orientation = calculateScreenOrientation(this);
@@ -291,44 +225,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         }
     }
 
-    private void loadPlaylist(String folder) {
-        File fileDirectory = new File(folder);
-        if (!fileDirectory.isDirectory()) return;
-        File[] files = listVideoFiles(folder);
-        if (files == null) {
-            return;
-        }
-        int sort = getIntent().getIntExtra("sort", 2);
-        int direction = (sort & 1) == 0 ? -1 : 1;
-        Arrays.sort(files, (o1, o2) -> {
-            if ((sort & 2) == 2) {
-                final long result = o2.lastModified() - o1.lastModified();
-                if (result < 0) {
-                    return -1 * direction;
-                }
-                if (result > 0) {
-                    return 1 * direction;
-                }
-            }
-            if ((sort & 4) == 4) {
-                final long result = o2.length() - o1.length();
-                if (result < 0) {
-                    return -1 * direction;
-                }
-                if (result > 0) {
-                    return 1 * direction;
-                }
-            }
-            return 0;
-        });
-        mPlayList = new ArrayList<>();
-        for (File file : files) {
-            mPlayList.add(file.getAbsolutePath());
-        }
-        if (mShuffle) {
-            Collections.shuffle(mPlayList);
-        }
-    }
 
     private void onBufferingUpdate(MediaPlayer mediaPlayer, int i) {
         mTimeBar.setBufferedPosition(i);
@@ -351,21 +247,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         return true;
     }
 
-    private void onNext(View view) {
-        if (mPlayList.size() < 2) return;
-        mLayout = false;
-        if (mPlayIndex + 1 < mPlayList.size()) {
-            mPlayIndex++;
-        } else {
-            mPlayIndex = 0;
-        }
-        mMediaPlayer.reset();
-        try {
-            play();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     private void onPlayPause(View view) {
         if (mMediaPlayer.isPlaying()) {
@@ -390,21 +271,7 @@ public class PlayerActivity extends Activity implements OnTouchListener {
 
     }
 
-    private void onPrev(View view) {
-        if (mPlayList.size() < 2) return;
-        mLayout = false;
-        if (mPlayIndex - 1 > -1) {
-            mPlayIndex--;
-        } else {
-            mPlayIndex = 0;
-        }
-        mMediaPlayer.reset();
-        try {
-            play();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
 
     private void onSeekComplete(MediaPlayer mediaPlayer) {
     }
@@ -417,13 +284,7 @@ public class PlayerActivity extends Activity implements OnTouchListener {
     }
 
     private void play() throws IOException {
-        if (mPlayList == null) {
-            mMediaPlayer.setDataSource(getIntent().getStringExtra(KEY_VIDEO_FILE));
-            mMediaPlayer.prepareAsync();
-            return;
-        }
-        getActionBar().setTitle(Shared.substringAfterLast(mPlayList.get(mPlayIndex), "/"));
-        mMediaPlayer.setDataSource(mPlayList.get(mPlayIndex));
+        mMediaPlayer.setDataSource(getIntent().getStringExtra(KEY_VIDEO_FILE));
         mMediaPlayer.prepareAsync();
     }
 
@@ -550,7 +411,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.player_activity);
-        bindingDeleteVideoEvent();
         bindingFullScreenEvent();
         mRoot = findViewById(R.id.root);
 //        mRoot.setOnClickListener(v -> {
@@ -623,91 +483,12 @@ public class PlayerActivity extends Activity implements OnTouchListener {
             }
 
         });
-        Button rewWithAmount = findViewById(R.id.exo_rew_with_amount);
-        rewWithAmount.setText("2");
-        rewWithAmount.setOnClickListener(v -> {
-//            int dif = mMediaPlayer.getCurrentPosition() - 10000;
-//            if (dif < 0) {
-//                dif = 0;
-//            }
-//            if (VERSION.SDK_INT >= VERSION_CODES.O) {
-//                mMediaPlayer.seekTo(dif);
-//            } else {
-//                mMediaPlayer.seekTo(dif);
-//            }
-            PlaybackParams playbackParams = new PlaybackParams();
-//            mSpeed /= 2;
-//            if (mSpeed > 1 && mSpeed < 2) {
-//                mSpeed = 1;
-//            }
-//            Toast.makeText(this, Float.toString(mSpeed), Toast.LENGTH_SHORT).show();
-//            mSpeed -= .5f; //mSpeed >> 1 == 0 ? 1 : mSpeed >> 1;
-//            if (mSpeed <= 0) mSpeed = 1;
-//            playbackParams.setSpeed(mSpeed);
-//            mMediaPlayer.setPlaybackParams(playbackParams);
-            if (mSpeed == .5f) {
-                mSpeed = 20f;
-            } else if (mSpeed == 20f) {
-                mSpeed = 6f;
-            } else if (mSpeed == 6f) {
-                mSpeed = 1f;
-            }
-            playbackParams.setSpeed(mSpeed);
-            mMediaPlayer.setPlaybackParams(playbackParams);
-            scheduleHideControls();
-            updateProgress();
-        });
-        Button ffwdWithAmount = findViewById(R.id.exo_ffwd_with_amount);
-        ffwdWithAmount.setText("2");
-        if (VERSION.SDK_INT >= VERSION_CODES.O) {
-            Typeface typeface = null;
-            typeface = getResources().getFont(R.font.roboto_medium_numbers);
-            rewWithAmount.setTypeface(typeface);
-            ffwdWithAmount.setTypeface(typeface);
-        }
-        ffwdWithAmount.setOnClickListener(v -> {
-//            int dif = mMediaPlayer.getCurrentPosition() + 10000;
-//            if (dif > mMediaPlayer.getDuration()) {
-//                dif = mMediaPlayer.getDuration();
-//            }
-//            if (VERSION.SDK_INT >= VERSION_CODES.O) {
-//                mMediaPlayer.seekTo(dif);
-//
-//            } else {
-//                mMediaPlayer.seekTo(dif);
-//            }
-            PlaybackParams playbackParams = new PlaybackParams();
-            // mSpeed += .5f; //= mSpeed << 1;
-//            if (mSpeed >= 10) {
-//                mSpeed = 6;
-//            }
-//            Toast.makeText(this, Float.toString(mSpeed), Toast.LENGTH_SHORT).show();
-            mMediaPlayer.seekTo(mMediaPlayer.getCurrentPosition() + 30 * 1000);
-            scheduleHideControls();
-            updateProgress();
-        });
+
         mPlayPause = findViewById(R.id.play_pause);
         mPlayPause.setOnClickListener(this::onPlayPause);
         mScaledTouchSlop = ViewConfiguration.get(this).getScaledTouchSlop();
         //mTextureView.setOnTouchListener(this);
-        ImageButton prev = findViewById(R.id.prev);
-        ImageButton next = findViewById(R.id.next);
-        mShuffle = PreferenceManager.getDefaultSharedPreferences(this)
-                .getBoolean(KEY_SHUFFLE, false);
-        findViewById(R.id.action_shuffle).setOnClickListener(v -> {
-            if (!mShuffle) {
-                Collections.shuffle(mPlayList);
-                mPlayIndex = mPlayList.indexOf(mPlayList.get(mPlayIndex));
-            }
-            mShuffle = !mShuffle;
-            PreferenceManager
-                    .getDefaultSharedPreferences(this)
-                    .edit()
-                    .putBoolean(KEY_SHUFFLE, mShuffle)
-                    .apply();
 
-        });
-        String videoFile = getIntent().getStringExtra(KEY_VIDEO_FILE);
         if (getIntent().getStringExtra(KEY_VIDEO_TITLE) != null)
             this.setTitle(getIntent().getStringExtra(KEY_VIDEO_TITLE));
         findViewById(R.id.action_speed).setOnClickListener(new OnClickListener() {
@@ -732,24 +513,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
                 });
             }
         });
-        if (videoFile != null) {
-            if (new File(videoFile).exists()) {
-                loadPlaylist(new File(videoFile).getParentFile().getAbsolutePath());
-                if (mPlayList.size() < 2) {
-                    prev.setAlpha(75);
-                    next.setAlpha(75);
-                    mPlayIndex = 0;
-                } else {
-                    prev.setOnClickListener(this::onPrev);
-                    next.setOnClickListener(this::onNext);
-                    mPlayIndex = mPlayList.indexOf(videoFile);
-                }
-                return;
-            }
-
-        }
-
-
     }
 
 

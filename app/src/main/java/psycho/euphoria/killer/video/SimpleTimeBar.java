@@ -1,4 +1,4 @@
-package psycho.euphoria.killer;
+package psycho.euphoria.killer.video;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -16,6 +16,9 @@ import android.view.View;
 import android.view.ViewParent;
 
 import java.util.concurrent.CopyOnWriteArraySet;
+
+import psycho.euphoria.killer.R;
+import psycho.euphoria.killer.Shared;
 
 
 public class SimpleTimeBar extends View implements TimeBar {

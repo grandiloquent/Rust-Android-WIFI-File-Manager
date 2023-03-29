@@ -1,3 +1,4 @@
+
 use std::collections::HashMap;
 use ndk::asset::AssetManager;
 use jni::JNIEnv;
@@ -5,7 +6,6 @@ use jni::objects::JObject;
 use std::ffi::CString;
 use std::io::Read;
 use std::ptr::NonNull;
-
 /*
 获取用于访问assets目录下文件的对象。
 https://developer.android.com/reference/android/content/res/AssetManager

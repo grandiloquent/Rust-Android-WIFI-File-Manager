@@ -113,7 +113,7 @@
         </LinearLayout>
     </FrameLayout>
 
-    <psycho.euphoria.killer.SimpleTimeBar
+    <psycho.euphoria.killer.video.SimpleTimeBar
         android:id="@+id/timebar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -130,41 +130,7 @@
         android:gravity="center"
         android:padding="@dimen/exo_styled_controls_padding">
 
-        <ImageButton
-            android:id="@+id/prev"
-            android:layout_width="@dimen/exo_icon_size"
-            android:layout_height="@dimen/exo_icon_size"
-            android:layout_marginLeft="@dimen/exo_icon_horizontal_margin"
-            android:layout_marginRight="@dimen/exo_icon_horizontal_margin"
-            android:background="?android:attr/selectableItemBackground"
-            android:padding="@dimen/exo_icon_padding"
-            android:scaleType="fitXY"
-            android:src="@drawable/exo_styled_controls_previous" />
 
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="0dp"
-            android:layout_marginLeft="@dimen/exo_icon_horizontal_margin"
-            android:layout_marginRight="@dimen/exo_icon_horizontal_margin"
-            android:scaleType="fitXY">
-            <!-- View's don't have foreground until API 23 so we have to nest in a parent. -->
-            <Button
-                android:id="@+id/exo_rew_with_amount"
-                android:layout_width="@dimen/exo_icon_size"
-                android:layout_height="@dimen/exo_icon_size"
-                android:layout_marginLeft="0dp"
-                android:layout_marginRight="0dp"
-                android:background="@drawable/exo_styled_controls_rewind"
-                android:backgroundTint="@android:color/white"
-                android:foreground="@drawable/exo_styled_controls_rewind"
-                android:gravity="center|bottom"
-                android:insetBottom="0dp"
-                android:paddingBottom="@dimen/exo_icon_padding_bottom"
-                android:scaleType="fitXY"
-                android:textAppearance="@style/ExoStyledControls.ButtonText" />
-        </FrameLayout>
 
         <ImageButton
             android:id="@+id/play_pause"
@@ -177,40 +143,8 @@
             android:scaleType="fitXY"
             android:src="@drawable/exo_styled_controls_play" />
 
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="0dp"
-            android:layout_marginLeft="@dimen/exo_icon_horizontal_margin"
-            android:layout_marginRight="@dimen/exo_icon_horizontal_margin"
-            android:scaleType="fitXY">
-            <!-- View's don't have foreground until API 23 so we have to nest in a parent. -->
-            <Button
-                android:id="@+id/exo_ffwd_with_amount"
-                android:layout_width="@dimen/exo_icon_size"
-                android:layout_height="@dimen/exo_icon_size"
-                android:layout_marginLeft="0dp"
-                android:layout_marginRight="0dp"
-                android:background="@drawable/exo_styled_controls_fastforward"
-                android:backgroundTint="@android:color/white"
-                android:foreground="@drawable/exo_styled_controls_fastforward"
-                android:gravity="center|bottom"
-                android:insetBottom="0dp"
-                android:paddingBottom="@dimen/exo_icon_padding_bottom"
-                android:scaleType="fitXY"
-                android:textAppearance="@style/ExoStyledControls.ButtonText" />
-        </FrameLayout>
 
-        <ImageButton
-            android:id="@+id/next"
-            android:layout_width="@dimen/exo_icon_size"
-            android:layout_height="@dimen/exo_icon_size"
-            android:layout_marginLeft="@dimen/exo_icon_horizontal_margin"
-            android:layout_marginRight="@dimen/exo_icon_horizontal_margin"
-            android:background="?android:attr/selectableItemBackground"
-            android:padding="@dimen/exo_icon_padding"
-            android:scaleType="fitXY"
-            android:src="@drawable/exo_styled_controls_next" />
+
 
     </LinearLayout>
 </FrameLayout>

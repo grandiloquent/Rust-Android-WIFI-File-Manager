@@ -79,7 +79,7 @@ pub fn get_file_list(query: String, default_path: &str) -> Vec<FileItem> {
     } else {
         path = decode(path.as_str()).unwrap().to_string();
     }
-    log::error!("{}", path);
+    
     match fs::read_dir(path) {
         Ok(v) => {
             v.map(|res| res.map(|e| {

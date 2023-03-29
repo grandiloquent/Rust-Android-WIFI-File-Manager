@@ -28,6 +28,9 @@ import java.util.stream.Collectors;
 
 import psycho.euphoria.killer.Shared.Listener;
 import psycho.euphoria.killer.tasks.DownloaderService;
+import psycho.euphoria.killer.video.PlayerActivity;
+
+import static psycho.euphoria.killer.video.PlayerActivity.*;
 
 public class MainActivity extends Activity {
     public static final int ITEM_ID_REFRESH = 1;
@@ -61,6 +64,7 @@ public class MainActivity extends Activity {
     private void initialize() {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         requestStorageManagerPermission();
+        launchActivity(this,"/storage/emulated/0/MP4/7.mp4",null);
         initializeWebView();
         String lastedAddress = mSharedPreferences.getString("address", null);
         if (lastedAddress != null) {
@@ -68,6 +72,7 @@ public class MainActivity extends Activity {
         }
         Intent intent = new Intent(this, ServerService.class);
         startService(intent);
+
     }
 
     private void initializeWebView() {
@@ -110,7 +115,7 @@ public class MainActivity extends Activity {
     private void playVideo() {
         CharSequence url = Shared.getText(this);
         if (url == null) return;
-        PlayerActivity.launchActivity(this, url.toString(), null);
+        launchActivity(this, url.toString(), null);
     }
 
     private void refresh() {

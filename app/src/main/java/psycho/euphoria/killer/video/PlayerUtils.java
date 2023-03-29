@@ -1,4 +1,4 @@
-package psycho.euphoria.killer;
+package psycho.euphoria.killer.video;
 
 import android.app.Activity;
 import android.view.View;
