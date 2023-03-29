@@ -407,7 +407,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         bindingFullScreenEvent();
         mRoot = findViewById(R.id.root);
         AndroidUtilities.density = getResources().getDisplayMetrics().density;
-
         //        mRoot.setOnClickListener(v -> {
 //            showSystemUi(true);
 //            showControls();
@@ -463,6 +462,13 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         mPlayPause.setOnClickListener(this::onPlayPause);
         mScaledTouchSlop = ViewConfiguration.get(this).getScaledTouchSlop();
         //mTextureView.setOnTouchListener(this);
+        LoopManager loopManager = new LoopManager(this);
+        findViewById(R.id.action_shuffle).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                loopManager.startLoop();
+            }
+        });
         if (getIntent().getStringExtra(KEY_VIDEO_TITLE) != null)
             this.setTitle(getIntent().getStringExtra(KEY_VIDEO_TITLE));
         findViewById(R.id.action_speed).setOnClickListener(new OnClickListener() {

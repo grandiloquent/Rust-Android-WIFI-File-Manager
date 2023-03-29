@@ -64,7 +64,7 @@ public class MainActivity extends Activity {
     private void initialize() {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         requestStorageManagerPermission();
-        launchActivity(this,"/storage/emulated/0/MP4/7.mp4",null);
+//        launchActivity(this,"/storage/emulated/0/MP4/7.mp4",null);
         initializeWebView();
         String lastedAddress = mSharedPreferences.getString("address", null);
         if (lastedAddress != null) {
