@@ -1,6 +1,6 @@
 # Rust Android Example
 
-使用 Rust 的 warp 框架编写一个在 Android 上运行的 Web 服务器。 
+使用 Rust 编写的一个在 Android 上运行的 Web 服务器。 
 
 1. 添加工具链
 
@@ -23,7 +23,18 @@ TARGET_CC = "C:\\Users\\Administrator\\AppData\\Local\\Android\\Sdk\\ndk\\23.1.7
 TARGET_AR= "C:\\Users\\Administrator\\AppData\\Local\\Android\\Sdk\\ndk\\23.1.7779620\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\llvm-ar.exe"
 ```
 
+## 第三方库
+
+### Rust
+
 - https://github.com/seanmonstar/reqwest
 - https://github.com/tiny-http/tiny-http
 - https://github.com/rusqlite/rusqlite
+
+## 更多
+
+参考项目或源代码
+
+- https://android.googlesource.com/platform/packages/apps/Gallery2/+/refs/heads/master/src/com/android/gallery3d/app/MoviePlayer.java
+- https://github.com/DrKLO/Telegram
 

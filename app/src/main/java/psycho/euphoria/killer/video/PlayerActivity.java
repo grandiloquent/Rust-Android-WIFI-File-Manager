@@ -77,11 +77,41 @@ public class PlayerActivity extends Activity implements OnTouchListener {
     private PlayerSizeInformation mPlayerSizeInformation;
     private final Runnable mHideAction = this::hiddenControls;
 
+    public MediaPlayer getMediaPlayer() {
+        return mMediaPlayer;
+    }
+
+    public SimpleTimeBar getTimeBar() {
+        return mTimeBar;
+    }
+
     public static void launchActivity(Context context, String videoFile, String title) {
         Intent intent = new Intent(context, PlayerActivity.class);
         intent.putExtra(KEY_VIDEO_FILE, videoFile);
         intent.putExtra(KEY_VIDEO_TITLE, title);
         context.startActivity(intent);
+    }
+
+    public void scheduleHideControls() {
+        mHandler.removeCallbacks(mHideAction);
+        mHandler.postDelayed(mHideAction, DEFAULT_HIDE_TIME_DELAY);
+    }
+
+    public void stopHideAction() {
+        mHandler.removeCallbacks(mHideAction);
+    }
+
+    public void updateCurrentTime(long position) {
+        mPosition.setText(getStringForTime(mStringBuilder, mFormatter, position));
+    }
+
+    public void updateProgress() {
+        if (mMediaPlayer == null || mBottomBar.getVisibility() != View.VISIBLE) {
+            return;
+        }
+        mTimeBar.setPosition(mMediaPlayer.getCurrentPosition());
+        mPosition.setText(getStringForTime(mStringBuilder, mFormatter, mMediaPlayer.getCurrentPosition()));
+        mHandler.postDelayed(this::updateProgress, 1000);
     }
 
     static int calculateScreenOrientation(Activity activity) {
@@ -266,11 +296,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         mMediaPlayer.prepareAsync();
     }
 
-    public void scheduleHideControls() {
-        mHandler.removeCallbacks(mHideAction);
-        mHandler.postDelayed(mHideAction, DEFAULT_HIDE_TIME_DELAY);
-    }
-
     private void setOnSystemUiVisibilityChangeListener() {
         // When the user touches the screen or uses some hard key, the framework
         // will change system ui visibility from invisible to visible. We show
@@ -298,15 +323,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         mBottomBar.setVisibility(View.VISIBLE);
         mCenterControls.setVisibility(View.VISIBLE);
         updateProgress();
-    }
-
-    public void updateProgress() {
-        if (mMediaPlayer == null || mBottomBar.getVisibility() != View.VISIBLE) {
-            return;
-        }
-        mTimeBar.setPosition(mMediaPlayer.getCurrentPosition());
-        mPosition.setText(getStringForTime(mStringBuilder, mFormatter, mMediaPlayer.getCurrentPosition()));
-        mHandler.postDelayed(this::updateProgress, 1000);
     }
 
     private void zoomIn() {
@@ -385,6 +401,7 @@ public class PlayerActivity extends Activity implements OnTouchListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.player_activity);
+        AndroidUtilities.setApplicationHandler(mHandler);
         bindingFullScreenEvent();
         mRoot = findViewById(R.id.root);
 //        mRoot.setOnClickListener(v -> {
@@ -436,7 +453,7 @@ public class PlayerActivity extends Activity implements OnTouchListener {
             public void onSurfaceTextureUpdated(SurfaceTexture surface) {
             }
         });
-        mTimeBar=findViewById(R.id.timebar);
+        mTimeBar = findViewById(R.id.timebar);
         new SeekManager(this);
         mPlayPause = findViewById(R.id.play_pause);
         mPlayPause.setOnClickListener(this::onPlayPause);
@@ -468,21 +485,6 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         });
     }
 
-    public void stopHideAction() {
-        mHandler.removeCallbacks(mHideAction);
-    }
-
-    public void updateCurrentTime(long position) {
-        mPosition.setText(getStringForTime(mStringBuilder, mFormatter, position));
-    }
-
-    public SimpleTimeBar getTimeBar() {
-        return mTimeBar;
-    }
-
-    public MediaPlayer getMediaPlayer() {
-        return mMediaPlayer;
-    }
     @Override
     protected void onStart() {
         super.onStart();
