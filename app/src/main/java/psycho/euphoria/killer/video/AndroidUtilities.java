@@ -1,6 +1,7 @@
 package psycho.euphoria.killer.video;
 
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -137,6 +138,8 @@ public class AndroidUtilities {
         }
         return val;
     }
+
+    public static Context applicationContext;
 
     public static void runOnUIThread(Runnable runnable) {
         runOnUIThread(runnable, 0);

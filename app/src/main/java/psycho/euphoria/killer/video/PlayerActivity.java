@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.media.MediaPlayer;
 import android.media.TimedMetaData;
@@ -13,6 +14,7 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.Surface;
@@ -404,7 +406,9 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         AndroidUtilities.setApplicationHandler(mHandler);
         bindingFullScreenEvent();
         mRoot = findViewById(R.id.root);
-//        mRoot.setOnClickListener(v -> {
+        AndroidUtilities.density = getResources().getDisplayMetrics().density;
+
+        //        mRoot.setOnClickListener(v -> {
 //            showSystemUi(true);
 //            showControls();
 //            scheduleHideControls();
