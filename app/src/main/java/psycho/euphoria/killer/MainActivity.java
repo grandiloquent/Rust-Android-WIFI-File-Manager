@@ -45,9 +45,10 @@ public class MainActivity extends Activity {
 
     SharedPreferences mSharedPreferences;
     WebView mWebView;
-/*
-启动使用 Rust 编写的服务器。host由主机名和端口组成。例如192.168.8.55:3000。其中主机名是设备在局域网中的IP，使用它可以在局域网的设备之间共享数据。例如连接到一个Wi-Fi的电脑和手机
-  */
+
+    /*
+    启动使用 Rust 编写的服务器。host由主机名和端口组成。例如192.168.8.55:3000。其中主机名是设备在局域网中的IP，使用它可以在局域网的设备之间共享数据。例如连接到一个Wi-Fi的电脑和手机
+      */
     public static native void startServer(AssetManager assetManager, String host);
 
     private void downloadM3u8Video() {
@@ -199,6 +200,7 @@ public class MainActivity extends Activity {
         menu.add(0, 3, 0, "保存页面");
         menu.add(0, 4, 0, "播放视频");
         menu.add(0, 6, 0, "首页");
+        menu.add(0, 7, 0, "首页");
         menu.add(0, 5, 0, "退出");
         return super.onCreateOptionsMenu(menu);
     }
@@ -223,6 +225,9 @@ public class MainActivity extends Activity {
                 break;
             case 6:
                 openHomePage();
+                break;
+            case 7:
+                Shared.setText(this, mWebView.getUrl());
                 break;
 
         }

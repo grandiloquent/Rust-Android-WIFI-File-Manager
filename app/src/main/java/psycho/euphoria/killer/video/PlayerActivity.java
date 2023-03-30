@@ -8,6 +8,7 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.media.MediaPlayer;
+import android.media.PlaybackParams;
 import android.media.TimedMetaData;
 import android.opengl.GLES20;
 import android.os.Build.VERSION;
@@ -463,36 +464,29 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         mScaledTouchSlop = ViewConfiguration.get(this).getScaledTouchSlop();
         //mTextureView.setOnTouchListener(this);
         LoopManager loopManager = new LoopManager(this);
+        findViewById(R.id.action_file_download).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PlaybackParams playbackParams = mMediaPlayer.getPlaybackParams();
+                float speed = playbackParams.getSpeed() * 2;
+                if (speed > 4) speed = 1;
+                playbackParams.setSpeed(speed);
+                mMediaPlayer.setPlaybackParams(playbackParams);
+            }
+        });
         findViewById(R.id.action_shuffle).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                loopManager.startLoop();
+                Shared.openTextContentDialog(PlayerActivity.this, "跳转", value -> {
+                    loopManager.startLoop(Utils.parseMilliseconds(value));
+                });
             }
         });
         if (getIntent().getStringExtra(KEY_VIDEO_TITLE) != null)
             this.setTitle(getIntent().getStringExtra(KEY_VIDEO_TITLE));
-        findViewById(R.id.action_speed).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Shared.openTextContentDialog(PlayerActivity.this, "跳转", value -> {
-                    Pattern pattern = Pattern.compile("\\b(\\d+ )+\\d+\\b");
-                    Matcher matcher = pattern.matcher(value);
-                    if (matcher.matches()) {
-                        String[] pieces = value.split(" ");
-                        int total = 0;
-                        for (int i = pieces.length - 1, j = 0; i > -1; i--, j++) {
-                            total += Integer.parseInt(pieces[i]) * Math.pow(60, j);
-                        }
-                        total *= 1000;
-                        if (VERSION.SDK_INT >= VERSION_CODES.O) {
-                            mMediaPlayer.seekTo(total, MediaPlayer.SEEK_CLOSEST);
-                        } else {
-                            mMediaPlayer.seekTo(total);
-                        }
-                    }
-                });
-            }
-        });
+        findViewById(R.id.action_speed).setOnClickListener(v -> Shared.openTextContentDialog(PlayerActivity.this, "跳转", value -> {
+            mMediaPlayer.seekTo(Utils.parseMilliseconds(value), MediaPlayer.SEEK_CLOSEST);
+        }));
     }
 
     @Override

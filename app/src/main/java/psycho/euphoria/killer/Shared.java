@@ -510,6 +510,7 @@ public class Shared {
 
     public static void openTextContentDialog(Activity activity, String title, Listener listener) {
         EditText editText = new EditText(activity);
+        editText.setMaxLines(1);
         editText.requestFocus();
         AlertDialog dialog = new Builder(activity)
                 .setTitle(title)

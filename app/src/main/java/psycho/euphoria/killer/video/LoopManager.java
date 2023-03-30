@@ -8,14 +8,14 @@ public class LoopManager {
     PlayerActivity mPlayerActivity;
     Handler mHandler = new Handler();
     int mStart;
-    int mOffset = 15 * 1000;
+    int mOffset = 10 * 1000;
     boolean mIsStarted = false;
 
     public LoopManager(PlayerActivity activity) {
         mPlayerActivity = activity;
     }
 
-    public void startLoop() {
+    public void startLoop(int start) {
         mHandler.removeCallbacks(null);
         if (mIsStarted) {
             mIsStarted = false;
@@ -24,7 +24,7 @@ public class LoopManager {
         }
         Toast.makeText(mPlayerActivity, "Loop started", Toast.LENGTH_SHORT).show();
         mIsStarted = true;
-        mStart = mPlayerActivity.getMediaPlayer().getCurrentPosition();
+        mStart = start;
         mHandler.postDelayed(this::check, 500);
     }
 
@@ -36,6 +36,7 @@ public class LoopManager {
         if (mPlayerActivity.getMediaPlayer().getCurrentPosition() - mStart >= mOffset) {
             mPlayerActivity.getMediaPlayer().seekTo(mStart);
         }
-        mHandler.postDelayed(this::check, 500);
+        if (mIsStarted)
+            mHandler.postDelayed(this::check, 500);
     }
 }
