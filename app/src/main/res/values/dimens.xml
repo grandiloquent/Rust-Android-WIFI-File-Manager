@@ -1,1 +1,6 @@
-<resources></resources>
+<resources>
+    <dimen name="circletimer_dot_size">12dp</dimen>
+    <dimen name="circletimer_circle_size">4dp</dimen>
+    <dimen name="circletimer_marker_size">16dp</dimen>
+    <dimen name="max_timer_circle_size">360dp</dimen>
+</resources>

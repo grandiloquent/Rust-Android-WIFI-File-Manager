@@ -66,15 +66,17 @@ public class MainActivity extends Activity {
     private void initialize() {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         requestStorageManagerPermission();
-//        launchActivity(this,"/storage/emulated/0/MP4/7.mp4",null);
-        initializeWebView();
-        String lastedAddress = mSharedPreferences.getString("address", null);
-        if (lastedAddress != null) {
-            mWebView.loadUrl(lastedAddress);
-        }
-        Intent intent = new Intent(this, ServerService.class);
-        startService(intent);
+////        launchActivity(this,"/storage/emulated/0/MP4/7.mp4",null);
+//        initializeWebView();
+//        String lastedAddress = mSharedPreferences.getString("address", null);
+//        if (lastedAddress != null) {
+//            mWebView.loadUrl(lastedAddress);
+//        }
+//        Intent intent = new Intent(this, ServerService.class);
+//        startService(intent);
 
+        SeekView seekView=new SeekView(this);
+        setContentView(seekView);
     }
 
     private void initializeWebView() {
