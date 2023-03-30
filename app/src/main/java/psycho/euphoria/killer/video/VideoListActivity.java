@@ -2,6 +2,7 @@ package psycho.euphoria.killer.video;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -20,6 +21,7 @@ import java.util.List;
 
 import psycho.euphoria.killer.R;
 import psycho.euphoria.killer.Shared;
+import psycho.euphoria.killer.Shared.Listener;
 
 public class VideoListActivity extends Activity {
     public static final String KEY_SORT = "sort";
@@ -93,7 +95,7 @@ public class VideoListActivity extends Activity {
         });
         List<VideoItem> videoItems = new ArrayList<>();
         for (File video : videos) {
-           // video.renameTo(new File(video.getParentFile(),Shared.substringBeforeLast(video.getName(),".")));
+            // video.renameTo(new File(video.getParentFile(),Shared.substringBeforeLast(video.getName(),".")));
             VideoItem videoItem = new VideoItem();
             videoItem.path = video.getAbsolutePath();
             videoItems.add(videoItem);
@@ -193,6 +195,17 @@ public class VideoListActivity extends Activity {
         }
         if (item.getItemId() == R.id.action_sort_by_size_descending) {
             actionSortBySizeDescending();
+        }
+        if (item.getItemId() == R.id.action_loop_duration) {
+            Shared.openTextContentDialog(this, "设置循环时间", new Listener() {
+                @Override
+                public void onSuccess(String value) {
+                    PreferenceManager.getDefaultSharedPreferences(VideoListActivity.this)
+                            .edit()
+                            .putInt("loop_duration", Integer.parseInt(value.trim()))
+                            .apply();
+                }
+            });
         }
         return super.onOptionsItemSelected(item);
     }

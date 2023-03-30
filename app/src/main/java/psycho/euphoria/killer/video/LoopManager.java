@@ -2,6 +2,7 @@ package psycho.euphoria.killer.video;
 
 
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 public class LoopManager {
@@ -13,6 +14,8 @@ public class LoopManager {
 
     public LoopManager(PlayerActivity activity) {
         mPlayerActivity = activity;
+        mOffset = PreferenceManager.getDefaultSharedPreferences(activity)
+                .getInt("loop_duration", 10) * 1000;
     }
 
     public boolean isStarted() {

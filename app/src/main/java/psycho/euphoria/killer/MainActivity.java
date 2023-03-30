@@ -74,8 +74,7 @@ public class MainActivity extends Activity {
         }
         Intent intent = new Intent(this, ServerService.class);
         startService(intent);
-        Intent service = new Intent(this,VideoListActivity.class);
-        startActivity(service);
+
     }
 
     private void initializeWebView() {
@@ -119,7 +118,6 @@ public class MainActivity extends Activity {
 //        CharSequence url = Shared.getText(this);
 //        if (url == null) return;
 //        launchActivity(this, url.toString(), null);
-
     }
 
     private void refresh() {
