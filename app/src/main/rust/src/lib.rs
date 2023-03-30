@@ -2,16 +2,18 @@
 
 use std::collections::HashMap;
 use std::fs;
+use ascii::AsciiChar::c;
 
 use jni::JNIEnv;
 use jni::objects::{JObject, JString};
 use ndk::asset::AssetManager;
 use regex::Regex;
 use rusqlite::{Connection, Error};
-use tiny_http::{Header, HeaderField,  Response, Server};
+use tiny_http::{Header, HeaderField, Response, Server};
 use urlencoding::decode;
 
 use crate::assets::{get_asset_manager, read_asset};
+use crate::handlers::{Context,handle_page};
 use crate::headers::get_header;
 use crate::strings::StringExt;
 use crate::utils::{get_file_list, get_notes, response_file, update_note};
@@ -21,6 +23,7 @@ mod assets;
 mod mimetypes;
 mod strings;
 mod headers;
+mod handlers;
 
 fn get_query_parameters(original_url: &str, name: String) -> String {
     original_url.to_string().substring_after((name + "=").as_str()).substring_before("&")
@@ -28,7 +31,7 @@ fn get_query_parameters(original_url: &str, name: String) -> String {
 
 fn run_server(host: &str, ass: AssetManager) {
     let server = Server::http(host).unwrap();
-    let cache: HashMap<String, String> = HashMap::new();
+    let cache: HashMap<&str, String> = HashMap::new();
     let headers: HashMap<String, Header> = HashMap::new();
     let re = Regex::new(r"^/[^/]+(?:js|css)").unwrap();
     let files_opened_directly = Regex::new(r".+(?:html|jpeg|png|jpg|xhtml|txt|gif)").unwrap();
@@ -39,20 +42,22 @@ fn run_server(host: &str, ass: AssetManager) {
         "CREATE TABLE IF NOT EXISTS notes(_id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT,content TEXT,create_at INTEGER NOT NULL,update_at  INTEGER NOT NULL)",
         (), // empty list of parameters.
     );
+
+    let context = Context {
+        cache: &cache,
+        ass: &ass,
+        headers: &headers,
+    };
     for mut request in server.incoming_requests() {
         let original_url = request.url().to_owned();
         let path = original_url.substring_before("?");
         if path == "/" {
-            let data = read_asset("index.html", cache.clone(), &ass);
-            let _ = request.respond(Response::from_string(data)
-                .with_header(get_header("index.html", &headers)));
+            handle_page("index.html", &context, request);
         } else if static_pages.is_match(path.as_str()) {
-            let filename = (*(&path[1..])).to_string() + ".html";
-            let data = read_asset(filename.as_str(), cache.clone(), &ass);
-            let _ = request.respond(Response::from_string(data)
-                .with_header(get_header(filename.as_str(), &headers)));
+            let filename = (&path[1..]).to_string() + ".html";
+            handle_page(filename.as_str(), &context, request);
         } else if re.is_match(path.as_str()) {
-            let data = read_asset(&path[1..], cache.clone(), &ass);
+            let data = read_asset((&path[1..]).to_string(), &cache, &ass).unwrap();
             let _ = request.respond(Response::from_string(data)
                 .with_header(get_header(&path[1..], &headers)));
         } else if path == "/api/files" {

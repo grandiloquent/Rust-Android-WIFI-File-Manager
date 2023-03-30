@@ -1,10 +1,10 @@
-
 use std::collections::HashMap;
 use ndk::asset::AssetManager;
 use jni::JNIEnv;
 use jni::objects::JObject;
 use std::ffi::CString;
-use std::io::Read;
+use std::fmt::Error;
+use std::io::{ErrorKind, Read};
 use std::ptr::NonNull;
 /*
 获取用于访问assets目录下文件的对象。
@@ -25,27 +25,50 @@ pub fn get_asset_manager(env: JNIEnv, asset_manager_object: JObject) -> AssetMan
     asset_manager
 }
 
-pub fn read_resource_file(ass: &AssetManager, n: &str) -> std::string::String {
-    match ass.open(&CString::new(n).unwrap()) {
+pub fn read_resource_file(ass: &AssetManager, n: &str) -> Result<String, Box<dyn std::error::Error>> {
+    let filename = &CString::new(n)?;
+    match ass.open(filename) {
         Some(mut a) => {
             let mut text = std::string::String::new();
-            a.read_to_string(&mut text).expect("TODO: panic message");
-            return text;
+            a.read_to_string(&mut text)?;
+            Ok(text)
         }
         None => {
-            return std::string::String::new();
+            Err("Error reading")?
         }
     }
+
+    //
+    // match ass.open(&CString::new(n).unwrap()) {
+    //     Some(mut a) => {
+    //         let mut text = std::string::String::new();
+    //         a.read_to_string(&mut text).expect("TODO: panic message");
+    //         return text;
+    //     }
+    //     None => {
+    //         return std::string::String::new();
+    //     }
+    // }
+    // match ass.open(&CString::new(n).unwrap()) {
+    //     Some(mut a) => {
+    //         let mut text = std::string::String::new();
+    //         a.read_to_string(&mut text).expect("TODO: panic message");
+    //         return text;
+    //     }
+    //     None => {
+    //         return std::string::String::new();
+    //     }
+    // }
 }
 
-pub fn read_asset(name: &str, cache: HashMap<String, String>, ass: &AssetManager) -> String {
-    let data: String = match cache.get(name) {
-        Some(v) => v.clone(),
+pub fn read_asset<'a>(name: String, cache: &HashMap<&'a str, String>, ass: &AssetManager) -> Result<String, Box<dyn std::error::Error>> {
+    let data = match cache.get(name.as_str()) {
+        Some(v) => v.to_string(),
         None => {
-            let s = read_resource_file(&ass, name);
-            cache.clone().insert(name.to_string(), s.clone());
+            let s = read_resource_file(&ass, name.as_str())?;
+            cache.clone().insert(name.as_str(), s.to_string());
             s
         }
     };
-    data
+    Ok(data)
 }

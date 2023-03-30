@@ -200,7 +200,7 @@ public class MainActivity extends Activity {
         menu.add(0, 3, 0, "保存页面");
         menu.add(0, 4, 0, "播放视频");
         menu.add(0, 6, 0, "首页");
-        menu.add(0, 7, 0, "首页");
+        menu.add(0, 7, 0, "复制");
         menu.add(0, 5, 0, "退出");
         return super.onCreateOptionsMenu(menu);
     }
