@@ -2,6 +2,7 @@
 
 use std::collections::HashMap;
 use std::fs;
+use std::sync::Mutex;
 use ascii::AsciiChar::c;
 
 use jni::JNIEnv;
@@ -45,7 +46,7 @@ fn run_server(host: &str, ass: AssetManager) {
 
     let context = Context {
         cache: &cache,
-        ass: &ass,
+        ass: Mutex::new(&ass),
         headers: &headers,
     };
     for mut request in server.incoming_requests() {
