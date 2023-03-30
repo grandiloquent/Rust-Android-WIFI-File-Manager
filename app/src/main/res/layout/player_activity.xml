@@ -22,7 +22,6 @@
         android:background="#b0000000">
 
         <LinearLayout
-            android:id="@+id/exo_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|start"
@@ -74,7 +73,6 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/exo_basic_controls"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"

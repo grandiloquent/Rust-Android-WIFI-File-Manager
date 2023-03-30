@@ -477,9 +477,13 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         findViewById(R.id.action_shuffle).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                Shared.openTextContentDialog(PlayerActivity.this, "跳转", value -> {
-                    loopManager.startLoop(Utils.parseMilliseconds(value));
-                });
+                if (loopManager.isStarted()) {
+                    loopManager.startLoop(0);
+                } else {
+                    Shared.openTextContentDialog(PlayerActivity.this, "跳转", value -> {
+                        loopManager.startLoop(Utils.parseMilliseconds(value));
+                    });
+                }
             }
         });
         if (getIntent().getStringExtra(KEY_VIDEO_TITLE) != null)

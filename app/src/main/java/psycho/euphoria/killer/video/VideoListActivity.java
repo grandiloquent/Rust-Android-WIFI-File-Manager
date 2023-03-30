@@ -19,10 +19,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import psycho.euphoria.killer.R;
+import psycho.euphoria.killer.Shared;
 
 public class VideoListActivity extends Activity {
     public static final String KEY_SORT = "sort";
-    private GridView mGridView;
     private VideoItemAdapter mVideoItemAdapter;
     private String mDirectory;
     private int mSort = 2;
@@ -50,7 +50,11 @@ public class VideoListActivity extends Activity {
 
 
     private String getDefaultPath() {
-        return getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+        File dir = new File(Environment.getExternalStorageDirectory(), ".others");
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+        return dir.getAbsolutePath();
     }
 
     private void initialize() {
@@ -58,13 +62,10 @@ public class VideoListActivity extends Activity {
         loadFolder(mFilter, mSort);
     }
 
-    private void loadDirectory() {
-        loadFolder(mFilter, mSort);
-    }
 
     private void loadFolder(String filter, int sort) {
         File dir = new File(mDirectory);
-        File[] videos = dir.listFiles(pathname -> pathname.isFile() && pathname.getName().endsWith(".mp4") && (TextUtils.isEmpty(filter) || pathname.getName().contains(filter)));
+        File[] videos = dir.listFiles(pathname -> pathname.isFile() && !pathname.getName().contains(".") && (TextUtils.isEmpty(filter) || pathname.getName().contains(filter)));
         if (videos == null) {
             return;
         }
@@ -92,6 +93,7 @@ public class VideoListActivity extends Activity {
         });
         List<VideoItem> videoItems = new ArrayList<>();
         for (File video : videos) {
+           // video.renameTo(new File(video.getParentFile(),Shared.substringBeforeLast(video.getName(),".")));
             VideoItem videoItem = new VideoItem();
             videoItem.path = video.getAbsolutePath();
             videoItems.add(videoItem);
@@ -121,12 +123,12 @@ public class VideoListActivity extends Activity {
         mSort = PreferenceManager.getDefaultSharedPreferences(this)
                 .getInt(KEY_SORT, 3);
         setContentView(R.layout.video_list_activity);
-        mGridView = findViewById(R.id.recycler_view);
-        mGridView.setNumColumns(2);
-        registerForContextMenu(mGridView);
+        GridView gridView = findViewById(R.id.recycler_view);
+        gridView.setNumColumns(2);
+        registerForContextMenu(gridView);
         mVideoItemAdapter = new VideoItemAdapter(this);
-        mGridView.setAdapter(mVideoItemAdapter);
-        mGridView.setOnItemClickListener((parent, view, position, id) -> {
+        gridView.setAdapter(mVideoItemAdapter);
+        gridView.setOnItemClickListener((parent, view, position, id) -> {
             File source = new File(
                     mVideoItemAdapter.getItem(position).path
             );
@@ -157,8 +159,6 @@ public class VideoListActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.video_list, menu);
-        menu.findItem(R.id.action_selector).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-        menu.findItem(R.id.action_bookmark).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         searchView.setIconifiedByDefault(false);
         searchView.setOnQueryTextListener(new OnQueryTextListener() {
@@ -181,9 +181,6 @@ public class VideoListActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
-        } else if (item.getItemId() == R.id.action_video) {
-            mDirectory = getDefaultPath();
-            loadDirectory();
         }
         if (item.getItemId() == R.id.action_sort_by_create_time_ascending) {
             actionSortByCreateTimeAscending();

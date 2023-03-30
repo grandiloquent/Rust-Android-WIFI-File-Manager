@@ -15,6 +15,10 @@ public class LoopManager {
         mPlayerActivity = activity;
     }
 
+    public boolean isStarted() {
+        return mIsStarted;
+    }
+
     public void startLoop(int start) {
         mHandler.removeCallbacks(null);
         if (mIsStarted) {
@@ -28,12 +32,13 @@ public class LoopManager {
         mHandler.postDelayed(this::check, 500);
     }
 
+
     public void stopLoop() {
         mHandler.removeCallbacks(null);
     }
 
     private void check() {
-        if (mPlayerActivity.getMediaPlayer().getCurrentPosition() - mStart >= mOffset) {
+        if (mPlayerActivity.getMediaPlayer() != null && mPlayerActivity.getMediaPlayer().getCurrentPosition() - mStart >= mOffset) {
             mPlayerActivity.getMediaPlayer().seekTo(mStart);
         }
         if (mIsStarted)

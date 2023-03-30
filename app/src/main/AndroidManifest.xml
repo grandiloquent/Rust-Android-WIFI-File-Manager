@@ -30,6 +30,8 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true">
         </activity>
+        <activity android:name="psycho.euphoria.killer.video.VideoListActivity" />
+
         <service android:name=".ServerService" />
     </application>
 

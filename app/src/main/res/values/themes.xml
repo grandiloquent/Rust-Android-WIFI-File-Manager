@@ -18,18 +18,12 @@
     </declare-styleable>
 
     <drawable name="exo_styled_controls_play">@drawable/exo_ic_play_circle_filled</drawable>
-    <drawable name="exo_styled_controls_next">@drawable/exo_ic_skip_next</drawable>
-    <drawable name="exo_styled_controls_previous">@drawable/exo_ic_skip_previous</drawable>
-    <drawable name="exo_styled_controls_fastforward">@drawable/exo_ic_forward</drawable>
-    <drawable name="exo_styled_controls_rewind">@drawable/exo_ic_rewind</drawable>
     <drawable name="exo_styled_controls_fullscreen_enter">@drawable/exo_ic_fullscreen_enter
     </drawable>
 
     <dimen name="exo_icon_size">52dp</dimen>
     <dimen name="exo_icon_horizontal_margin">5dp</dimen>
     <dimen name="exo_icon_padding">2dp</dimen>
-    <dimen name="exo_icon_text_size">9dp</dimen>
-    <dimen name="exo_icon_padding_bottom">18dp</dimen>
 
     <dimen name="exo_styled_controls_padding">0dp</dimen>
 
@@ -39,28 +33,7 @@
     <dimen name="exo_media_button_height">52dp</dimen>
 
 
-    <style name="ExoStyledControls" />
-
-    <style name="ExoStyledControls.ButtonText">
-        <item name="android:textStyle">bold</item>
-        <item name="android:textSize">@dimen/exo_icon_text_size</item>
-        <item name="android:textColor">@color/exo_white</item>
-    </style>
-
     <string name="exo_controls_time_placeholder" translatable="false">00:00:00</string>
 
-
-    <style name="MyActionBar" parent="@android:style/Widget.Material.Light.ActionBar">
-        <item name="android:background">#9C27B0</item>
-        <item name="android:textColorSecondary">@android:color/white</item>
-        <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:textColor">#333333</item>
-    </style>
-    <style name="AppBaseTheme" >
-        <item name="android:actionBarStyle">@style/MyActionBar</item>
-        <item name="android:windowNoTitle">false</item>
-        <item name="android:windowActionBar">true</item>
-
-    </style>
 
 </resources>

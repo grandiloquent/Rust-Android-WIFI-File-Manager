@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import psycho.euphoria.killer.Shared.Listener;
 import psycho.euphoria.killer.tasks.DownloaderService;
 import psycho.euphoria.killer.video.PlayerActivity;
+import psycho.euphoria.killer.video.VideoListActivity;
 
 import static psycho.euphoria.killer.video.PlayerActivity.*;
 
@@ -73,7 +74,8 @@ public class MainActivity extends Activity {
         }
         Intent intent = new Intent(this, ServerService.class);
         startService(intent);
-
+        Intent service = new Intent(this,VideoListActivity.class);
+        startActivity(service);
     }
 
     private void initializeWebView() {
@@ -114,9 +116,10 @@ public class MainActivity extends Activity {
     }
 
     private void playVideo() {
-        CharSequence url = Shared.getText(this);
-        if (url == null) return;
-        launchActivity(this, url.toString(), null);
+//        CharSequence url = Shared.getText(this);
+//        if (url == null) return;
+//        launchActivity(this, url.toString(), null);
+
     }
 
     private void refresh() {
