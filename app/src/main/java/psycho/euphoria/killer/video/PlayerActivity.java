@@ -44,13 +44,13 @@ import javax.microedition.khronos.egl.EGLSurface;
 
 import psycho.euphoria.killer.R;
 import psycho.euphoria.killer.Shared;
-import psycho.euphoria.killer.video.TimeBar.OnScrubListener;
+import psycho.euphoria.killer.video.SeekView.Listener;
 
 import static psycho.euphoria.killer.Shared.getStringForTime;
 import static psycho.euphoria.killer.Shared.hideSystemUI;
 
 
-public class PlayerActivity extends Activity implements OnTouchListener {
+public class PlayerActivity extends Activity {
 
     public static final int DEFAULT_HIDE_TIME_DELAY = 5000;
     public static final String KEY_SHUFFLE = "shuffle";
@@ -201,6 +201,7 @@ public class PlayerActivity extends Activity implements OnTouchListener {
             FrameLayout.LayoutParams layoutParams = new LayoutParams(width, getResources().getDisplayMetrics().widthPixels);
             layoutParams.leftMargin = left;
             mTextureView.setLayoutParams(layoutParams);
+            scheduleHideControls();
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
             int videoWidth = mMediaPlayer.getVideoWidth();
@@ -314,7 +315,7 @@ public class PlayerActivity extends Activity implements OnTouchListener {
                                 && (visibility & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0) {
                             showControls();
                             getActionBar().show();
-                            scheduleHideControls();
+                           // scheduleHideControls();
                             zoomOut();
                         }
                     }
@@ -407,6 +408,14 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         AndroidUtilities.setApplicationHandler(mHandler);
         bindingFullScreenEvent();
         mRoot = findViewById(R.id.root);
+        SeekView seekView = new SeekView(this);
+        mRoot.addView(seekView);
+        seekView.setListener(new Listener() {
+            @Override
+            public void onStop(int value) {
+                mMediaPlayer.seekTo(value * 1000 + mMediaPlayer.getCurrentPosition());
+            }
+        });
         AndroidUtilities.density = getResources().getDisplayMetrics().density;
         //        mRoot.setOnClickListener(v -> {
 //            showSystemUi(true);
@@ -512,102 +521,38 @@ public class PlayerActivity extends Activity implements OnTouchListener {
         clearSurface();
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN: {
-                mLastFocusX = event.getX();
-                showControls();
-                mMediaPlayer.pause();
-                mCurrentPosition = mMediaPlayer.getCurrentPosition();
-                mDelta = 0;
-                break;
-            }
-            case MotionEvent.ACTION_MOVE: {
-                final float scrollX = mLastFocusX - event.getX();
-                if (Math.abs(scrollX) > 1) {
-                    if (scrollX < 0) {
-                        mDelta++;
-                    } else {
-                        mDelta--;
-                    }
-                }
-                mPosition.setText(getStringForTime(mStringBuilder, mFormatter, mCurrentPosition + mDelta * 1000));
-                mLastFocusX = event.getX();
-                break;
-            }
-            case MotionEvent.ACTION_UP: {
-                mMediaPlayer.seekTo(mCurrentPosition + mDelta * 1000);
-                mMediaPlayer.start();
-                scheduleHideControls();
-            }
-        }
-        return true;
-    }
-
-    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
-        private int mScaledTouchSlop;
-        private int mCurrentTime;
-
-        public GestureListener() {
-            mScaledTouchSlop = ViewConfiguration.get(PlayerActivity.this).getScaledTouchSlop();
-        }
-
-        @Override
-        public boolean onDoubleTap(MotionEvent e) {
-            return true;
-        }
-
-        @Override
-        public boolean onDown(MotionEvent event) {
-            // don't return false here or else none of the other
-            // gestures will work
-            mCurrentTime = mMediaPlayer.getCurrentPosition();
-            return true;
-        }
-
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            return true;
-        }
-
-        @Override
-        public void onLongPress(MotionEvent e) {
-        }
-
-        @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            try {
-                float diffY = e2.getY() - e1.getY();
-                float diffX = e2.getX() - e1.getX();
-                if (Math.abs(diffX) > Math.abs(diffY)) {
-                    // && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD
-                    if (Math.abs(diffX) > mScaledTouchSlop) {
-                        if (diffX > 0) {
-                            mMediaPlayer.seekTo(mMediaPlayer.getCurrentPosition() + 1);
-                        } else {
-                        }
-                    }
-                }
-//                else {
-//                    if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
-//                        if (diffY > 0) {
-//                        } else {
-//                        }
+//    @Override
+//    public boolean onTouch(View v, MotionEvent event) {
+//        switch (event.getAction()) {
+//            case MotionEvent.ACTION_DOWN: {
+//                mLastFocusX = event.getX();
+//                showControls();
+//                mMediaPlayer.pause();
+//                mCurrentPosition = mMediaPlayer.getCurrentPosition();
+//                mDelta = 0;
+//                break;
+//            }
+//            case MotionEvent.ACTION_MOVE: {
+//                final float scrollX = mLastFocusX - event.getX();
+//                if (Math.abs(scrollX) > 1) {
+//                    if (scrollX < 0) {
+//                        mDelta++;
+//                    } else {
+//                        mDelta--;
 //                    }
 //                }
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
-            return true;
-        }
+//                mPosition.setText(getStringForTime(mStringBuilder, mFormatter, mCurrentPosition + mDelta * 1000));
+//                mLastFocusX = event.getX();
+//                break;
+//            }
+//            case MotionEvent.ACTION_UP: {
+//                mMediaPlayer.seekTo(mCurrentPosition + mDelta * 1000);
+//                mMediaPlayer.start();
+//                scheduleHideControls();
+//            }
+//        }
+//        return true;
+//    }
 
-        @Override
-        public boolean onSingleTapConfirmed(MotionEvent e) {
-            showControls();
-            scheduleHideControls();
-            return true;
-        }
-    }
 
 }
