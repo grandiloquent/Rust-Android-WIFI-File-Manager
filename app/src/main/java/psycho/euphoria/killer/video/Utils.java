@@ -1,7 +1,6 @@
 package psycho.euphoria.killer.video;
 
 import android.app.Activity;
-import android.media.MediaPlayer;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

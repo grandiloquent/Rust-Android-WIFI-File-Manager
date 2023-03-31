@@ -117,32 +117,4 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:layout_marginBottom="52dp" />
-
-    <LinearLayout
-        android:id="@+id/exo_center_controls"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@android:color/transparent"
-        android:clipToPadding="false"
-        android:gravity="center"
-        android:padding="@dimen/exo_styled_controls_padding">
-
-
-
-        <ImageButton
-            android:id="@+id/play_pause"
-            android:layout_width="@dimen/exo_icon_size"
-            android:layout_height="@dimen/exo_icon_size"
-            android:layout_marginLeft="@dimen/exo_icon_horizontal_margin"
-            android:layout_marginRight="@dimen/exo_icon_horizontal_margin"
-            android:background="?android:attr/selectableItemBackground"
-            android:padding="@dimen/exo_icon_padding"
-            android:scaleType="fitXY"
-            android:src="@drawable/exo_styled_controls_play" />
-
-
-
-
-    </LinearLayout>
 </FrameLayout>

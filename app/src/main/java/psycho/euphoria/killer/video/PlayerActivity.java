@@ -5,36 +5,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.media.MediaPlayer;
 import android.media.PlaybackParams;
 import android.media.TimedMetaData;
 import android.opengl.GLES20;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.TextureView.SurfaceTextureListener;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
-import android.view.ViewConfiguration;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.Formatter;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -44,7 +32,6 @@ import javax.microedition.khronos.egl.EGLSurface;
 
 import psycho.euphoria.killer.R;
 import psycho.euphoria.killer.Shared;
-import psycho.euphoria.killer.video.SeekView.Listener;
 
 import static psycho.euphoria.killer.Shared.getStringForTime;
 import static psycho.euphoria.killer.Shared.hideSystemUI;
@@ -53,11 +40,8 @@ import static psycho.euphoria.killer.Shared.hideSystemUI;
 public class PlayerActivity extends Activity {
 
     public static final int DEFAULT_HIDE_TIME_DELAY = 5000;
-    public static final String KEY_SHUFFLE = "shuffle";
     public static final String KEY_VIDEO_FILE = "VideoFile";
     public static final String KEY_VIDEO_TITLE = "VideoTitle";
-    private static final int TOUCH_IGNORE = -1;
-    private static final int TOUCH_NONE = 0;
     private final Handler mHandler = new Handler();
     private final StringBuilder mStringBuilder = new StringBuilder();
     private final Formatter mFormatter = new Formatter(mStringBuilder);
@@ -65,17 +49,10 @@ public class PlayerActivity extends Activity {
     private MediaPlayer mMediaPlayer;
     private Surface mSurface;
     private FrameLayout mRoot;
-    private boolean mLayout = false;
     private FrameLayout mBottomBar;
     private TextView mDuration;
     private SimpleTimeBar mTimeBar;
     private TextView mPosition;
-    private LinearLayout mCenterControls;
-    private ImageButton mPlayPause;
-    private int mScaledTouchSlop;
-    private int mDelta = 0;
-    private int mCurrentPosition;
-    private float mLastFocusX;
     private int mLastSystemUiVis;
     private PlayerSizeInformation mPlayerSizeInformation;
     private final Runnable mHideAction = this::hiddenControls;
@@ -218,7 +195,6 @@ public class PlayerActivity extends Activity {
     private void hiddenControls() {
         mTimeBar.setVisibility(View.GONE);
         mBottomBar.setVisibility(View.GONE);
-        mCenterControls.setVisibility(View.GONE);
         hideSystemUI(this);
         zoomIn();
     }
@@ -265,10 +241,8 @@ public class PlayerActivity extends Activity {
     private void onPlayPause(View view) {
         if (mMediaPlayer.isPlaying()) {
             mMediaPlayer.pause();
-            mPlayPause.setBackgroundDrawable(getResources().getDrawable(R.drawable.exo_ic_play_circle_filled));
         } else {
             mMediaPlayer.start();
-            mPlayPause.setBackgroundDrawable(getResources().getDrawable(R.drawable.exo_ic_pause_circle_filled));
         }
     }
 
@@ -279,7 +253,6 @@ public class PlayerActivity extends Activity {
 //        PlaybackParams playbackParams = new PlaybackParams();
 //        playbackParams.setSpeed(mSpeed);
 //        mMediaPlayer.setPlaybackParams(playbackParams);
-        mPlayPause.setBackgroundDrawable(getResources().getDrawable(R.drawable.exo_ic_pause_circle_filled));
         updateProgress();
         hiddenControls();
 
@@ -298,6 +271,7 @@ public class PlayerActivity extends Activity {
     private void play() throws IOException {
         mMediaPlayer.setDataSource(getIntent().getStringExtra(KEY_VIDEO_FILE));
         mMediaPlayer.prepareAsync();
+        mSeekView.setPath(getIntent().getStringExtra(KEY_VIDEO_FILE),mMediaPlayer);
     }
 
     private void setOnSystemUiVisibilityChangeListener() {
@@ -305,19 +279,18 @@ public class PlayerActivity extends Activity {
         // will change system ui visibility from invisible to visible. We show
         // the media control and enable system UI (e.g. ActionBar) to be visible at this point
         getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(
-                new View.OnSystemUiVisibilityChangeListener() {
-
-                    @Override
-                    public void onSystemUiVisibilityChange(int visibility) {
-                        int diff = mLastSystemUiVis ^ visibility;
-                        mLastSystemUiVis = visibility;
-                        if ((diff & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) != 0
-                                && (visibility & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0) {
-                            showControls();
-                            getActionBar().show();
-                           // scheduleHideControls();
-                            zoomOut();
-                        }
+                visibility -> {
+                    int diff = mLastSystemUiVis ^ visibility;
+                    mLastSystemUiVis = visibility;
+                    if ((diff & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) != 0
+                            && (visibility & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0) {
+                        showControls();
+                        getActionBar().show();
+                        mSeekView.setMarginBottom(mBottomBar.getMeasuredHeight()
+                        +Shared.getNavigationBarHeight(PlayerActivity.this,
+                                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)+64);
+                        // scheduleHideControls();
+                        zoomOut();
                     }
                 });
     }
@@ -325,9 +298,10 @@ public class PlayerActivity extends Activity {
     private void showControls() {
         mTimeBar.setVisibility(View.VISIBLE);
         mBottomBar.setVisibility(View.VISIBLE);
-        mCenterControls.setVisibility(View.VISIBLE);
         updateProgress();
     }
+
+    private SeekView mSeekView;
 
     private void zoomIn() {
         if (mMediaPlayer == null) {
@@ -408,14 +382,7 @@ public class PlayerActivity extends Activity {
         AndroidUtilities.setApplicationHandler(mHandler);
         bindingFullScreenEvent();
         mRoot = findViewById(R.id.root);
-        SeekView seekView = new SeekView(this);
-        mRoot.addView(seekView);
-        seekView.setListener(new Listener() {
-            @Override
-            public void onStop(int value) {
-                mMediaPlayer.seekTo(value * 1000 + mMediaPlayer.getCurrentPosition());
-            }
-        });
+
         AndroidUtilities.density = getResources().getDisplayMetrics().density;
         //        mRoot.setOnClickListener(v -> {
 //            showSystemUi(true);
@@ -441,7 +408,6 @@ public class PlayerActivity extends Activity {
 //                        // other navigational controls.
 //                    }
 //                });
-        mCenterControls = findViewById(R.id.exo_center_controls);
         mTextureView = findViewById(R.id.texture_view);
         mPosition = findViewById(R.id.position);
         mBottomBar = findViewById(R.id.exo_bottom_bar);
@@ -468,9 +434,6 @@ public class PlayerActivity extends Activity {
         });
         mTimeBar = findViewById(R.id.timebar);
         new SeekManager(this);
-        mPlayPause = findViewById(R.id.play_pause);
-        mPlayPause.setOnClickListener(this::onPlayPause);
-        mScaledTouchSlop = ViewConfiguration.get(this).getScaledTouchSlop();
         //mTextureView.setOnTouchListener(this);
         LoopManager loopManager = new LoopManager(this);
         findViewById(R.id.action_file_download).setOnClickListener(new OnClickListener() {
@@ -500,6 +463,10 @@ public class PlayerActivity extends Activity {
         findViewById(R.id.action_speed).setOnClickListener(v -> Shared.openTextContentDialog(PlayerActivity.this, "跳转", value -> {
             mMediaPlayer.seekTo(Utils.parseMilliseconds(value), MediaPlayer.SEEK_CLOSEST);
         }));
+        mSeekView = new SeekView(this);
+        mSeekView.setListener(value -> mMediaPlayer.seekTo(value * 1000 + mMediaPlayer.getCurrentPosition()));
+        mRoot.addView(mSeekView);
+
     }
 
     @Override
@@ -520,7 +487,6 @@ public class PlayerActivity extends Activity {
         }
         clearSurface();
     }
-
 //    @Override
 //    public boolean onTouch(View v, MotionEvent event) {
 //        switch (event.getAction()) {

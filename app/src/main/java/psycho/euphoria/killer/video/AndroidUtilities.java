@@ -7,10 +7,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Handler;
 
-import java.util.regex.Matcher;
-
-import psycho.euphoria.killer.BuildConfig;
-
 // https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java
 public class AndroidUtilities {
     public static float density = 1;

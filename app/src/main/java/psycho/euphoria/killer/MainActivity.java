@@ -74,8 +74,6 @@ public class MainActivity extends Activity {
         }
         Intent intent = new Intent(this, ServerService.class);
         startService(intent);
-
-
     }
 
     private void initializeWebView() {
