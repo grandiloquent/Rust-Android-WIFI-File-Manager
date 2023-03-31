@@ -15,6 +15,8 @@ import java.io.File;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import psycho.euphoria.killer.video.PlayerActivity;
+
 public class WebAppInterface {
 
     private MainActivity mContext;
@@ -58,6 +60,26 @@ public class WebAppInterface {
     }
 
     @JavascriptInterface
+    public void openPage() {
+        CharSequence str = Shared.getText(mContext);
+        if (str == null) {
+            return;
+        }
+        mContext.runOnUiThread(() -> {
+            mContext.getWebView().loadUrl(str.toString());
+        });
+    }
+
+    @JavascriptInterface
+    public void playVideo() {
+        CharSequence str = Shared.getText(mContext);
+        if (str == null) {
+            return;
+        }
+        PlayerActivity.launchActivity(mContext, str.toString(), null);
+    }
+
+    @JavascriptInterface
     public String readText() {
         ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = clipboard.getPrimaryClip();
@@ -69,6 +91,12 @@ public class WebAppInterface {
         return null;
     }
 
+    @JavascriptInterface
+    public void serverHome() {
+        mContext.runOnUiThread(() -> {
+            mContext.getWebView().loadUrl("http://" + Shared.getDeviceIP(mContext) + ":3000");
+        });
+    }
 
     @JavascriptInterface
     public void share(String path) {
@@ -79,15 +107,15 @@ public class WebAppInterface {
     }
 
     @JavascriptInterface
+    public void startServer() {
+        Intent intent = new Intent(mContext, ServerService.class);
+        mContext.startService(intent);
+    }
+
+    @JavascriptInterface
     public void writeText(String text) {
         ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("demo", text);
         clipboard.setPrimaryClip(clip);
-    }
-
-    @JavascriptInterface
-    public void startServer() {
-        Intent intent = new Intent(mContext, ServerService.class);
-        mContext.startService(intent);
     }
 }

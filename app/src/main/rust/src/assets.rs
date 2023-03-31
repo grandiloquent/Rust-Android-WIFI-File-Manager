@@ -6,6 +6,7 @@ use std::ffi::CString;
 use std::fmt::Error;
 use std::io::{ErrorKind, Read};
 use std::ptr::NonNull;
+use std::sync::MutexGuard;
 /*
 获取用于访问assets目录下文件的对象。
 https://developer.android.com/reference/android/content/res/AssetManager
@@ -61,7 +62,7 @@ pub fn read_resource_file(ass: &AssetManager, n: &str) -> Result<String, Box<dyn
     // }
 }
 
-pub fn read_asset<'a>(name: String, cache: &HashMap<&'a str, String>, ass: &AssetManager) -> Result<String, Box<dyn std::error::Error>> {
+pub fn read_asset<'a>(name: String, cache: &HashMap<&'a str, String>, ass: MutexGuard<&AssetManager>) -> Result<String, Box<dyn std::error::Error>> {
     let data = match cache.get(name.as_str()) {
         Some(v) => v.to_string(),
         None => {

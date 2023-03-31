@@ -14,7 +14,7 @@ pub struct Context<'a> {
 }
 
 pub fn handle_page(name: &str, context: &Context, request: Request) {
-    match read_asset(name.to_string(), context.cache, context.ass.lock().unwrap().deref()) {
+    match read_asset(name.to_string(), context.cache, context.ass.lock().unwrap()) {
         Ok(data) => {
             let _ = request.respond(Response::from_string(data)
                 .with_header(get_header(name, context.headers)));

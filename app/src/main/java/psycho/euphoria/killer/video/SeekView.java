@@ -104,8 +104,8 @@ public class SeekView extends View {
     private MediaPlayer mMediaPlayer;
 
     public void setPath(String path, MediaPlayer mediaPlayer) {
-        mMediaMetadataRetriever = new MediaMetadataRetriever();
-        mMediaMetadataRetriever.setDataSource(path);
+//        mMediaMetadataRetriever = new MediaMetadataRetriever();
+//        mMediaMetadataRetriever.setDataSource(path);
         mMediaPlayer = mediaPlayer;
     }
 

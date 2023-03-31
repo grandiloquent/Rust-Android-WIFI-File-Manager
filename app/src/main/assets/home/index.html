@@ -86,12 +86,38 @@
 <body>
     <div style="height: 20px;"></div>
     <div class="title">
-        菜单
+        服务器
     </div>
     <div class="tablist">
         <div class="tablist-wrapper">
             <div bind @click="startServer" class="tablist-item">
                 启动服务器
+            </div>
+            <div bind @click="serverHome" class="tablist-item">
+                服务器首页
+            </div>
+        </div>
+    </div>
+    <div style="height: 20px;"></div>
+    <div class="title">
+        视频
+    </div>
+    <div class="tablist">
+        <div class="tablist-wrapper">
+
+            <div bind @click="playVideo" class="tablist-item">
+                播放视频
+            </div>
+        </div>
+    </div>
+    <div style="height: 20px;"></div>
+    <div class="title">
+        其他
+    </div>
+    <div class="tablist">
+        <div class="tablist-wrapper">
+            <div bind @click="openPage" class="tablist-item">
+                打开页面
             </div>
         </div>
     </div>
@@ -182,6 +208,15 @@
         bind();
         function startServer() {
             NativeAndroid.startServer();
+        }
+        function playVideo() {
+            NativeAndroid.playVideo();
+        }
+        function openPage() {
+            NativeAndroid.openPage();
+        }
+        function serverHome() {
+            NativeAndroid.serverHome();
         }
     </script>
 </body>

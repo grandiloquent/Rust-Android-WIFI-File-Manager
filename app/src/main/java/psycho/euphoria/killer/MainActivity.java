@@ -36,6 +36,7 @@ import static psycho.euphoria.killer.video.PlayerActivity.*;
 public class MainActivity extends Activity {
     public static final int ITEM_ID_REFRESH = 1;
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36";
+    public static final String FILE_ANDROID_ASSET_HOME_INDEX_HTML = "file:///android_asset/home/index.html";
 
     static {
 /*
@@ -46,6 +47,10 @@ public class MainActivity extends Activity {
 
     SharedPreferences mSharedPreferences;
     WebView mWebView;
+
+    public WebView getWebView() {
+        return mWebView;
+    }
 
     /*
     启动使用 Rust 编写的服务器。host由主机名和端口组成。例如192.168.8.55:3000。其中主机名是设备在局域网中的IP，使用它可以在局域网的设备之间共享数据。例如连接到一个Wi-Fi的电脑和手机
@@ -72,7 +77,7 @@ public class MainActivity extends Activity {
         if (lastedAddress != null) {
             mWebView.loadUrl(lastedAddress);
         }
-        mWebView.loadUrl("file:///android_asset/home/index.html");;
+        mWebView.loadUrl(FILE_ANDROID_ASSET_HOME_INDEX_HTML);
 
     }
 
@@ -110,7 +115,8 @@ public class MainActivity extends Activity {
     }
 
     private void openHomePage() {
-        mWebView.loadUrl("http://" + Shared.getDeviceIP(this) + ":3000");
+        mWebView.loadUrl(FILE_ANDROID_ASSET_HOME_INDEX_HTML);
+
     }
 
     private void playVideo() {
@@ -198,7 +204,6 @@ public class MainActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, 1, 0, "刷新");
-        menu.add(0, 2, 0, "打开");
         menu.add(0, 3, 0, "保存页面");
         menu.add(0, 4, 0, "播放视频");
         menu.add(0, 6, 0, "首页");
@@ -212,9 +217,6 @@ public class MainActivity extends Activity {
         switch (item.getItemId()) {
             case 1:
                 refresh();
-                break;
-            case 2:
-                open();
                 break;
             case 3:
                 saveRenderedWebPage();

@@ -58,7 +58,7 @@ fn run_server(host: &str, ass: AssetManager) {
             let filename = (&path[1..]).to_string() + ".html";
             handle_page(filename.as_str(), &context, request);
         } else if re.is_match(path.as_str()) {
-            let data = read_asset((&path[1..]).to_string(), &cache, &ass).unwrap();
+            let data = read_asset((&path[1..]).to_string(), &cache, context.ass.lock().unwrap()).unwrap();
             let _ = request.respond(Response::from_string(data)
                 .with_header(get_header(&path[1..], &headers)));
         } else if path == "/api/files" {
