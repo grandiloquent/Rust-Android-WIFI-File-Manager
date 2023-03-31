@@ -9,6 +9,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -31,7 +32,9 @@ public class CustomWebViewClient extends WebViewClient {
             "://i.imgur.com/",
             "://onclickgenius.com/",
             "://inpagepush.com/",
-            ".doppiocdn.com/"
+            ".doppiocdn.com/",
+            ".googleapis.com/",
+            "adsco.re/"
     };
     private final WebResourceResponse mEmptyResponse = new WebResourceResponse(
             "text/plain",
@@ -70,8 +73,14 @@ public class CustomWebViewClient extends WebViewClient {
         if (Arrays.stream(mBlocks).anyMatch(url::contains)) {
             return mEmptyResponse;
         }
-        if (url.endsWith(".m3u8")) {
+        if (url.contains(".m3u8")||url.contains(".m3u8?")) {
             Shared.setText(mContext, url);
+            mContext.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mContext, "解析到视频地址", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
         return super.shouldInterceptRequest(view, url);
     }

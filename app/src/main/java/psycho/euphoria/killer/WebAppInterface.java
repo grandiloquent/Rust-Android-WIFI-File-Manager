@@ -5,6 +5,7 @@ import android.app.DownloadManager.Request;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
@@ -84,4 +85,9 @@ public class WebAppInterface {
         clipboard.setPrimaryClip(clip);
     }
 
+    @JavascriptInterface
+    public void startServer() {
+        Intent intent = new Intent(mContext, ServerService.class);
+        mContext.startService(intent);
+    }
 }

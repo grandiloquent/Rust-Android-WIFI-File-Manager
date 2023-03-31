@@ -72,8 +72,8 @@ public class MainActivity extends Activity {
         if (lastedAddress != null) {
             mWebView.loadUrl(lastedAddress);
         }
-        Intent intent = new Intent(this, ServerService.class);
-        startService(intent);
+        mWebView.loadUrl("file:///android_asset/home/index.html");;
+
     }
 
     private void initializeWebView() {
