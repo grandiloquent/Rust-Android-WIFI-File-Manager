@@ -129,14 +129,8 @@ function onFavSubmit(evt) {
 
     let path;
     switch (evt.detail.id) {
-        case `1`:
-            path = "/notes.html";
-            break
         case `2`:
             path = "http://192.168.8.189:8080/notes";
-            break
-        case `3`:
-            path = "/editor.html";
             break
         case `4`:
             path = "http://192.168.8.189:8080/?path=D%3A%5CBooks";
@@ -172,12 +166,8 @@ customElements.whenDefined('custom-bottom-sheet').then(() => {
     }, {
         title: "整理", id: 6
     }]
-    fav.data = [{
-        title: "文档", id: 1
-    }, {
+    fav.data = [ {
         title: "共享文档", id: 2
-    }, {
-        title: "编辑文档", id: 3
     }, {
         title: "书籍", id: 4
     }, {

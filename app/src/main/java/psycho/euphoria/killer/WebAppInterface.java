@@ -131,5 +131,10 @@ public class WebAppInterface {
         ((InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE))
                 .showInputMethodPicker();
     }
-
+    @JavascriptInterface
+    public void notes() {
+        mContext.runOnUiThread(() -> {
+            mContext.getWebView().loadUrl(String.format("http://%s:3000/notes", Shared.getDeviceIP(mContext)));
+        });
+    }
 }

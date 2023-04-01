@@ -17,6 +17,13 @@ function videoList() {
 function switchInputMethod() {
     NativeAndroid.switchInputMethod();
 }
+function searchVideo() {
+    const string = NativeAndroid.readText();
+    window.location.href=`https://www.google.com/search?q=${encodeURIComponent(string)}+movie+online`;
+}
+function notes() {
+    NativeAndroid.notes();
+}
 // 
 
 bind();
