@@ -6,9 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>编辑器</title>
-    <link rel="stylesheet" href="editor.css">
-    <script src="custom-toast.js"></script>
-    <script src="shared.js"></script>
+    <link rel="stylesheet" href="assets/editor/editor.css">
+    <script src="assets/custom-toast.js"></script>
 </head>
 
 <body>
@@ -17,17 +16,8 @@
         <div style="height: 49px;"></div>
     </div>
     <div class="bar-renderer">
-        <div bind @click="openLink" class="bar-item-renderer">
-            <svg viewBox="0 0 24 24">
-                <path
-                    d="M14.578 16.594l4.641-4.594-4.641-4.594 1.406-1.406 6 6-6 6zM9.422 16.594l-1.406 1.406-6-6 6-6 1.406 1.406-4.641 4.594z">
-                </path>
-            </svg>
-            <div class="bar-item-title">
-                链接
-            </div>
-        </div>
-        <div bind @click="onTranslateChinese" class="bar-item-renderer">
+        
+        <div bind @click="onTranslateFn" class="bar-item-renderer">
             <svg viewBox="0 0 24 24">
                 <path
                     d="M21.516 20.484v-13.969q0-0.422-0.305-0.727t-0.727-0.305h-9.047l1.313 3.797h1.453v-1.266h1.266v1.266h4.547v1.313h-1.922q-0.703 2.344-2.391 4.219l3.281 3.281-0.938 0.891-3.094-3.094 1.031 3.094-1.969 2.531h6.469q0.422 0 0.727-0.305t0.305-0.727zM13.172 10.594l0.797 2.344 0.844 1.125q1.453-1.594 2.063-3.469h-3.703zM6.984 15.984q2.156 0 3.492-1.359t1.336-3.516q0-0.047-0.141-1.031h-4.688v1.734h2.953q-0.094 0.891-0.844 1.641t-2.109 0.75q-1.313 0-2.227-0.938t-0.914-2.25q0-1.359 0.914-2.297t2.227-0.938q1.266 0 2.063 0.797l1.313-1.266q-1.453-1.313-3.375-1.313-2.063 0-3.516 1.477t-1.453 3.539 1.453 3.516 3.516 1.453zM21 3.984q0.797 0 1.406 0.609t0.609 1.406v15q0 0.797-0.609 1.406t-1.406 0.609h-9l-0.984-3h-8.016q-0.797 0-1.406-0.609t-0.609-1.406v-15q0-0.797 0.609-1.406t1.406-0.609h6.984l1.031 3h9.984z">
@@ -35,6 +25,14 @@
             </svg>
             <div class="bar-item-title">
                 中文
+            </div>
+        </div>
+        <div bind @click="onTranslateEnglish" class="bar-item-renderer">
+            <svg viewBox="0 0 24 24">
+                <path d="M15.891 17.016h3.234l-1.641-4.359zM18.516 9.984l4.5 12h-2.016l-1.125-3h-4.734l-1.125 3h-2.016l4.5-12h2.016zM12.891 15.047l-0.797 2.063-3.094-3.094-5.016 4.969-1.406-1.406 5.109-5.016q-1.875-2.063-3-4.547h2.016q0.984 1.875 2.297 3.328 2.156-2.391 3.188-5.344h-11.203v-2.016h7.031v-1.969h1.969v1.969h7.031v2.016h-2.953q-0.469 1.5-1.547 3.398t-2.156 3.117l-0.047 0.047z"></path>
+            </svg>
+            <div class="bar-item-title">
+                英文
             </div>
         </div>
         <div bind @click="onCopyLine" class="bar-item-renderer">
@@ -60,7 +58,7 @@
                 <path d="M20.391 8.391l-4.828-4.828q-0.563-0.563-1.406-0.563h-9.141q-0.844 0-1.43 0.586t-0.586 1.43v13.969q0 0.844 0.586 1.43t1.43 0.586h13.969q0.844 0 1.43-0.586t0.586-1.43v-9.141q0-0.844-0.609-1.453zM6.984 6.984h7.031v2.016h-7.031v-2.016zM17.016 17.016h-10.031v-2.016h10.031v2.016zM17.016 12.984h-10.031v-1.969h10.031v1.969z"></path>
             </svg>
             <div class="bar-item-title">
-                翻译
+                评论
             </div>
         </div>
         <div bind @click="onShow" class="bar-item-renderer">
@@ -76,7 +74,10 @@
     <custom-bottom-sheet bind="customBottomSheet" @submit="onCustomBottomSheet" style="display:none;">
     </custom-bottom-sheet>
 
-    <script src="editor.js"></script>
+
+    <script src="assets/editor/shared.js"></script>
+    <script src="assets/editor/data.js"></script>
+    <script src="assets/editor/editor.js"></script>
     
 </body>
 

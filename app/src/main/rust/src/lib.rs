@@ -10,10 +10,12 @@ mod asset;
 mod error;
 mod util;
 mod res;
+mod server;
+mod mimetypes;
 
 use jni::JNIEnv;
 use jni::objects::{JObject, JString};
-use crate::handler::run_server;
+use crate::server::run_server;
 use crate::util::get_asset_manager;
 
 #[no_mangle]

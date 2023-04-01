@@ -450,30 +450,8 @@ button {
   -->
   */
 })();
-////////////////////////////////////////////////////////////
-/*
-绑定元素和事件
-例如：<div bind="div" @click="click"></div>
-执行下列代码后，即可通过 this.div 访问该元素
-在全局下编写click函数，即可自动绑定到该元素的click事件
-*/
-function bind(elememnt) {
-    (elememnt || document).querySelectorAll('[bind]').forEach(element => {
-        if (element.getAttribute('bind')) {
-            window[element.getAttribute('bind')] = element;
-        }
-        [...element.attributes].filter(attr => attr.nodeName.startsWith('@')).forEach(attr => {
-            if (!attr.value) return;
-            element.addEventListener(attr.nodeName.slice(1), evt => {
-                window[attr.value](evt);
-            });
-        });
-    })
-}
 
-function camel(string) {
-    return string.replaceAll(/[ _-]([a-zA-Z])/g, m => m[1].toUpperCase());
-}
+////////////////////////////////////////////////////////////
 
 function copyLine(editor, count) {
     const start = editor.selectionStart;
@@ -691,17 +669,22 @@ function formatHead(editor, count) {
         offsetEnd, 'end');
 }
 
-function getLine() {
+function getLine(extended) {
     let start = textarea.selectionStart;
     const strings = textarea.value;
     if (strings[start] === '\n' && start - 1 > 0) {
         start--;
     }
-    while (start > 0 && strings[start] != '\n') {
+    while (start > 0 && strings[start] !== '\n') {
         start--;
     }
+    if (extended) {
+        while (start + 1 < strings.length && /\s/.test(strings[start])) {
+            start++
+        }
+    }
     let end = textarea.selectionEnd;
-    while (end - 1 < strings.length && strings[end] != '\n') {
+    while (end + 1 < strings.length && strings[end] !== '\n') {
         end++;
     }
     return [strings.substring(start, end), start, end]
@@ -726,7 +709,7 @@ async function insertLink() {
     } catch (e) {
     }
     textarea.setRangeText(
-        `- [${name}](${strings})`,
+        `- [${name.trim()}](${strings})`,
         textarea.selectionStart,
         textarea.selectionEnd,
         'end'
@@ -737,7 +720,7 @@ function jumpPage(textarea) {
     const line = getLine(textarea);
     const value = /(?<=(href|src)=")[^"]+(?=")/.exec(line);
     const path = new URL(window.location).searchParams.get("path");
-    if (!value) {
+    if (!value && path) {
         window.open('http://127.0.0.1:8081/' + substringBeforeLast(substringAfter(path, "\\app\\"), "."), "_blank");
         return
     }
@@ -769,42 +752,6 @@ function onCopyLine() {
     copyLine(textarea);
 }
 
-function onCustomBottomSheet(evt) {
-    customBottomSheet.style.display = 'none';
-    switch (evt.detail.id) {
-        case "1":
-            onCopy();
-            break;
-        case "2":
-            onPreview();
-            break;
-        case "3":
-            onInsert();
-            break;
-        case "4":
-            onTranslateEnglish();
-            break;
-        case "5":
-            onCode();
-            break;
-        case "6":
-            onEval();
-            break;
-        case "7":
-            customDialog.style.display = 'block';
-            break;
-        case "8":
-            insertLink()
-            break;
-        case "9":
-            onCode();
-            break;
-        case "10":
-            onShowTranslator()
-            break
-    }
-}
-
 async function onEval() {
     const p = findBlock(textarea);
     const s = textarea.value.substring(p[0], p[1]);
@@ -825,9 +772,9 @@ function onPreview() {
     const searchParams = new URL(window.location).searchParams;
     if (searchParams.has("path")) {
         const path = searchParams.get("path");
-        window.open(`/markdown.html?path=${path}`, '_blank')
+        window.open(`/markdown?path=${path}`, '_blank')
     } else {
-        window.open(`/markdown.html?id=${searchParams.get("id")}`, '_blank')
+        window.open(`/markdown?id=${searchParams.get("id")}`, '_blank')
     }
 }
 
@@ -866,7 +813,7 @@ function onShow() {
 }
 
 function onShowTranslator() {
-    window.translator.style.display = 'block';
+    onInsert();
 }
 
 async function onSnippet() {
@@ -894,6 +841,13 @@ async function onTranslateChinese() {
 async function onTranslateEnglish() {
     let array1 = getLine();
     textarea.setRangeText(`\n\n${await translate(array1[0], 'en')}
+          `, array1[2], array1[2], 'end');
+}
+
+async function onTranslateFn() {
+    let array1 = getLine();
+    textarea.setRangeText(`\n\nfn ${snake(await translate(array1[0], 'en'))}(){
+    }
           `, array1[2], array1[2], 'end');
 }
 
@@ -1005,10 +959,15 @@ function snake(string) {
 function sortLines() {
     const points = findBlock(textarea);
     const lines = textarea.value.substring(points[0], points[1]).split('\n')
-        .sort((x, y) => x.localeCompare(y));
+        .sort((x, y) => {
+            let v1 = /\d{4}\)/.exec(x);
+            let v2 = /\d{4}\)/.exec(y)
+            if (v1 && v2)
+                return v1[0].localeCompare(v2[0])
+            return x.localeCompare(y);
+        });
     textarea.setRangeText(`\n\n${lines.join('\n')}`, points[0], points[1], 'end');
 }
-
 
 function tab(textarea) {
     textarea.addEventListener('keydown', function (e) {
@@ -1118,112 +1077,3 @@ async function uploadImage(image, name) {
     return await response.text();
 }
 
-function upperCamel(string) {
-    string = camel(string);
-    return string.slice(0, 1).toUpperCase() + string.slice(1);
-}
-
-function writeText(message) {
-    const textarea = document.createElement("textarea");
-    textarea.style.position = 'fixed';
-    textarea.style.right = '100%';
-    document.body.appendChild(textarea);
-    textarea.value = message;
-    textarea.select();
-    document.execCommand('copy');
-    textarea.remove();
-}
-
-///////////////////
-bind();
-customElements.whenDefined('custom-bottom-sheet').then(() => {
-    customBottomSheet.data = [{
-        id: 4,
-        title: "翻译英文"
-    }, {
-        id: 3,
-        title: "评论"
-    }, {
-        id: 5,
-        title: "粘贴代码"
-    }, {
-        id: 1,
-        title: "复制代码块"
-    }, {
-        id: 7,
-        title: "设置代码块"
-    }, {
-        id: 2,
-        title: "预览"
-    }, {
-        id: 6,
-        title: "执行代码"
-    }, {
-        id: 8,
-        title: "插入链接"
-    }, {
-        id: 9,
-        title: "代码"
-    }, {
-        id: 10,
-        title: "翻译"
-    }]
-})
-
-document.addEventListener('visibilitychange', () => {
-    localStorage.setItem('contents', textarea.value);
-})
-textarea.value = localStorage.getItem('contents') || '';
-const id = new URL(window.location).searchParams.get("id");
-let baseUri = window.location.host === '127.0.0.1:5500' ? 'http://192.168.8.55:10808' : '';
-render();
-document.addEventListener('keydown', async evt => {
-    if (evt.ctrlKey) {
-        if (evt.key === 's') {
-            evt.preventDefault();
-            await onSave();
-        } else if (evt.key === 'j') {
-            evt.preventDefault();
-            openLink();
-        } else if (evt.key === 'o') {
-            evt.preventDefault();
-            sortLines();
-        } else if (evt.key === 'p') {
-            evt.preventDefault();
-            onPreview();
-        } else if (evt.key === 'k') {
-            evt.preventDefault();
-            insertLink();
-        } else if (evt.key === 'e') {
-            evt.preventDefault();
-            onEval();
-        } else if (evt.key === 'l') {
-            evt.preventDefault();
-            onCode()
-        } else if (evt.key === '1') {
-            evt.preventDefault();
-            const pv = findCodeBlock(textarea);
-            navigator.clipboard.writeText(textarea.value.substring(pv[0], pv[1]));
-        } else if (evt.key === '2') {
-            evt.preventDefault();
-            const p = findCodeBlock(textarea);
-            textarea.setRangeText(await navigator.clipboard.readText(), p[0], p[1], "end");
-        } else if (evt.key === '3') {
-            evt.preventDefault();
-            const p = findCodeBlockExtend(textarea);
-            textarea.setRangeText(textarea.value.substring(p[0], p[1])
-                .split('\n')
-                .map(x => `    ${x.trimEnd()}`).join('\n'), p[0], p[1]);
-        } else if (evt.key === 'u') {
-            evt.preventDefault();
-            uploadHanlder(textarea)
-        } else if (evt.key === 'h') {
-            evt.preventDefault();
-            formatHead(textarea, 3);
-        }
-
-    } else if (evt.key === 'F3') {
-        evt.preventDefault();
-        onTranslateChinese();
-    }
-});
