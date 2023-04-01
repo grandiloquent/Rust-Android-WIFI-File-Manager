@@ -1,19 +1,31 @@
 package psycho.euphoria.killer.video;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.media.MediaCodec;
+import android.media.MediaExtractor;
+import android.media.MediaFormat;
+import android.media.MediaMuxer;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.GridView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
+import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,6 +40,46 @@ public class VideoListActivity extends Activity {
     private String mDirectory;
     private int mSort = 2;
     private String mFilter;
+
+    @SuppressLint("WrongConstant")
+    public static void extractAudio(String videoPath, String dstPath) {
+        MediaMuxer mediaMuxer = null;
+        MediaExtractor mediaExtractor = new MediaExtractor();
+        try {
+            mediaExtractor.setDataSource(videoPath);
+            int audioTrackIdx = -1;
+            for (int i = 0; i < mediaExtractor.getTrackCount(); i++) {
+                MediaFormat mediaFormat = mediaExtractor.getTrackFormat(i);
+                if (mediaFormat.getString(MediaFormat.KEY_MIME).startsWith("audio/")) {
+                    mediaExtractor.selectTrack(i);
+                    mediaMuxer = new MediaMuxer(dstPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+                    audioTrackIdx = mediaMuxer.addTrack(mediaFormat);
+                }
+            }
+            if (mediaMuxer == null) {
+                return;
+            }
+            mediaMuxer.start();
+            MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
+            ByteBuffer byteBuffer = ByteBuffer.allocate(500 * 1024);
+            int readSize;
+            while ((readSize = mediaExtractor.readSampleData(byteBuffer, 0)) > 0) {
+                bufferInfo.offset = 0;
+                bufferInfo.size = readSize;
+                bufferInfo.flags = mediaExtractor.getSampleFlags();
+                bufferInfo.presentationTimeUs = mediaExtractor.getSampleTime();
+                mediaMuxer.writeSampleData(audioTrackIdx, byteBuffer, bufferInfo);
+                mediaExtractor.advance();
+            }
+            mediaExtractor.release();
+            mediaMuxer.stop();
+            mediaMuxer.release();
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     private void actionSortByCreateTimeAscending() {
         mSort = 2;
@@ -49,7 +101,6 @@ public class VideoListActivity extends Activity {
         sort();
     }
 
-
     private String getDefaultPath() {
         File dir = new File(Environment.getExternalStorageDirectory(), ".others");
         if (!dir.exists()) {
@@ -62,7 +113,6 @@ public class VideoListActivity extends Activity {
         mDirectory = getDefaultPath();
         loadFolder(mFilter, mSort);
     }
-
 
     private void loadFolder(String filter, int sort) {
         File dir = new File(mDirectory);
@@ -101,7 +151,6 @@ public class VideoListActivity extends Activity {
         }
         mVideoItemAdapter.updateVideos(videoItems);
     }
-
 
     private void sort() {
         PreferenceManager
@@ -151,9 +200,14 @@ public class VideoListActivity extends Activity {
         AdapterContextMenuInfo contextMenuInfo = (AdapterContextMenuInfo) item.getMenuInfo();
         VideoItem videoItem = mVideoItemAdapter.getItem(contextMenuInfo.position);
         File dir = new File(mDirectory, item.getTitle().toString());
-        File f = new File(videoItem.path);
-        f.renameTo(new File(dir, f.getName()));
-        loadFolder(mFilter, mSort);
+        new Thread(() -> {
+            File f = new File(videoItem.path);
+            File dst = new File(f.getParentFile(), Shared.substringBeforeLast(f.getName(), ".") + ".mp3");
+            extractAudio(f.getAbsolutePath(), dst.getAbsolutePath());
+            this.runOnUiThread(() -> {
+                Toast.makeText(this, "音频完成", Toast.LENGTH_SHORT).show();
+            });
+        }).start();
         return super.onContextItemSelected(item);
     }
 
@@ -176,6 +230,12 @@ public class VideoListActivity extends Activity {
             }
         });
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        menu.add(0, 0, 0, "提取音频");
+        super.onCreateContextMenu(menu, v, menuInfo);
     }
 
     @Override
@@ -208,6 +268,4 @@ public class VideoListActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-
 }
