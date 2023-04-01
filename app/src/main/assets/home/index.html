@@ -6,228 +6,59 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>首页</title>
+    <link rel="stylesheet" href="index.css">
     <style>
-        html {
-            -webkit-tap-highlight-color: transparent;
-            height: 100%;
-            overflow: visible;
-            cursor: pointer;
-        }
 
-        body {
-            -webkit-tap-highlight-color: transparent;
-            -webkit-font-smoothing: antialiased;
-            color: rgba(0, 0, 0, .87);
-            font-family: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
-            margin: 0;
-            text-size-adjust: 100%;
-            overflow: visible;
-            overflow-y: scroll;
-            bottom: auto;
-            height: 100%;
-            right: auto;
-            width: auto;
-            min-height: 668px;
-        }
-
-        .tablist {
-            -webkit-tap-highlight-color: transparent;
-            position: relative;
-            display: flex;
-            height: 32px;
-            max-width: 100%;
-            overflow-y: hidden;
-            overflow-x: overlay;
-            margin-bottom: 12px;
-            padding-left: 16px;
-        }
-
-        .tablist-wrapper {
-            display: flex;
-        }
-
-        .tablist-item {
-            -webkit-tap-highlight-color: transparent;
-            display: flex;
-            -webkit-box-align: center;
-            align-items: center;
-            cursor: pointer;
-            white-space: nowrap;
-            outline: none;
-            letter-spacing: .01785714em;
-            font-size: .875rem;
-            font-weight: 500;
-            line-height: 1.25rem;
-            border-radius: 24px;
-            box-sizing: border-box;
-            padding: 5px 13px;
-            margin-right: 8px;
-            border: 1px solid #dadce0;
-            color: #3c4043;
-        }
-
-        .selected {
-            border: 1px solid transparent;
-            background: #e8f0fe;
-            color: #1967d2;
-        }
-
-        .title {
-            -webkit-tap-highlight-color: transparent;
-            font-size: 1.125rem;
-            font-weight: 400;
-            letter-spacing: 0;
-            line-height: 1.5rem;
-            margin: 8px 16px 16px;
-        }
     </style>
 </head>
 
 <body>
-    <div style="height: 20px;"></div>
-    <div class="title">
-        服务器
-    </div>
-    <div class="tablist">
-        <div class="tablist-wrapper">
-            <div bind @click="startServer" class="tablist-item">
-                启动服务器
-            </div>
-            <div bind @click="serverHome" class="tablist-item">
-                服务器首页
-            </div>
+<div style="height: 20px;"></div>
+<div class="title">
+    服务器
+</div>
+<div class="tablist">
+    <div class="tablist-wrapper">
+        <div bind @click="startServer" class="tablist-item">
+            启动服务器
+        </div>
+        <div bind @click="serverHome" class="tablist-item">
+            服务器首页
         </div>
     </div>
-    <div style="height: 20px;"></div>
-    <div class="title">
-        视频
-    </div>
-    <div class="tablist">
-        <div class="tablist-wrapper">
+</div>
+<div style="height: 20px;"></div>
+<div class="title">
+    视频
+</div>
+<div class="tablist">
+    <div class="tablist-wrapper">
 
-            <div bind @click="playVideo" class="tablist-item">
-                播放视频
-            </div>
-            <div bind @click="videoList" class="tablist-item">
-                视频列表
-            </div>
+        <div bind @click="playVideo" class="tablist-item">
+            播放视频
         </div>
-        
-    </div>
-    <div style="height: 20px;"></div>
-    <div class="title">
-        其他
-    </div>
-    <div class="tablist">
-        <div class="tablist-wrapper">
-            <div bind @click="openPage" class="tablist-item">
-                打开页面
-            </div>
+        <div bind @click="videoList" class="tablist-item">
+            视频列表
         </div>
     </div>
-    <script>
-        function bind(elememnt) {
-            (elememnt || document).querySelectorAll('[bind]').forEach(element => {
-                if (element.getAttribute('bind')) {
-                    window[element.getAttribute('bind')] = element;
-                }
-                [...element.attributes].filter(attr => attr.nodeName.startsWith('@')).forEach(attr => {
-                    if (!attr.value) return;
-                    element.addEventListener(attr.nodeName.slice(1), evt => {
-                        window[attr.value](evt);
-                    });
-                });
-            })
-        }
 
-        function substring(strings, prefix, suffix) {
-            let start = strings.indexOf(prefix);
-            if (start === -1) {
-                return [0, 0]
-            }
-            start += prefix.length;
-            let end = strings.indexOf(suffix, start);
-            if (end === -1) {
-                return [0, 0]
-            }
-            return [start, end]
-        }
-
-        function substringAfter(string, delimiter, missingDelimiterValue) {
-            const index = string.indexOf(delimiter);
-            if (index === -1) {
-                return missingDelimiterValue || string;
-            } else {
-                return string.substring(index + delimiter.length);
-            }
-        }
-
-        function substringAfterLast(string, delimiter, missingDelimiterValue) {
-            const index = string.lastIndexOf(delimiter);
-            if (index === -1) {
-                return missingDelimiterValue || string;
-            } else {
-                return string.substring(index + delimiter.length);
-            }
-        }
-
-        function substringBefore(string, delimiter, missingDelimiterValue) {
-            const index = string.indexOf(delimiter);
-            if (index === -1) {
-                return missingDelimiterValue || string;
-            } else {
-                return string.substring(0, index);
-            }
-        }
-
-        function substringBeforeLast(string, delimiter, missingDelimiterValue) {
-            const index = string.lastIndexOf(delimiter);
-            if (index === -1) {
-                return missingDelimiterValue || string;
-            } else {
-                return string.substring(0, index);
-            }
-        }
-
-        function substringNearest(string, index, start, end) {
-            let j = index;
-            while (j > -1) {
-                if (start.indexOf(string[j]) !== -1) {
-                    j++
-                    break;
-                }
-                j--;
-            }
-            let k = index;
-            while (k < string.length) {
-                if (end.indexOf(string[k]) !== -1) {
-                    break;
-                }
-                k++;
-            }
-            return string.substring(j, k);
-        }
-    </script>
-    <script>
-        bind();
-        function startServer() {
-            NativeAndroid.startServer();
-        }
-        function playVideo() {
-            NativeAndroid.playVideo();
-        }
-        function openPage() {
-            NativeAndroid.openPage();
-        }
-        function serverHome() {
-            NativeAndroid.serverHome();
-        }
-        
-
-        function videoList() {
-            NativeAndroid.videoList();
-        }
-    </script>
+</div>
+<div style="height: 20px;"></div>
+<div class="title">
+    其他
+</div>
+<div class="tablist">
+    <div class="tablist-wrapper">
+        <div bind @click="openPage" class="tablist-item">
+            打开页面
+        </div>
+        <div bind @click="switchInputMethod" class="tablist-item">
+            切换输入法
+        </div>
+    </div>
+</div>
+<script src="shared.js"></script>
+<script src="index.js"></script>
 </body>
 
 </html>
