@@ -79,7 +79,7 @@ public class ServerService extends Service {
 //                    .getInt(KEY_PORT, 3000);
             String tempHost = Shared.getDeviceIP(this);
             //String host = tempHost == null ? "0.0.0.0" : tempHost;
-            MainActivity.startServer(ServerService.this.getAssets(), Shared.getDeviceIP(ServerService.this) + ":3000");
+            MainActivity.startServer(ServerService.this.getAssets(), Shared.getDeviceIP(ServerService.this), 3000);
         }).start();
     }
 

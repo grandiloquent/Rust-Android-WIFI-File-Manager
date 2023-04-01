@@ -23,6 +23,12 @@ TARGET_CC = "C:\\Users\\Administrator\\AppData\\Local\\Android\\Sdk\\ndk\\23.1.7
 TARGET_AR= "C:\\Users\\Administrator\\AppData\\Local\\Android\\Sdk\\ndk\\23.1.7779620\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\llvm-ar.exe"
 ```
 
+### rustup override set nightly
+
+```
+rustup override set nightly
+```
+
 ## 第三方库
 
 ### Rust
