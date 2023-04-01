@@ -1,34 +1,41 @@
-use std::ffi::CString;
-use std::io::Read;
-use std::ptr::NonNull;
-use jni::JNIEnv;
-use jni::objects::JObject;
 use ndk::asset::AssetManager;
+use std::sync::{Arc, RwLock};
+use std::collections::HashMap;
+use crate::util::read_resource_file;
 
-pub fn get_asset_manager(env: JNIEnv, asset_manager_object: JObject) -> AssetManager {
-    let aasset_manager_pointer = unsafe {
-        ndk_sys::AAssetManager_fromJava(env.get_native_interface(), *asset_manager_object)
-    };
-    let asset_manager = unsafe {
-        ndk::asset::AssetManager::from_ptr(NonNull::<ndk_sys::AAssetManager>::new_unchecked(
-            aasset_manager_pointer,
-        ))
-    };
-    asset_manager
+pub struct Cache {
+    ass: AssetManager,
+    data: Arc<RwLock<HashMap<String, String>>>,
 }
 
-
-pub fn read_resource_file(ass: &AssetManager, n: &str) -> Result<String, Box<dyn std::error::Error>> {
-    let filename = &CString::new(n)?;
-    match ass.open(filename) {
-        Some(mut a) => {
-            let mut text = std::string::String::new();
-            a.read_to_string(&mut text)?;
-            Ok(text)
-        }
-        None => {
-            Err("Error reading")?
+impl Cache {
+    pub fn new(ass: AssetManager) -> Cache {
+        Cache {
+            ass,
+            data: Arc::new(RwLock::new(HashMap::new())),
         }
     }
-
+    pub fn get(&self, key: &str) -> Option<String> {
+        match self.data.write() {
+            Ok(mut v) => {
+                match v.get(key) {
+                    None => {
+                        match read_resource_file(&self.ass, key) {
+                            Ok(value) => {
+                                v.insert(key.to_string(), value.clone());
+                                Some(value)
+                            }
+                            Err(_) => None
+                        }
+                    }
+                    Some(v) => {
+                        Some(v.to_string())
+                    }
+                }
+            }
+            Err(_) => {
+                None
+            }
+        }
+    }
 }

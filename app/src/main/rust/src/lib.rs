@@ -8,12 +8,13 @@ extern crate rocket;
 mod handler;
 mod asset;
 mod error;
+mod util;
+mod res;
 
 use jni::JNIEnv;
 use jni::objects::{JObject, JString};
-use ndk::asset::AssetManager;
-use crate::asset::get_asset_manager;
 use crate::handler::run_server;
+use crate::util::get_asset_manager;
 
 #[no_mangle]
 #[allow(non_snake_case)]
