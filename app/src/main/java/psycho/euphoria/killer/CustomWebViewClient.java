@@ -29,12 +29,20 @@ public class CustomWebViewClient extends WebViewClient {
             "://widgets.pinterest.com/",
             ".addthis.com/",
             "/ads/",
-            "://i.imgur.com/",
+//            "://i.imgur.com/",
             "://onclickgenius.com/",
             "://inpagepush.com/",
             ".doppiocdn.com/",
             ".googleapis.com/",
-            "adsco.re/"
+            "adsco.re/",
+            "challenges.cloudflare.com/",
+            "static.cloudflareinsights.com/",
+            "highrevenuegate.com/",
+            "googletagmanager.com/",
+            "www.film1k.com/wp-content/themes/",
+//            "/litespeed/js/",
+//            "betteradsystem.com/",
+            "cloudfront.net/angular-google-analytics"
     };
     private final WebResourceResponse mEmptyResponse = new WebResourceResponse(
             "text/plain",
@@ -70,10 +78,11 @@ public class CustomWebViewClient extends WebViewClient {
     @Override
     @SuppressWarnings("deprecation")
     public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-        if (Arrays.stream(mBlocks).anyMatch(url::contains)) {
-            return mEmptyResponse;
-        }
-        if (url.contains(".m3u8")||url.contains(".m3u8?")) {
+//        if (Arrays.stream(mBlocks).anyMatch(url::contains)) {
+//            return mEmptyResponse;
+//        }
+       // Log.e("B5aOx2", String.format("shouldInterceptRequest, %s", url));
+        if (url.contains(".m3u8") || url.contains(".m3u8?")) {
             Shared.setText(mContext, url);
             mContext.runOnUiThread(new Runnable() {
                 @Override
@@ -85,15 +94,12 @@ public class CustomWebViewClient extends WebViewClient {
         return super.shouldInterceptRequest(view, url);
     }
 
-    @Override
-    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-        return super.shouldInterceptRequest(view, request);
-    }
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
         String url = request.getUrl().toString();
-        if ((url.startsWith("https://") || url.startsWith("http://"))) {
+        if (url.equals("about:blank")||url.contains("glersakr.com")) return false;
+        if ((url.startsWith("https://") || url.startsWith("http://") )) {
             view.loadUrl(url);
         }
         return true;

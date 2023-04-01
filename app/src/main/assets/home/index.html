@@ -108,7 +108,11 @@
             <div bind @click="playVideo" class="tablist-item">
                 播放视频
             </div>
+            <div bind @click="videoList" class="tablist-item">
+                视频列表
+            </div>
         </div>
+        
     </div>
     <div style="height: 20px;"></div>
     <div class="title">
@@ -217,6 +221,11 @@
         }
         function serverHome() {
             NativeAndroid.serverHome();
+        }
+        
+
+        function videoList() {
+            NativeAndroid.videoList();
         }
     </script>
 </body>

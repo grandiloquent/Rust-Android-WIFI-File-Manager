@@ -34,9 +34,9 @@ import psycho.euphoria.killer.video.VideoListActivity;
 import static psycho.euphoria.killer.video.PlayerActivity.*;
 
 public class MainActivity extends Activity {
+    public static final String FILE_ANDROID_ASSET_HOME_INDEX_HTML = "file:///android_asset/home/index.html";
     public static final int ITEM_ID_REFRESH = 1;
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36";
-    public static final String FILE_ANDROID_ASSET_HOME_INDEX_HTML = "file:///android_asset/home/index.html";
 
     static {
 /*
@@ -78,7 +78,6 @@ public class MainActivity extends Activity {
             mWebView.loadUrl(lastedAddress);
         }
         mWebView.loadUrl(FILE_ANDROID_ASSET_HOME_INDEX_HTML);
-
     }
 
     private void initializeWebView() {
@@ -108,27 +107,18 @@ public class MainActivity extends Activity {
         startService(service);
     }
 
-    private void open() {
-        CharSequence url = Shared.getText(this);
-        if (url != null)
-            mWebView.loadUrl(url.toString());
-    }
 
     private void openHomePage() {
         mWebView.loadUrl(FILE_ANDROID_ASSET_HOME_INDEX_HTML);
 
     }
 
-    private void playVideo() {
-//        CharSequence url = Shared.getText(this);
-//        if (url == null) return;
-//        launchActivity(this, url.toString(), null);
-        Intent service = new Intent(this, VideoListActivity.class);
-        startActivity(service);
-    }
+
 
     private void refresh() {
         mWebView.clearCache(true);
+        mWebView.clearHistory();
+        mWebView.clearFormData();
         mWebView.reload();
     }
 
@@ -205,7 +195,6 @@ public class MainActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, 1, 0, "刷新");
         menu.add(0, 3, 0, "保存页面");
-        menu.add(0, 4, 0, "播放视频");
         menu.add(0, 6, 0, "首页");
         menu.add(0, 7, 0, "复制");
         menu.add(0, 5, 0, "退出");
@@ -220,9 +209,6 @@ public class MainActivity extends Activity {
                 break;
             case 3:
                 saveRenderedWebPage();
-                break;
-            case 4:
-                playVideo();
                 break;
             case 5:
                 restartService();

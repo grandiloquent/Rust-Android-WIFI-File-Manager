@@ -16,6 +16,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import psycho.euphoria.killer.video.PlayerActivity;
+import psycho.euphoria.killer.video.VideoListActivity;
 
 public class WebAppInterface {
 
@@ -76,6 +77,7 @@ public class WebAppInterface {
         if (str == null) {
             return;
         }
+       // Log.e("B5aOx2", String.format("playVideo, %s", str));
         PlayerActivity.launchActivity(mContext, str.toString(), null);
     }
 
@@ -117,5 +119,11 @@ public class WebAppInterface {
         ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("demo", text);
         clipboard.setPrimaryClip(clip);
+    }
+
+    @JavascriptInterface
+    public void videoList() {
+        Intent intent = new Intent(mContext,VideoListActivity.class);
+        mContext.startActivity(intent);
     }
 }

@@ -25,6 +25,7 @@ serde_json = "1.0"
 urlencoding = "2.1.2"
 tiny_http = "0.12.0"
 ascii = "1.0"
+postgres = "0.19.5"
 
 [dependencies.regex]
 version = "1.3"
