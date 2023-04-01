@@ -78,8 +78,7 @@ public class MainActivity extends Activity {
             mWebView.loadUrl(lastedAddress);
         }
         mWebView.loadUrl(FILE_ANDROID_ASSET_HOME_INDEX_HTML);
-        Intent intent = new Intent(this, ServerService.class);
-        startService(intent);
+
     }
 
     private void initializeWebView() {

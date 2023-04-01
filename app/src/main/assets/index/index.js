@@ -3,7 +3,7 @@ async function loadData(path) {
     //window.history.pushState(null, null, `?path=${encodeURIComponent(path)}`);
 
 
-    const res = await fetch(`/api/files?path=${encodeURIComponent(path)}`);
+    const res = await fetch(`/api/files?path=${path||''}`);
     return res.json();
 }
 
@@ -19,9 +19,9 @@ function onCustomBottomSheetSubmit(evt) {
         const item = items.filter(x => {
             return x.getAttribute('path') === detail.path;
         })[0];
-        if (item.getAttribute('isdirectory') === 'true') {
+        if (item.getAttribute('is_directory') === 'true') {
             items.filter(x => {
-                return x.getAttribute('isdirectory') === 'true'
+                return x.getAttribute('is_directory') === 'true'
                     && (!f || (substringAfterLast(decodeURIComponent(x.getAttribute('path')), "\\").indexOf(f) !== -1))
             }).forEach(x => {
                 insertPathLocalStorage(x.getAttribute('path'))
@@ -31,7 +31,7 @@ function onCustomBottomSheetSubmit(evt) {
             if (substringAfterLast(path, "\\").lastIndexOf(".") !== -1) {
                 const extension = "." + substringAfterLast(path, ".");
                 items.filter(x => {
-                    return x.getAttribute('isdirectory') === 'false' &&
+                    return x.getAttribute('is_directory') === 'false' &&
                         substringAfterLast(x.getAttribute('path')).endsWith(extension)
                         && (!f || (substringAfterLast(decodeURIComponent(x.getAttribute('path')), "\\").indexOf(f) !== -1));
                 }).forEach(x => {
@@ -39,7 +39,7 @@ function onCustomBottomSheetSubmit(evt) {
                 })
             } else {
                 items.filter(x => {
-                    return x.getAttribute('isdirectory') === 'false' &&
+                    return x.getAttribute('is_directory') === 'false' &&
                         substringAfterLast(path, "\\").lastIndexOf(".") === -1
                         && (!f || (substringAfterLast(decodeURIComponent(x.getAttribute('path')), "\\").indexOf(f) !== -1));
                 }).forEach(x => {
@@ -69,7 +69,7 @@ async function onDialogSubmit() {
     const path = this.dialog.dataset.path || new URL(window.location).searchParams.get("path");
     this.dialog.dataset.path = '';
     const url = new URL(`${window.origin}/api/file`);
-    url.searchParams.set("path", path || "C:\\Users\\Administrator\\Desktop");
+    url.searchParams.set("path", path );
     url.searchParams.set("action", this.dialog.dataset.action);
     url.searchParams.set("dst", dst);
     await fetch(url)
@@ -98,21 +98,21 @@ function substringAfterLast(string, delimiter, missingDelimiterValue) {
 }
 
 async function render(path) {
-    path = path || new URL(window.location).searchParams.get("path") || "C:\\Users\\Administrator\\Desktop";
+    path = path || new URL(window.location).searchParams.get("path") ;
     document.title = substringAfterLast(decodeURIComponent(path), "\\")
     const res = await loadData(path);
     this.wrapper.innerHTML = res.sort((x, y) => {
-        if (x.isDirectory !== y.isDirectory) if (x.isDirectory) return -1; else return 1;
+        if (x.is_directory !== y.is_directory) if (x.is_directory) return -1; else return 1;
         return x.path.localeCompare(y.path)
     })
         .map(x => {
-            return `<custom-item bind @submit="submit" ${x.isDirectory ? 'folder' : ''} title="${x.filename}" path="${encodeURIComponent(x.path)}" isDirectory="${x.isDirectory}"></custom-item>`
+            return `<custom-item bind @submit="submit" ${x.is_directory ? 'folder' : ''} title="${substringAfterLast(x.path,'/')}" path="${encodeURIComponent(x.path)}" isdirectory="${x.is_directory}"></custom-item>`
         }).join('');
     bind(this.wrapper);
 }
 
 function submit(evt) {
-    const encodedPath = encodeURIComponent(evt.detail.path);
+    const encodedPath = evt.detail.path;
     if (evt.detail.id === '0') {
         if (evt.detail.isDirectory === "true") {
 
@@ -129,7 +129,7 @@ function submit(evt) {
                 // else if (evt.detail.path.endsWith(".md")) {
                 //     window.location = `/markdown?path=${encodeURIComponent(evt.detail.path)}`
             // }
-            else if (decodeURIComponent(evt.detail.path).indexOf("\\Books\\") === -1 && /\.(?:bat|c|cc|cmd|conf|cpp|cs|css|gitignore|gradle|h|html|java|js|json|jsx|md|properties|rs|service|sql|srt|toml|txt|vtt|xml|au3)$/.test(evt.detail.path)) {
+            else if (decodeURIComponent(evt.detail.path).indexOf("/Books/") === -1 && /\.(?:bat|c|cc|cmd|conf|cpp|cs|css|gitignore|gradle|h|html|java|js|json|jsx|md|properties|rs|service|sql|srt|toml|txt|vtt|xml|au3)$/.test(evt.detail.path)) {
                 window.open(`/editor?path=${encodedPath}`)
             } else {
                 window.location = `/api/file?path=${encodedPath}`
