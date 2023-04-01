@@ -15,8 +15,9 @@ mod mimetypes;
 mod header;
 mod strings;
 
-use jni::JNIEnv;
-use jni::objects::{JObject, JString};
+use jni::{JavaVM, JNIEnv};
+use jni::objects::{JObject, JString, JValue};
+use jni::sys::jstring;
 use crate::server::run_server;
 use crate::util::get_asset_manager;
 
@@ -25,10 +26,13 @@ use crate::util::get_asset_manager;
 pub extern "C" fn Java_psycho_euphoria_killer_MainActivity_startServer(
     env: JNIEnv,
     _class: jni::objects::JClass,
+    context: JObject,
     asset_manager: JObject, host: JString, port: u16,
 ) {
     let _host: std::string::String =
         env.get_string(host).expect("Couldn't get java string!").into();
+    let class = env.get_object_class(context).unwrap();
+
 
     #[cfg(target_os = "android")]
     android_logger::init_once(
