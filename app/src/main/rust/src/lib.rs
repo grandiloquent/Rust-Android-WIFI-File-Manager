@@ -1,10 +1,13 @@
-
 #![allow(unused_qualifications)]
 #![feature(decl_macro)]
+#![feature(addr_parse_ascii)]
 
-#[macro_use] extern crate rocket;
+#[macro_use]
+extern crate rocket;
+
 mod handler;
 mod asset;
+mod error;
 
 use jni::JNIEnv;
 use jni::objects::{JObject, JString};
@@ -29,7 +32,5 @@ pub extern "C" fn Java_psycho_euphoria_killer_MainActivity_startServer(
             .with_tag("Rust"),
     );
     let ass = get_asset_manager(env, asset_manager);
-    unsafe {
-        run_server(_host.as_str(), port,ass);
-    }
+    run_server(_host.as_str(), port, ass);
 }

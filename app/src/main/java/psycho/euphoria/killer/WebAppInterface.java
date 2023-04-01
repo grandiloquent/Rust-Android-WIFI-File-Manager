@@ -60,6 +60,13 @@ public class WebAppInterface {
     }
 
     @JavascriptInterface
+    public void notes() {
+        mContext.runOnUiThread(() -> {
+            mContext.getWebView().loadUrl(String.format("http://%s:3000/notes", Shared.getDeviceIP(mContext)));
+        });
+    }
+
+    @JavascriptInterface
     public void openPage() {
         CharSequence str = Shared.getText(mContext);
         if (str == null) {
@@ -112,6 +119,11 @@ public class WebAppInterface {
         mContext.startService(intent);
     }
 
+    @JavascriptInterface
+    public void switchInputMethod() {
+        ((InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE))
+                .showInputMethodPicker();
+    }
 
     @JavascriptInterface
     public void videoList() {
@@ -124,17 +136,5 @@ public class WebAppInterface {
         ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("demo", text);
         clipboard.setPrimaryClip(clip);
-    }
-
-    @JavascriptInterface
-    public void switchInputMethod() {
-        ((InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE))
-                .showInputMethodPicker();
-    }
-    @JavascriptInterface
-    public void notes() {
-        mContext.runOnUiThread(() -> {
-            mContext.getWebView().loadUrl(String.format("http://%s:3000/notes", Shared.getDeviceIP(mContext)));
-        });
     }
 }

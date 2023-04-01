@@ -41,26 +41,22 @@ public class ServerService extends Service {
         Notification notification =
                 null;
         PendingIntent piDismiss = getPendingIntentDismiss();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notification = new Notification.Builder(this, KP_NOTIFICATION_CHANNEL_ID)
-                    .setContentTitle("视频下载器")
-                    .setSmallIcon(android.R.drawable.stat_sys_download)
-                    .addAction(getAction(piDismiss))
-                    .build();
-        }
+        notification = new Notification.Builder(this, KP_NOTIFICATION_CHANNEL_ID)
+                .setContentTitle("本地服务器")
+                .setSmallIcon(android.R.drawable.stat_sys_download)
+                .addAction(getAction(piDismiss))
+                .build();
         startForeground(1, notification);
     }
 
     private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            mNotificationChannel =
-                    new NotificationChannel(
-                            KP_NOTIFICATION_CHANNEL_ID,
-                            "视频下载器",
-                            NotificationManager.IMPORTANCE_LOW);
-            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
-                    .createNotificationChannel(mNotificationChannel);
-        }
+        mNotificationChannel =
+                new NotificationChannel(
+                        KP_NOTIFICATION_CHANNEL_ID,
+                        "本地服务器",
+                        NotificationManager.IMPORTANCE_LOW);
+        ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
+                .createNotificationChannel(mNotificationChannel);
     }
 
     private Notification.Action getAction(PendingIntent piDismiss) {
