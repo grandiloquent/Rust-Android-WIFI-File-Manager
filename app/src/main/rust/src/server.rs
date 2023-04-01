@@ -21,7 +21,8 @@ pub async fn run_server(host: &str, port: u16, ass: AssetManager) {
             handler::indexFile,
             handler::file,
         handler::apiFiles,
-          handler::apiFile])
+          handler::apiFile,
+         handler:: apiAssetFile])
         .manage(Arc::new(Cache::new(ass)))
         .register("/", catchers![error::not_found])
         .launch().await;

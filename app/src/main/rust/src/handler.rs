@@ -79,14 +79,19 @@ pub fn apiFiles(path: String) -> RawJson<String> {
 
 #[get("/api/file?<path>")]
 pub async fn apiFile(path: String, referer: Referer) -> Option<NamedFile> {
-    log::error!("{}-{}", path, referer.0);
     let p = Path::new(path.as_str());
     if p.exists() {
         NamedFile::open(path).await.ok()
     } else {
-        let query =referer.0.substring_after("path=").substring_before("&");
+        let query = referer.0.substring_after("path=").substring_before("&");
         let file_path = decode(query.as_str()).unwrap().to_string().substring_before_last("/");
         NamedFile::open(file_path + path.substring_after_last("/api").as_str()).await.ok()
     }
-    // RawJson(serde_json::to_string(&get_file_list(path, "/storage/emulated/0")).unwrap_or("".to_string()))
+}
+
+#[get("/api/<path..>")]
+pub async fn apiAssetFile(path: PathBuf, referer: Referer) -> Option<NamedFile> {
+    let query = referer.0.substring_after("path=").substring_before("&");
+    let file_path = decode(query.as_str()).unwrap().to_string().substring_before_last("/");
+    NamedFile::open(file_path + "/" + path.to_str().unwrap()).await.ok()
 }
