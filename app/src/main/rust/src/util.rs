@@ -1,9 +1,12 @@
 use std::ffi::CString;
+use std::fs;
 use std::io::Read;
 use std::ptr::NonNull;
 use jni::JNIEnv;
 use jni::objects::JObject;
 use ndk::asset::AssetManager;
+use rocket::serde::Deserialize;
+use rocket::serde::Serialize;
 
 pub fn get_asset_manager(env: JNIEnv, asset_manager_object: JObject) -> AssetManager {
     let aasset_manager_pointer = unsafe {
@@ -30,5 +33,29 @@ pub fn read_resource_file(ass: &AssetManager, n: &str) -> Result<String, Box<dyn
             Err("Error reading")?
         }
     }
+}
 
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct FileItem {
+    pub path: String,
+    pub is_directory: bool,
+}
+
+pub fn get_file_list(query: String, default_path: &str) -> Vec<FileItem> {
+    let mut path = query;
+    if path.is_empty() {
+        path = default_path.to_string();
+    }
+    match fs::read_dir(path) {
+        Ok(v) => {
+            v.map(|res| res.map(|e| {
+                FileItem {
+                    path: e.path().display().to_string(),
+                    is_directory: e.file_type().unwrap().is_dir(),
+                }
+            }))
+                .collect::<Result<Vec<_>, std::io::Error>>().unwrap()
+        }
+        Err(_) => Vec::new()
+    }
 }

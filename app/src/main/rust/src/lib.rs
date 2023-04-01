@@ -12,6 +12,8 @@ mod util;
 mod res;
 mod server;
 mod mimetypes;
+mod header;
+mod strings;
 
 use jni::JNIEnv;
 use jni::objects::{JObject, JString};
