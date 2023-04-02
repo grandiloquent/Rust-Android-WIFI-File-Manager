@@ -45,6 +45,10 @@ public class MainActivity extends Activity {
     SharedPreferences mSharedPreferences;
     WebView mWebView;
 
+    public SharedPreferences getSharedPreferences() {
+        return mSharedPreferences;
+    }
+
     public WebView getWebView() {
         return mWebView;
     }
@@ -67,14 +71,9 @@ public class MainActivity extends Activity {
 
     private void initialize() {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        requestStorageManagerPermission();
-//        launchActivity(this, "/storage/emulated/0/MP4/7.mp4", null);
+        Actions.requestStorageManagerPermission();
         mWebView = Actions.initializeWebView();
         Actions.loadStartPage(false);
-    }
-
-    public SharedPreferences getSharedPreferences() {
-        return mSharedPreferences;
     }
 
     private void launchDownloadService(String title, String url) {
@@ -98,21 +97,6 @@ public class MainActivity extends Activity {
         mWebView.reload();
     }
 
-    private void requestStorageManagerPermission() {
-        if (VERSION.SDK_INT >= VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                try {
-                    Uri uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID);
-                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri);
-                    startActivity(intent);
-                } catch (Exception ex) {
-                    Intent intent = new Intent();
-                    intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                    startActivity(intent);
-                }
-            }
-        }
-    }
 
     private void restartService() {
         Intent service = new Intent(this, DownloaderService.class);
@@ -120,12 +104,6 @@ public class MainActivity extends Activity {
         startService(service);
     }
 
-    private void saveRenderedWebPage() {
-        File d = new File(Environment.getExternalStorageDirectory(), "web.mht");
-        mWebView.saveWebArchive(
-                d.getAbsolutePath()
-        );
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,7 +148,7 @@ public class MainActivity extends Activity {
                 refresh();
                 break;
             case 3:
-                saveRenderedWebPage();
+                Actions.saveRenderedWebPage();
                 break;
             case 5:
                 restartService();
