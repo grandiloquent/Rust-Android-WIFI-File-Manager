@@ -35,7 +35,6 @@ import static psycho.euphoria.killer.video.PlayerActivity.*;
 
 public class MainActivity extends Activity {
     public static final String FILE_ANDROID_ASSET_HOME_INDEX_HTML = "file:///android_asset/home/index.html";
-    public static final int ITEM_ID_REFRESH = 1;
     public static final String USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
 
     static {
@@ -154,22 +153,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        List<String> needPermissions;
-        needPermissions = Arrays.stream(new String[]{
-                        permission.INTERNET,
-                        permission.ACCESS_WIFI_STATE,
-                        permission.READ_EXTERNAL_STORAGE,
-                }).filter(permission -> checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED)
-                .collect(Collectors.toList());
-        if (VERSION.SDK_INT <= 28 && checkSelfPermission(permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            needPermissions.add(permission.WRITE_EXTERNAL_STORAGE);
-        } else if (VERSION.SDK_INT >= VERSION_CODES.P && (checkSelfPermission(permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED)) {
-            needPermissions.add(permission.FOREGROUND_SERVICE);
-        }
-        if (needPermissions.size() > 0) {
-            requestPermissions(needPermissions.toArray(new String[0]), ITEM_ID_REFRESH);
-            return;
-        }
+        Actions.setContext(this);
+
+
+
         initialize();
     }
 
