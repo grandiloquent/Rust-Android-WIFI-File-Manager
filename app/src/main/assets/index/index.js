@@ -52,11 +52,7 @@ function onCustomBottomSheetSubmit(evt) {
     } else if (evt.detail.id === '4') {
         fetch(`/api/zip?path=${detail.path}`)
     } else if (evt.detail.id === '5') {
-        input.value = substringAfterLast(decodeURIComponent(detail.path), '\\');
-        this.dialog.dataset.path = detail.path;
-        this.dialog.style.display = 'block';
-        this.dialog.setAttribute('title', '重命名');
-        this.dialog.dataset.action = "5";
+        rename(detail.path)
     } else if (evt.detail.id === '6') {
         fetch(`/api/file?action=10&path=${detail.path}`);
     }

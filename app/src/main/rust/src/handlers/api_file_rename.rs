@@ -1,7 +1,8 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use rocket::fs::NamedFile;
 use crate::handlers::data::Message;
 use rocket::serde::json::{json, Value};
+use std::fs;
 
 #[get("/api/file/rename?<path>&<dst>")]
 pub async fn api_file_rename(path: String, dst: String) -> Value {
@@ -13,6 +14,15 @@ pub async fn api_file_rename(path: String, dst: String) -> Value {
             "error":1
         })
     } else {
+
+        if let Some(value) = p.parent() {
+            let d = value.join(dst);
+            if !d.exists() {
+                fs::rename(p, d);
+            }
+        } else {}
+// https://doc.rust-lang.org/std/fs/fn.rename.html
+
         json!({
             "error":0
         })

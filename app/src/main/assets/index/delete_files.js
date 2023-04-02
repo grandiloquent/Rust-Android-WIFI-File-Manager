@@ -1,6 +1,6 @@
 async function requestDeleteFiles() {
     const paths = getPaths();
-    const response = await fetch(`/api/files/delete`, {
+    const response = await fetch(`/api/file/delete`, {
         method: "POST",
         body: JSON.stringify(paths)
     });

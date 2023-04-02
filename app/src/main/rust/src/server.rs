@@ -21,11 +21,12 @@ pub async fn run_server(host: &str, port: u16, ass: AssetManager) {
             handlers::index::index,
             handlers::index_file::index_file,
             handlers::file::file,
-            handler::api_files,
+            handlers::api_files::api_files,
             handler::api_asset_file,
             handlers::api_file::api_file,
             handler::video,
-                 handlers::api_file_rename::api_file_rename
+            handlers::api_file_rename::api_file_rename,
+            handlers::api_file_delete::api_file_delete
                ])
         .manage(Arc::new(Cache::new(ass)))
         .register("/", catchers![error::not_found])
