@@ -73,9 +73,7 @@ public class MainActivity extends Activity {
 
 
     private void refresh() {
-        mWebView.clearCache(true);
-        mWebView.clearHistory();
-        mWebView.clearFormData();
+        Actions.clearWebViewCachesCustom();
         mWebView.reload();
     }
 

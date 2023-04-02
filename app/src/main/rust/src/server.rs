@@ -21,8 +21,8 @@ pub async fn run_server(host: &str, port: u16, ass: AssetManager) {
             handler::indexFile,
             handler::file,
             handler::api_files,
-            handler::api_file,
             handler::api_asset_file,
+                               handler::api_file,
             handler::video
                ])
         .manage(Arc::new(Cache::new(ass)))

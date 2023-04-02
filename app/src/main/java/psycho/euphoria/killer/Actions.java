@@ -80,7 +80,15 @@ public class Actions {
     public static void setContext(MainActivity context) {
         sContext = context;
     }
-
+    public static void clearWebViewCachesCustom() {
+        try {
+            String dataDir = sContext.getPackageManager().getPackageInfo(sContext.getPackageName(), 0).applicationInfo.dataDir;
+            new File(dataDir + "/app_webview/").delete();
+        } catch (Exception e) {
+            e.printStackTrace();
+            e.getSuppressed();
+        }
+    }
     public static void setWebView(WebView webView) {
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);

@@ -58,10 +58,26 @@ function setFavorite() {
     dialog.addEventListener('submit', evt => {
         const keyValue = key.value.trim();
         const valueValue = value.value.trim();
-        console.log(keyValue, valueValue);
+        const obj = JSON.parse(NativeAndroid.getString("key_quick_access") || '{}');
+        if (keyValue && valueValue) {
+            obj[keyValue] = valueValue;
+        }
+        NativeAndroid.setString("key_quick_access",
+            JSON.stringify(obj));
     })
     document.body.appendChild(dialog);
 }
 // 
 
 bind();
+
+const items = JSON.parse(NativeAndroid.getString("key_quick_access") || '{}');
+for (const iterator in items) {
+    const div = document.createElement('div');
+    div.textContent = iterator;
+    div.className='tablist-item'
+    div.addEventListener('click', evt => {
+        window.location = items[iterator];
+    })
+    quickAccess.insertAdjacentElement('afterbegin', div)
+}

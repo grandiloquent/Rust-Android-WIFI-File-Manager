@@ -27,6 +27,7 @@ public class Calculations {
         while (true) {
             try {
                 ServerSocket serverPort = new ServerSocket(start);
+                serverPort.close();
                 return start;
             } catch (IOException ignored) {
                 start++;

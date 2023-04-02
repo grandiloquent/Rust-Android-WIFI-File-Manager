@@ -73,22 +73,23 @@ pub fn api_files(path: String) -> RawJson<String> {
 
 
 #[get("/api/file?<path>")]
-pub async fn api_file(path: String, referer: Referer) -> Option<NamedFile> {
+pub async fn api_file(path: String) -> Option<NamedFile> {
     let p = Path::new(path.as_str());
-    if p.exists() {
-        NamedFile::open(path).await.ok()
-    } else {
-        let query = referer.0.substring_after("path=").substring_before("&");
-        let file_path = decode(query.as_str()).unwrap().to_string().substring_before_last("/");
-        NamedFile::open(file_path + path.substring_after_last("/api").as_str()).await.ok()
-    }
+    NamedFile::open(path).await.ok()
 }
 
-#[get("/api/<path..>")]
-pub async fn api_asset_file(path: PathBuf, referer: Referer) -> Option<NamedFile> {
-    let query = referer.0.substring_after("path=").substring_before("&");
-    let file_path = decode(query.as_str()).unwrap().to_string().substring_before_last("/");
-    NamedFile::open(file_path + "/" + path.to_str().unwrap()).await.ok()
+#[get("/api/<sub_path..>?<path>")]
+pub async fn api_asset_file(sub_path: PathBuf, referer: Option<Referer>, path: Option<String>) -> Option<NamedFile> {
+    match referer {
+        None => {
+            NamedFile::open("'").await.ok()
+        }
+        Some(v) => {
+            let query = v.0.substring_after("path=").substring_before("&");
+            let file_path = decode(query.as_str()).unwrap().to_string().substring_before_last("/");
+            NamedFile::open(file_path + "/" + sub_path.to_str().unwrap()).await.ok()
+        }
+    }
 }
 
 #[get("/video/<path>")]

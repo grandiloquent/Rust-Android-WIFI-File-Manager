@@ -6,8 +6,10 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
@@ -22,9 +24,11 @@ import psycho.euphoria.killer.video.VideoListActivity;
 public class WebAppInterface {
 
     private MainActivity mContext;
+    SharedPreferences mSharedPreferences;
 
     public WebAppInterface(MainActivity context) {
         mContext = context;
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     public void check(String uri) {
@@ -57,6 +61,11 @@ public class WebAppInterface {
             Log.e("B5aOx2", String.format("downloadFile, %s", ignored.getMessage()));
         }
 
+    }
+
+    @JavascriptInterface
+    public String getString(String key) {
+        return mSharedPreferences.getString(key, "");
     }
 
     @JavascriptInterface
@@ -101,8 +110,16 @@ public class WebAppInterface {
     @JavascriptInterface
     public void serverHome() {
         mContext.runOnUiThread(() -> {
-            mContext.getWebView().loadUrl("http://" + Shared.getDeviceIP(mContext) + ":3000");
+            mContext.getWebView().loadUrl("http://" + Shared.getDeviceIP(mContext) + ":" +
+                    mSharedPreferences.getInt(
+                            Data.KEY_PORT, Data.DEFAULT_PORT
+                    ));
         });
+    }
+
+    @JavascriptInterface
+    public void setString(String key, String value) {
+        mSharedPreferences.edit().putString(key, value).apply();
     }
 
     @JavascriptInterface
@@ -117,6 +134,7 @@ public class WebAppInterface {
     public void startServer() {
         Actions.launchServer();
     }
+
     @JavascriptInterface
     public void switchInputMethod() {
         ((InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE))
