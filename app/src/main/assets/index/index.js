@@ -3,18 +3,17 @@ async function loadData(path) {
     //window.history.pushState(null, null, `?path=${encodeURIComponent(path)}`);
 
 
-    const res = await fetch(`/api/files?path=${path||''}`);
+    const res = await fetch(`/api/files?path=${path || ''}`);
     return res.json();
 }
 
 function onCustomBottomSheetSubmit(evt) {
     evt.stopPropagation();
-    customBottomSheet.style.display = 'none';
     if (evt.detail.id === '1') {
         insertPathLocalStorage(detail.path)
         customToast.setAttribute('message', '成功写入剪切板');
     } else if (evt.detail.id === '2') {
-        const f =  new URL(window.location).searchParams.get("f") || ''
+        const f = new URL(window.location).searchParams.get("f") || ''
         const items = [...document.querySelectorAll('custom-item')];
         const item = items.filter(x => {
             return x.getAttribute('path') === detail.path;
@@ -65,7 +64,7 @@ async function onDialogSubmit() {
     const path = this.dialog.dataset.path || new URL(window.location).searchParams.get("path");
     this.dialog.dataset.path = '';
     const url = new URL(`${window.origin}/api/file`);
-    url.searchParams.set("path", path );
+    url.searchParams.set("path", path);
     url.searchParams.set("action", this.dialog.dataset.action);
     url.searchParams.set("dst", dst);
     await fetch(url)
@@ -94,7 +93,7 @@ function substringAfterLast(string, delimiter, missingDelimiterValue) {
 }
 
 async function render(path) {
-    path = path || new URL(window.location).searchParams.get("path") ;
+    path = path || new URL(window.location).searchParams.get("path");
     document.title = substringAfterLast(decodeURIComponent(path), "\\")
     const res = await loadData(path);
     this.wrapper.innerHTML = res.sort((x, y) => {
@@ -102,7 +101,7 @@ async function render(path) {
         return x.path.localeCompare(y.path)
     })
         .map(x => {
-            return `<custom-item bind @submit="submit" ${x.is_directory ? 'folder' : ''} title="${substringAfterLast(x.path,'/')}" path="${encodeURIComponent(x.path)}" isdirectory="${x.is_directory}"></custom-item>`
+            return `<custom-item bind @submit="submit" ${x.is_directory ? 'folder' : ''} title="${substringAfterLast(x.path, '/')}" path="${encodeURIComponent(x.path)}" isdirectory="${x.is_directory}"></custom-item>`
         }).join('');
     bind(this.wrapper);
 }
@@ -122,8 +121,8 @@ function submit(evt) {
             } else if (evt.detail.path.endsWith(".srt")) {
                 window.location = `/srt?path=${encodeURIComponent(evt.detail.path)}`
             }
-                // else if (evt.detail.path.endsWith(".md")) {
-                //     window.location = `/markdown?path=${encodeURIComponent(evt.detail.path)}`
+            // else if (evt.detail.path.endsWith(".md")) {
+            //     window.location = `/markdown?path=${encodeURIComponent(evt.detail.path)}`
             // }
             else if (decodeURIComponent(evt.detail.path).indexOf("/Books/") === -1 && /\.(?:bat|c|cc|cmd|conf|cpp|cs|css|gitignore|gradle|h|html|java|js|json|jsx|md|properties|rs|service|sql|srt|toml|txt|vtt|xml|au3)$/.test(evt.detail.path)) {
                 window.open(`/editor?path=${encodedPath}`)
@@ -133,7 +132,17 @@ function submit(evt) {
         }
     } else {
         detail = evt.detail;
-        customBottomSheet.style.display = "block";
+        const sheet = document.createElement('custom-context-bottom-sheet');
+
+        document.body.appendChild(sheet);
+        console.log(detail)
+        if (detail.is_directory === "true") {
+            sheet.data = [
+                "选定",
+                "选定同类文件",
+                "重命名"
+            ]
+        }
     }
 }
 
@@ -178,6 +187,7 @@ async function onDelete() {
 ///////////////////////////
 bind();
 customElements.whenDefined('custom-bottom-sheet').then(() => {
+    /*
     customBottomSheet.data = [{
         title: "选定", id: 1
     }, {
@@ -191,6 +201,7 @@ customElements.whenDefined('custom-bottom-sheet').then(() => {
     }, {
         title: "整理", id: 6
     }]
+    */
     fav.data = []
 })
 
