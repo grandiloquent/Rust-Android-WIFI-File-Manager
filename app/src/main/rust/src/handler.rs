@@ -22,11 +22,7 @@ pub fn api_files(path: String) -> RawJson<String> {
 }
 
 
-#[get("/api/file?<path>")]
-pub async fn api_file(path: String) -> Option<NamedFile> {
-    let p = Path::new(path.as_str());
-    NamedFile::open(path).await.ok()
-}
+
 
 #[get("/api/<sub_path..>?<path>")]
 pub async fn api_asset_file(sub_path: PathBuf, referer: Option<Referer>, path: Option<String>) -> Option<NamedFile> {
