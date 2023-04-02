@@ -115,8 +115,7 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public void startServer() {
-        Intent intent = new Intent(mContext, ServerService.class);
-        mContext.startService(intent);
+        Calculations.launchServer(mContext);
     }
 
     @JavascriptInterface

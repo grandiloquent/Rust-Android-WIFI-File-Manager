@@ -34,8 +34,6 @@ import psycho.euphoria.killer.video.VideoListActivity;
 import static psycho.euphoria.killer.video.PlayerActivity.*;
 
 public class MainActivity extends Activity {
-    public static final String FILE_ANDROID_ASSET_HOME_INDEX_HTML = "file:///android_asset/home/index.html";
-    public static final String USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
 
     static {
 /*
@@ -71,27 +69,12 @@ public class MainActivity extends Activity {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         requestStorageManagerPermission();
 //        launchActivity(this, "/storage/emulated/0/MP4/7.mp4", null);
-        initializeWebView();
-        String lastedAddress = mSharedPreferences.getString("address", null);
-        if (lastedAddress != null) {
-            mWebView.loadUrl(lastedAddress);
-        }
-        mWebView.loadUrl(FILE_ANDROID_ASSET_HOME_INDEX_HTML);
-
+        mWebView = Actions.initializeWebView();
+        Actions.loadStartPage(false);
     }
 
-    private void initializeWebView() {
-        mWebView = new WebView(this);
-        WebSettings settings = mWebView.getSettings();
-        settings.setJavaScriptEnabled(true);
-        settings.setDomStorageEnabled(true);
-        settings.setAppCacheEnabled(true);
-        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-        settings.setUserAgentString(USER_AGENT);
-        mWebView.addJavascriptInterface(new WebAppInterface(this), "NativeAndroid");
-        mWebView.setWebViewClient(new CustomWebViewClient(this));
-        mWebView.setWebChromeClient(new CustomWebChromeClient(this));
-        setContentView(mWebView);
+    public SharedPreferences getSharedPreferences() {
+        return mSharedPreferences;
     }
 
     private void launchDownloadService(String title, String url) {
@@ -105,12 +88,6 @@ public class MainActivity extends Activity {
         Intent service = new Intent(this, DownloaderService.class);
         service.setAction("merge");
         startService(service);
-    }
-
-
-    private void openHomePage() {
-        mWebView.loadUrl(FILE_ANDROID_ASSET_HOME_INDEX_HTML);
-
     }
 
 
@@ -154,10 +131,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Actions.setContext(this);
-
-
-
-        initialize();
+        if (!Actions.requestPermission())
+            initialize();
     }
 
     @Override
@@ -201,7 +176,7 @@ public class MainActivity extends Activity {
                 restartService();
                 break;
             case 6:
-                openHomePage();
+                Actions.loadStartPage(true);
                 break;
             case 7:
                 Shared.setText(this, mWebView.getUrl());
