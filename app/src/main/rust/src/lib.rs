@@ -15,11 +15,10 @@ mod mimetypes;
 mod header;
 mod strings;
 
-use jni::{JavaVM, JNIEnv};
-use jni::objects::{JObject, JString, JValue};
-use jni::sys::jstring;
+use jni::{JNIEnv};
+use jni::objects::{JObject, JString};
 use crate::server::run_server;
-use crate::util::get_asset_manager;
+use crate::util::{get_asset_manager,get_string};
 
 #[no_mangle]
 #[allow(non_snake_case)]
@@ -31,8 +30,6 @@ pub extern "C" fn Java_psycho_euphoria_killer_MainActivity_startServer(
 ) {
     let _host: std::string::String =
         env.get_string(host).expect("Couldn't get java string!").into();
-    let class = env.get_object_class(context).unwrap();
-
 
     #[cfg(target_os = "android")]
     android_logger::init_once(
@@ -40,6 +37,9 @@ pub extern "C" fn Java_psycho_euphoria_killer_MainActivity_startServer(
             .with_max_level(log::LevelFilter::Trace)
             .with_tag("Rust"),
     );
-    let ass = get_asset_manager(env, asset_manager);
+    // unsafe {
+    //     log::error!("{}",get_string(env,context,"address"));
+    // }
+    let ass =get_asset_manager(env, asset_manager);
     run_server(_host.as_str(), port, ass);
 }

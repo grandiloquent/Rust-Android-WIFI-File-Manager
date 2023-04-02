@@ -5,7 +5,6 @@ use crate::error;
 use rocket::config::LogLevel;
 use rocket::figment::Figment;
 use crate::asset::Cache;
-use crate::res::{Asset};
 use crate::handler;
 
 #[tokio::main]
@@ -16,13 +15,16 @@ pub async fn run_server(host: &str, port: u16, ass: AssetManager) {
         .merge((rocket::Config::PORT, port))
         .merge((rocket::Config::LOG_LEVEL, LogLevel::Critical));
     let _ = rocket::custom(figment)
-        .mount("/", routes![
+        .mount("/",
+               routes![
             handler::index,
             handler::indexFile,
             handler::file,
-        handler::apiFiles,
-          handler::apiFile,
-         handler:: apiAssetFile])
+            handler::api_files,
+            handler::apiFile,
+            handler::api_asset_file,
+            handler::video
+               ])
         .manage(Arc::new(Cache::new(ass)))
         .register("/", catchers![error::not_found])
         .launch().await;

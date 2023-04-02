@@ -3,7 +3,7 @@ use std::fs;
 use std::io::Read;
 use std::ptr::NonNull;
 use jni::JNIEnv;
-use jni::objects::{JClass, JMethodID, JObject, JString, JValue};
+use jni::objects::{ JObject, JString, JValue};
 use ndk::asset::AssetManager;
 use rocket::serde::Deserialize;
 use rocket::serde::Serialize;
