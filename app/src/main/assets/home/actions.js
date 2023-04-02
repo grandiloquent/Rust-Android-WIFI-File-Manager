@@ -24,7 +24,7 @@ function searchVideo() {
 function notes() {
     NativeAndroid.notes();
 }
-function settings() {
+function setFavorite() {
     const dialog = document.createElement('custom-dialog');
     const div = document.createElement('div');
     dialog.setAttribute('title', "添加收藏");
