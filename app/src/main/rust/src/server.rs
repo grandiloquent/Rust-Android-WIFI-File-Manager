@@ -5,7 +5,6 @@ use crate::error;
 use rocket::config::LogLevel;
 use rocket::figment::Figment;
 use crate::asset::Cache;
-use crate::handler;
 use crate::handlers;
 
 #[tokio::main]
@@ -22,9 +21,9 @@ pub async fn run_server(host: &str, port: u16, ass: AssetManager) {
             handlers::index_file::index_file,
             handlers::file::file,
             handlers::api_files::api_files,
-            handler::api_asset_file,
+            handlers::api_asset_file::api_asset_file,
             handlers::api_file::api_file,
-            handler::video,
+            handlers::video::video,
             handlers::api_file_rename::api_file_rename,
             handlers::api_file_delete::api_file_delete,
             handlers::api_file_rename::api_file_move,

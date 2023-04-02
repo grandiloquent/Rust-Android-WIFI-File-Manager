@@ -5,7 +5,6 @@
 #[macro_use]
 extern crate rocket;
 
-mod handler;
 mod asset;
 mod error;
 mod util;
