@@ -112,9 +112,9 @@ function submit(evt) {
                 const item = items.filter(x => {
                     return x.getAttribute('path') === detail.path;
                 })[0];
-                if (item.getAttribute('is_directory') === 'true') {
+                if (item.getAttribute('isdirectory') === 'true') {
                     items.filter(x => {
-                        return x.getAttribute('is_directory') === 'true'
+                        return x.getAttribute('isdirectory') === 'true'
                             && (!f || (substringAfterLast(decodeURIComponent(x.getAttribute('path')), "\\").indexOf(f) !== -1))
                     }).forEach(x => {
                         insertPathLocalStorage(x.getAttribute('path'))
@@ -124,7 +124,7 @@ function submit(evt) {
                     if (substringAfterLast(path, "\\").lastIndexOf(".") !== -1) {
                         const extension = "." + substringAfterLast(path, ".");
                         items.filter(x => {
-                            return x.getAttribute('is_directory') === 'false' &&
+                            return x.getAttribute('isdirectory') === 'false' &&
                                 substringAfterLast(x.getAttribute('path')).endsWith(extension)
                                 && (!f || (substringAfterLast(decodeURIComponent(x.getAttribute('path')), "\\").indexOf(f) !== -1));
                         }).forEach(x => {
