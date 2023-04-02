@@ -1,8 +1,9 @@
 use std::path::{Path, PathBuf};
 use rocket::fs::NamedFile;
-use crate::handlers::data::Message;
 use rocket::serde::json::{json, Value};
 use std::fs;
+use std::io::{self, Read};
+use rocket::serde::{Serialize, Deserialize, json::Json};
 
 #[get("/api/file/rename?<path>&<dst>")]
 pub async fn api_file_rename(path: String, dst: String) -> Value {
@@ -14,7 +15,6 @@ pub async fn api_file_rename(path: String, dst: String) -> Value {
             "error":1
         })
     } else {
-
         if let Some(value) = p.parent() {
             let d = value.join(dst);
             if !d.exists() {
@@ -27,4 +27,26 @@ pub async fn api_file_rename(path: String, dst: String) -> Value {
             "error":0
         })
     }
+}
+
+
+#[post("/api/file/move?<dst>", data = "<list>")]
+pub async fn api_file_delete(dst: String, list: Json<Vec<String>>) -> Value {
+// https://doc.rust-lang.org/std/path/struct.Path.html
+    let d = Path::new(dst.as_str());
+    for path in list.into_inner() {
+        let p = Path::new(path.as_str());
+
+            let f = d.join(p.file_name().unwrap().to_str().unwrap());
+            if !f.exists() {
+                fs::rename(p, f);
+            }
+        
+    }
+
+// https://doc.rust-lang.org/stable/std/fs/fn.remove_dir_all.html
+
+    json!({
+            "error":0
+        })
 }
