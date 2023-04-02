@@ -31,7 +31,7 @@ pub async fn api_file_rename(path: String, dst: String) -> Value {
 
 
 #[post("/api/file/move?<dst>", data = "<list>")]
-pub async fn api_file_delete(dst: String, list: Json<Vec<String>>) -> Value {
+pub async fn api_file_move(dst: String, list: Json<Vec<String>>) -> Value {
 // https://doc.rust-lang.org/std/path/struct.Path.html
     let d = Path::new(dst.as_str());
     for path in list.into_inner() {
