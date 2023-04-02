@@ -21,7 +21,7 @@ pub async fn run_server(host: &str, port: u16, ass: AssetManager) {
             handler::indexFile,
             handler::file,
             handler::api_files,
-            handler::apiFile,
+            handler::api_file,
             handler::api_asset_file,
             handler::video
                ])

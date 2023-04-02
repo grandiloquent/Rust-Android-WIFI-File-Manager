@@ -73,7 +73,7 @@ pub fn api_files(path: String) -> RawJson<String> {
 
 
 #[get("/api/file?<path>")]
-pub async fn apiFile(path: String, referer: Referer) -> Option<NamedFile> {
+pub async fn api_file(path: String, referer: Referer) -> Option<NamedFile> {
     let p = Path::new(path.as_str());
     if p.exists() {
         NamedFile::open(path).await.ok()
