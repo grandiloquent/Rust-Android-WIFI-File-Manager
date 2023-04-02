@@ -7,7 +7,7 @@ use rocket::{State};
 use rocket::fs::NamedFile;
 use urlencoding::decode;
 use crate::asset::Cache;
-use crate::header::Referer;
+use crate::headers::referer::Referer;
 use crate::res::{Asset};
 use crate::strings::StringExt;
 

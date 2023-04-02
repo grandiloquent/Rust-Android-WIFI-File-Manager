@@ -35,19 +35,7 @@ function calculateProgressPercent(video) {
     return ((video.currentTime / video.duration) * 100).toFixed(2) + '%';
 }
 
-function formatDuration(ms) {
-    if (isNaN(ms)) return '0:00';
-    if (ms < 0) ms = -ms;
-    const time = {
-        hour: Math.floor(ms / 3600) % 24,
-        minute: Math.floor(ms / 60) % 60,
-        second: Math.floor(ms) % 60,
-    };
-    return Object.entries(time)
-        .filter((val, index) => index || val[1])
-        .map(val => (val[1] + '').padStart(2, '0'))
-        .join(':');
-}
+
 
 function getCurrentVideoFileName() {
     let s = substringAfterLast(decodeURIComponent(video.src), '/');
@@ -166,12 +154,7 @@ function onProgress() {
     progressBarLoaded.style.width = calculateLoadedPercent(video);
 }
 
-function onTimeupdate() {
-    timeFirst.textContent = formatDuration(video.currentTime);
-    const width = calculateProgressPercent(video);
-    progressBarPlayed.style.width = width
-    progressBarPlayhead.style.left = width
-}
+
 
 async function playIndexedVideo(next) {
     await loadData();

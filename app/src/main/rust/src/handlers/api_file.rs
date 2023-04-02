@@ -1,8 +1,9 @@
 use std::path::Path;
 use rocket::fs::NamedFile;
+use rocket_seek_stream::SeekStream;
 
 #[get("/api/file?<path>")]
-pub async fn api_file(path: String) -> Option<NamedFile> {
+pub fn api_file<'a>(path: String) ->std::io::Result<SeekStream<'a>> {
     let p = Path::new(path.as_str());
-    NamedFile::open(path).await.ok()
+    SeekStream::from_path(p)
 }
