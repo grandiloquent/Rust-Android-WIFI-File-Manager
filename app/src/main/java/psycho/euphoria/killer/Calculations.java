@@ -2,15 +2,10 @@ package psycho.euphoria.killer;
 
 import android.Manifest.permission;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
-import android.os.Environment;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;

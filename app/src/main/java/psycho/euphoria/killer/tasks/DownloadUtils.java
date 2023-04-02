@@ -3,13 +3,11 @@ package psycho.euphoria.killer.tasks;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.os.Build.VERSION_CODES;
 import android.os.Process;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.Callable;
-import java.util.function.Function;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;

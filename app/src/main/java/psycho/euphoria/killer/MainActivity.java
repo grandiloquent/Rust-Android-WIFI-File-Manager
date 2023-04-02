@@ -1,37 +1,17 @@
 package psycho.euphoria.killer;
 
-import android.Manifest.permission;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
-import android.net.Uri;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
-
-import java.io.File;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import psycho.euphoria.killer.Shared.Listener;
 import psycho.euphoria.killer.tasks.DownloaderService;
-import psycho.euphoria.killer.video.PlayerActivity;
-import psycho.euphoria.killer.video.VideoListActivity;
-
-import static psycho.euphoria.killer.video.PlayerActivity.*;
 
 public class MainActivity extends Activity {
 
@@ -70,8 +50,8 @@ public class MainActivity extends Activity {
     }
 
     private void initialize() {
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         Actions.requestStorageManagerPermission();
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mWebView = Actions.initializeWebView();
         Actions.loadStartPage(false);
     }

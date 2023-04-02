@@ -9,15 +9,11 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.AssetManager;
-import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 
 import java.io.File;
-
-import psycho.euphoria.killer.Shared;
 
 public class ServerService extends Service {
 
