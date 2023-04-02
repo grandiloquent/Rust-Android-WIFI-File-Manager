@@ -14,6 +14,7 @@ mod server;
 mod mimetypes;
 mod header;
 mod strings;
+mod handlers;
 
 use jni::{JNIEnv};
 use jni::objects::{JObject, JString};

@@ -6,6 +6,7 @@ use rocket::config::LogLevel;
 use rocket::figment::Figment;
 use crate::asset::Cache;
 use crate::handler;
+use crate::handlers;
 
 #[tokio::main]
 pub async fn run_server(host: &str, port: u16, ass: AssetManager) {
@@ -17,9 +18,9 @@ pub async fn run_server(host: &str, port: u16, ass: AssetManager) {
     let _ = rocket::custom(figment)
         .mount("/",
                routes![
-            handler::index,
-            handler::indexFile,
-            handler::file,
+            handlers::index::index,
+            handlers::index_file::index_file,
+            handlers::file::file,
             handler::api_files,
             handler::api_asset_file,
                                handler::api_file,
