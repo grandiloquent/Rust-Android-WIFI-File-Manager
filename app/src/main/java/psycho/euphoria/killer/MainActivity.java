@@ -55,7 +55,7 @@ public class MainActivity extends Activity {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mWebView = Actions.initializeWebView();
         Actions.loadStartPage(false);
-        Actions.launchServer();
+       // Actions.launchServer();
     }
 
     private void launchDownloadService(String title, String url) {
