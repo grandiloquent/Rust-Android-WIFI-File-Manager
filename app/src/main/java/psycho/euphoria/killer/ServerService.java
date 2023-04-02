@@ -1,12 +1,7 @@
 package psycho.euphoria.killer;
 
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Environment;
@@ -16,6 +11,7 @@ import android.preference.PreferenceManager;
 import java.io.File;
 
 import psycho.euphoria.killer.service.Actions;
+import psycho.euphoria.killer.service.Calculations;
 
 import static psycho.euphoria.killer.service.Data.ACTION_DISMISS;
 
@@ -36,11 +32,10 @@ public class ServerService extends Service {
 
     private void startServer() {
         new Thread(() -> {
-//            int port = PreferenceManager.getDefaultSharedPreferences(this)
-//                    .getInt(KEY_PORT, 3000);
+            int port = Calculations.getUsablePort(Data.DEFAULT_PORT);
+            mSharedPreferences.edit().putInt(Data.KEY_PORT, port).apply();
             String tempHost = Shared.getDeviceIP(this);
-            //String host = tempHost == null ? "0.0.0.0" : tempHost;
-            MainActivity.startServer(ServerService.this, ServerService.this.getAssets(), Shared.getDeviceIP(ServerService.this), 3000);
+            MainActivity.startServer(ServerService.this, ServerService.this.getAssets(), Shared.getDeviceIP(ServerService.this), port);
         }).start();
     }
 

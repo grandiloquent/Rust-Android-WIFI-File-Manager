@@ -5,6 +5,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+
 import psycho.euphoria.killer.ServerService;
 
 import static psycho.euphoria.killer.service.Data.ACTION_DISMISS;
@@ -20,4 +23,14 @@ public class Calculations {
         return new Notification.Action.Builder(null, "关闭", piDismiss).build();
     }
 
+    public static int getUsablePort(int start) {
+        while (true) {
+            try {
+                ServerSocket serverPort = new ServerSocket(start);
+                return start;
+            } catch (IOException ignored) {
+                start++;
+            }
+        }
+    }
 }
