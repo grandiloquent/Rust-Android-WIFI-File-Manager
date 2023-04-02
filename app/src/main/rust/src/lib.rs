@@ -19,7 +19,7 @@ mod handlers;
 use jni::{JNIEnv};
 use jni::objects::{JObject, JString};
 use crate::server::run_server;
-use crate::util::{get_asset_manager,get_string};
+use crate::util::{get_asset_manager};
 
 #[no_mangle]
 #[allow(non_snake_case)]

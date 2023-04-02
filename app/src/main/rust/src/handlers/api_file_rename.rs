@@ -1,9 +1,7 @@
-use std::path::{Path, PathBuf};
-use rocket::fs::NamedFile;
+use std::path::{Path};
 use rocket::serde::json::{json, Value};
 use std::fs;
-use std::io::{self, Read};
-use rocket::serde::{Serialize, Deserialize, json::Json};
+use rocket::serde::{json::Json};
 
 #[get("/api/file/rename?<path>&<dst>")]
 pub async fn api_file_rename(path: String, dst: String) -> Value {

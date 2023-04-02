@@ -1,10 +1,7 @@
-use std::path::{Path, PathBuf};
-use rocket::fs::NamedFile;
-use crate::handlers::data::Message;
+use std::path::{Path};
 use rocket::serde::json::{json, Value};
 use std::fs;
-use std::io::{self, Read};
-use rocket::serde::{Serialize, Deserialize, json::Json};
+use rocket::serde::{ json::Json};
 
 
 #[post("/api/file/delete", data = "<list>")]
