@@ -13,6 +13,7 @@ fn read_file(p: &Path) -> Result<(), Box<dyn Error>> {
             Some(path) => path.to_owned(),
             None => continue,
         };
+        log::error!("{}", outpath.to_str().unwrap());
         if (*file.name()).ends_with('/') {
             fs::create_dir_all(&outpath)?;
         } else {
