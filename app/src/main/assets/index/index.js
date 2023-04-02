@@ -195,17 +195,7 @@ customElements.whenDefined('custom-bottom-sheet').then(() => {
     }, {
         title: "整理", id: 6
     }]
-    fav.data = [{
-        title: "D:\\Books", id: 1
-    }, {
-        title: "D:\\资源", id: 2
-    }, {
-        title: "桌面", id: 3
-    }, {
-        title: "下载", id: 4
-    }, {
-        title: "视频", id: 5
-    }]
+    fav.data = []
 })
 
 
