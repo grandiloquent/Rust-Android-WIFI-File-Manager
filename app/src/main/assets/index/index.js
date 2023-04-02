@@ -7,56 +7,6 @@ async function loadData(path) {
     return res.json();
 }
 
-function onCustomBottomSheetSubmit(evt) {
-    evt.stopPropagation();
-    if (evt.detail.id === '1') {
-        insertPathLocalStorage(detail.path)
-        customToast.setAttribute('message', '成功写入剪切板');
-    } else if (evt.detail.id === '2') {
-        const f = new URL(window.location).searchParams.get("f") || ''
-        const items = [...document.querySelectorAll('custom-item')];
-        const item = items.filter(x => {
-            return x.getAttribute('path') === detail.path;
-        })[0];
-        if (item.getAttribute('is_directory') === 'true') {
-            items.filter(x => {
-                return x.getAttribute('is_directory') === 'true'
-                    && (!f || (substringAfterLast(decodeURIComponent(x.getAttribute('path')), "\\").indexOf(f) !== -1))
-            }).forEach(x => {
-                insertPathLocalStorage(x.getAttribute('path'))
-            })
-        } else {
-            const path = decodeURIComponent(item.getAttribute('path'));
-            if (substringAfterLast(path, "\\").lastIndexOf(".") !== -1) {
-                const extension = "." + substringAfterLast(path, ".");
-                items.filter(x => {
-                    return x.getAttribute('is_directory') === 'false' &&
-                        substringAfterLast(x.getAttribute('path')).endsWith(extension)
-                        && (!f || (substringAfterLast(decodeURIComponent(x.getAttribute('path')), "\\").indexOf(f) !== -1));
-                }).forEach(x => {
-                    insertPathLocalStorage(x.getAttribute('path'))
-                })
-            } else {
-                items.filter(x => {
-                    return x.getAttribute('is_directory') === 'false' &&
-                        substringAfterLast(path, "\\").lastIndexOf(".") === -1
-                        && (!f || (substringAfterLast(decodeURIComponent(x.getAttribute('path')), "\\").indexOf(f) !== -1));
-                }).forEach(x => {
-                    insertPathLocalStorage(x.getAttribute('path'))
-                })
-            }
-
-        }
-        customToast.setAttribute('message', '成功写入剪切板');
-    } else if (evt.detail.id === '4') {
-        fetch(`/api/zip?path=${detail.path}`)
-    } else if (evt.detail.id === '5') {
-        rename(detail.path)
-    } else if (evt.detail.id === '6') {
-        fetch(`/api/file?action=10&path=${detail.path}`);
-    }
-}
-
 
 async function onDialogSubmit() {
     const dst = input.value.trim();
@@ -136,13 +86,68 @@ function submit(evt) {
 
         document.body.appendChild(sheet);
         console.log(detail)
-        if (detail.is_directory === "true") {
+        if (detail.isDirectory !== "true" && (detail.path.endsWith(".zip")
+            || detail.path.endsWith(".epub"))) {
             sheet.data = [
                 "选定",
                 "选定同类文件",
-                "重命名"
+                "重命名",
+                "解压"
+            ]
+        } else {
+            sheet.data = [
+                "选定",
+                "选定同类文件",
+                "重命名",
+                "压缩"
             ]
         }
+        sheet.addEventListener('submit', evt => {
+            if (evt.detail === '选定') {
+                insertPathLocalStorage(detail.path)
+                customToast.setAttribute('message', '成功写入剪切板');
+            } else if (evt.detail === '选定同类文件') {
+                const f = new URL(window.location).searchParams.get("f") || ''
+                const items = [...document.querySelectorAll('custom-item')];
+                const item = items.filter(x => {
+                    return x.getAttribute('path') === detail.path;
+                })[0];
+                if (item.getAttribute('is_directory') === 'true') {
+                    items.filter(x => {
+                        return x.getAttribute('is_directory') === 'true'
+                            && (!f || (substringAfterLast(decodeURIComponent(x.getAttribute('path')), "\\").indexOf(f) !== -1))
+                    }).forEach(x => {
+                        insertPathLocalStorage(x.getAttribute('path'))
+                    })
+                } else {
+                    const path = decodeURIComponent(item.getAttribute('path'));
+                    if (substringAfterLast(path, "\\").lastIndexOf(".") !== -1) {
+                        const extension = "." + substringAfterLast(path, ".");
+                        items.filter(x => {
+                            return x.getAttribute('is_directory') === 'false' &&
+                                substringAfterLast(x.getAttribute('path')).endsWith(extension)
+                                && (!f || (substringAfterLast(decodeURIComponent(x.getAttribute('path')), "\\").indexOf(f) !== -1));
+                        }).forEach(x => {
+                            insertPathLocalStorage(x.getAttribute('path'))
+                        })
+                    } else {
+                        items.filter(x => {
+                            return x.getAttribute('is_directory') === 'false' &&
+                                substringAfterLast(path, "\\").lastIndexOf(".") === -1
+                                && (!f || (substringAfterLast(decodeURIComponent(x.getAttribute('path')), "\\").indexOf(f) !== -1));
+                        }).forEach(x => {
+                            insertPathLocalStorage(x.getAttribute('path'))
+                        })
+                    }
+
+                }
+                customToast.setAttribute('message', '成功写入剪切板');
+            } else if (evt.detail === '解压') {
+                fetch(`/api/zip?path=${detail.path}`)
+            } else if (evt.detail === '重命名') {
+                rename(detail.path)
+            } 
+        })
     }
 }
 
