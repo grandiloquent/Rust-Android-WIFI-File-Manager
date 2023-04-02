@@ -115,9 +115,8 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public void startServer() {
-        Actions.launchServer(mContext);
+        Actions.launchServer();
     }
-
     @JavascriptInterface
     public void switchInputMethod() {
         ((InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE))

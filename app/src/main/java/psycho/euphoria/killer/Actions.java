@@ -29,9 +29,9 @@ public class Actions {
         return webView;
     }
 
-    public static void launchServer(Context context) {
-        Intent intent = new Intent(context, ServerService.class);
-        context.startService(intent);
+    public static void launchServer() {
+        Intent intent = new Intent(sContext, ServerService.class);
+        sContext.startService(intent);
     }
 
     public static void loadStartPage(boolean isHomePage) {

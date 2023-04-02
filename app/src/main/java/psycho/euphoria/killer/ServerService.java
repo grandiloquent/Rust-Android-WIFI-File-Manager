@@ -15,14 +15,15 @@ import android.preference.PreferenceManager;
 
 import java.io.File;
 
+import psycho.euphoria.killer.service.Actions;
+
+import static psycho.euphoria.killer.service.Data.ACTION_DISMISS;
+
 public class ServerService extends Service {
 
 
-    public static final String ACTION_DISMISS = "cn.kpkpkp.ServerService.ACTION_DISMISS";
-    private static final String KP_NOTIFICATION_CHANNEL_ID = "kp_notification_channel";
     SharedPreferences mSharedPreferences;
     private String mLogFileName;
-    private NotificationChannel mNotificationChannel;
 
     public String getString(String key) {
         return mSharedPreferences.getString(key, "");
@@ -33,45 +34,13 @@ public class ServerService extends Service {
     }
 
 
-    private void createNotification() {
-        Notification notification =
-                null;
-        PendingIntent piDismiss = getPendingIntentDismiss();
-        notification = new Notification.Builder(this, KP_NOTIFICATION_CHANNEL_ID)
-                .setContentTitle("本地服务器")
-                .setSmallIcon(android.R.drawable.stat_sys_download)
-                .addAction(getAction(piDismiss))
-                .build();
-        startForeground(1, notification);
-    }
-
-    private void createNotificationChannel() {
-        mNotificationChannel =
-                new NotificationChannel(
-                        KP_NOTIFICATION_CHANNEL_ID,
-                        "本地服务器",
-                        NotificationManager.IMPORTANCE_LOW);
-        ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
-                .createNotificationChannel(mNotificationChannel);
-    }
-
-    private Notification.Action getAction(PendingIntent piDismiss) {
-        return new Notification.Action.Builder(null, "关闭", piDismiss).build();
-    }
-
-    private PendingIntent getPendingIntentDismiss() {
-        Intent dismissIntent = new Intent(this, ServerService.class);
-        dismissIntent.setAction(ACTION_DISMISS);
-        return PendingIntent.getService(this, 0, dismissIntent, 0);
-    }
-
     private void startServer() {
         new Thread(() -> {
 //            int port = PreferenceManager.getDefaultSharedPreferences(this)
 //                    .getInt(KEY_PORT, 3000);
             String tempHost = Shared.getDeviceIP(this);
             //String host = tempHost == null ? "0.0.0.0" : tempHost;
-            MainActivity.startServer(ServerService.this.getAssets(), Shared.getDeviceIP(ServerService.this), 3000);
+            MainActivity.startServer(ServerService.this, ServerService.this.getAssets(), Shared.getDeviceIP(ServerService.this), 3000);
         }).start();
     }
 
@@ -84,12 +53,12 @@ public class ServerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Actions.setServerService(this);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mLogFileName = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
                 "service.txt").getAbsolutePath();
         Shared.log(mLogFileName, "onCreate");
-        createNotificationChannel();
-
+        Actions.createNotificationChannel();
     }
 
     @Override
@@ -111,7 +80,7 @@ public class ServerService extends Service {
             }
         }
         // https://developer.android.com/guide/components/foreground-services
-        createNotification();
+        Actions.createNotification();
         startServer();
         return START_STICKY;
     }

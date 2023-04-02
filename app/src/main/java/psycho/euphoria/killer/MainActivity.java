@@ -1,6 +1,7 @@
 package psycho.euphoria.killer;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
@@ -36,7 +37,7 @@ public class MainActivity extends Activity {
     /*
     启动使用 Rust 编写的服务器。host由主机名和端口组成。例如192.168.8.55:3000。其中主机名是设备在局域网中的IP，使用它可以在局域网的设备之间共享数据。例如连接到一个Wi-Fi的电脑和手机
       */
-    public static native void startServer(AssetManager assetManager, String host, int port);
+    public static native void startServer(ServerService service, AssetManager assetManager, String host, int port);
 
     private void downloadM3u8Video() {
         CharSequence url = Shared.getText(this);
@@ -54,6 +55,7 @@ public class MainActivity extends Activity {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mWebView = Actions.initializeWebView();
         Actions.loadStartPage(false);
+        Actions.launchServer();
     }
 
     private void launchDownloadService(String title, String url) {
