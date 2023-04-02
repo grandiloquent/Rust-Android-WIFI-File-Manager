@@ -115,7 +115,7 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public void startServer() {
-        Calculations.launchServer(mContext);
+        Actions.launchServer(mContext);
     }
 
     @JavascriptInterface
