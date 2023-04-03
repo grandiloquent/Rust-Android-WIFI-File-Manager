@@ -36,6 +36,7 @@ pub async fn run_server(srv: Server, db: Database, ass: AssetManager) {
             handlers::api_file_new::api_file_new_dir,
             handlers::upload::upload,
             handlers:: api_article:: api_article,
+            handlers:: api_article:: api_article_update,
             handlers:: api_article:: api_articles,
             handlers::note::notes,
             handlers::editor::editor,
