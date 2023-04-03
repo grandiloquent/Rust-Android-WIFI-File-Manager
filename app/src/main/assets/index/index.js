@@ -13,10 +13,8 @@ async function onDialogSubmit() {
     if (!dst) return;
     const path = this.dialog.dataset.path || new URL(window.location).searchParams.get("path");
     this.dialog.dataset.path = '';
-    const url = new URL(`${window.origin}/api/file`);
-    url.searchParams.set("path", path);
-    url.searchParams.set("action", this.dialog.dataset.action);
-    url.searchParams.set("dst", dst);
+    const url = new URL(`${window.origin}${this.dialog.dataset.action}`);
+    url.searchParams.set("path", (path || '/storage/emulated/0') + "/" + dst);
     await fetch(url)
     location.reload();
 }
@@ -24,13 +22,13 @@ async function onDialogSubmit() {
 function onNewFile() {
     this.dialog.style.display = 'block';
     this.dialog.setAttribute('title', '新建文件');
-    this.dialog.dataset.action = "1";
+    this.dialog.dataset.action = "/api/file/new_file";
 }
 
 function onNewFolder() {
     this.dialog.style.display = 'block';
-    this.dialog.setAttribute('title', '新建文件');
-    this.dialog.dataset.action = "2";
+    this.dialog.setAttribute('title', '新建文件夹');
+    this.dialog.dataset.action = "/api/file/new_dir";
 }
 
 function substringAfterLast(string, delimiter, missingDelimiterValue) {
@@ -54,9 +52,10 @@ function submit(evt) {
             window.history.pushState({}, '', `?path=${encodedPath}`);
             render(evt.detail.path);
         } else {
-            if (/\.(?:mp4|m4a)$/.test(evt.detail.path)) {
-                window.location = `/video?path=${encodedPath}`
-            } else if (evt.detail.path.endsWith(".srt")) {
+            if (openVideoFile(evt.detail.path)) {
+                return
+            }
+            if (evt.detail.path.endsWith(".srt")) {
                 window.location = `/srt?path=${encodeURIComponent(evt.detail.path)}`
             }
             // else if (evt.detail.path.endsWith(".md")) {
@@ -70,75 +69,7 @@ function submit(evt) {
         }
     } else {
         detail = evt.detail;
-        const sheet = document.createElement('custom-context-bottom-sheet');
-
-        document.body.appendChild(sheet);
-        console.log(detail)
-        if (detail.isDirectory !== "true" && (detail.path.endsWith(".zip")
-            || detail.path.endsWith(".epub"))) {
-            sheet.data = [
-                "选定",
-                "选定同类文件",
-                "重命名",
-                "解压"
-            ]
-        } else {
-            sheet.data = [
-                "选定",
-                "选定同类文件",
-                "重命名",
-                "压缩",
-                "收藏"
-            ]
-        }
-        sheet.addEventListener('submit', evt => {
-            if (evt.detail === '选定') {
-                insertPathLocalStorage(detail.path)
-                customToast.setAttribute('message', '成功写入剪切板');
-            } else if (evt.detail === '选定同类文件') {
-                const f = new URL(window.location).searchParams.get("f") || ''
-                const items = [...document.querySelectorAll('custom-item')];
-                const item = items.filter(x => {
-                    return x.getAttribute('path') === detail.path;
-                })[0];
-                if (item.getAttribute('isdirectory') === 'true') {
-                    items.filter(x => {
-                        return x.getAttribute('isdirectory') === 'true'
-                            && (!f || (substringAfterLast(decodeURIComponent(x.getAttribute('path')), "\\").indexOf(f) !== -1))
-                    }).forEach(x => {
-                        insertPathLocalStorage(x.getAttribute('path'))
-                    })
-                } else {
-                    const path = decodeURIComponent(item.getAttribute('path'));
-                    if (substringAfterLast(path, "\\").lastIndexOf(".") !== -1) {
-                        const extension = "." + substringAfterLast(path, ".");
-                        items.filter(x => {
-                            return x.getAttribute('isdirectory') === 'false' &&
-                                substringAfterLast(x.getAttribute('path')).endsWith(extension)
-                                && (!f || (substringAfterLast(decodeURIComponent(x.getAttribute('path')), "\\").indexOf(f) !== -1));
-                        }).forEach(x => {
-                            insertPathLocalStorage(x.getAttribute('path'))
-                        })
-                    } else {
-                        items.filter(x => {
-                            return x.getAttribute('is_directory') === 'false' &&
-                                substringAfterLast(path, "\\").lastIndexOf(".") === -1
-                                && (!f || (substringAfterLast(decodeURIComponent(x.getAttribute('path')), "\\").indexOf(f) !== -1));
-                        }).forEach(x => {
-                            insertPathLocalStorage(x.getAttribute('path'))
-                        })
-                    }
-
-                }
-                customToast.setAttribute('message', '成功写入剪切板');
-            } else if (evt.detail === '解压') {
-                fetch(`/api/zip?path=${detail.path}`)
-            } else if (evt.detail === '重命名') {
-                rename(detail.path)
-            } else if (evt.detail === "收藏") {
-                saveStoragePath(detail.path);
-            }
-        })
+        showContextMenu(detail)
     }
 }
 
