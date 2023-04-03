@@ -9,10 +9,11 @@ use crate::handlers;
 
 #[tokio::main]
 pub async fn run_server(host: &str, port: u16, ass: AssetManager) {
-    log::error!("Starting server {}:{}", host, port);
+    log::error!("Starting server {}:{}:{}", host, port,std::env::temp_dir().to_str().unwrap());
     let figment = Figment::from(rocket::Config::default())
         .merge((rocket::Config::ADDRESS, host))
         .merge((rocket::Config::PORT, port))
+        .merge((rocket::Config::TEMP_DIR, "/storage/emulated/0"))
         .merge((rocket::Config::LOG_LEVEL, LogLevel::Critical));
     let _ = rocket::custom(figment)
         .mount("/",

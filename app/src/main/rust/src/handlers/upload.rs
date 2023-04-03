@@ -7,9 +7,15 @@ pub struct UploadData<'f> {
     data: TempFile<'f>,
 }
 
-#[post("/upload", data = "<form>")]
-pub async fn upload(mut form: Form<UploadData<'_>>) -> std::io::Result<()> {
-    log::error!("Uploading {}",form.into_inner().key.unwrap());
+#[derive(FromForm)]
+pub struct Upload<'f> {
+    f: TempFile<'f>,
+}
+
+#[post("/upload", format = "multipart/form-data", data = "<form>")]
+pub async fn upload(mut form: Form<Upload<'_>>) -> std::io::Result<()> {
+    log::error!("{}", "::upload");
+    log::error!("Uploading {}",form.into_inner().f.name().unwrap());
     //form.upload.persist_to("/tmp/complete/file.txt").await?;
     Ok(())
 }
