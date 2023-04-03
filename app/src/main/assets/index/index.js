@@ -191,25 +191,6 @@ async function onDelete() {
 
 ///////////////////////////
 bind();
-customElements.whenDefined('custom-bottom-sheet').then(() => {
-    /*
-    customBottomSheet.data = [{
-        title: "选定", id: 1
-    }, {
-        title: "选定同类文件", id: 2
-    }, {
-        title: "粘贴", id: 3
-    }, {
-        title: "解压", id: 4
-    }, {
-        title: "重命名", id: 5
-    }, {
-        title: "整理", id: 6
-    }]
-    */
-    fav.data = []
-})
-
 
 render();
 
