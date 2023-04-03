@@ -322,10 +322,12 @@ function start(uri) {
         video.src = uri;
     } else {
         let path = new URL(window.location).searchParams.get('path');
+        setTitle(substringAfterLast(path, "/"));
         if (path)
-            video.src = `/api/file?path=${path}`
+            video.src = `/api/file?path=${encodeURIComponent(path)}`
     }
 }
+
 start()
 // layout.style.height = `${window.innerWidth * 0.5625}px`;
 // let timer, items;
