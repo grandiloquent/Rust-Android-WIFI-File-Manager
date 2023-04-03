@@ -8,7 +8,7 @@ pub struct Message<'a> {
     message: &'a str,
 }
 
-impl <'a>Message<'a>{
+impl<'a> Message<'a> {
     pub fn new(error: u32, message: &'a str) -> Self {
         Message {
             error,

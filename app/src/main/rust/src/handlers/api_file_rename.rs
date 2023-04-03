@@ -35,11 +35,10 @@ pub async fn api_file_move(dst: String, list: Json<Vec<String>>) -> Value {
     for path in list.into_inner() {
         let p = Path::new(path.as_str());
 
-            let f = d.join(p.file_name().unwrap().to_str().unwrap());
-            if !f.exists() {
-                fs::rename(p, f);
-            }
-        
+        let f = d.join(p.file_name().unwrap().to_str().unwrap());
+        if !f.exists() {
+            fs::rename(p, f);
+        }
     }
 
 // https://doc.rust-lang.org/stable/std/fs/fn.remove_dir_all.html

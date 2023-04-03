@@ -1,6 +1,5 @@
 use rocket::Request;
 use rocket::request::{FromRequest, Outcome};
-use std::convert::Infallible;
 
 #[derive(Debug)]
 pub enum RangeFromHeader {

@@ -1,7 +1,7 @@
 use std::path::{Path};
 use rocket::serde::json::{json, Value};
 use std::fs;
-use rocket::serde::{ json::Json};
+use rocket::serde::{json::Json};
 
 
 #[post("/api/file/delete", data = "<list>")]

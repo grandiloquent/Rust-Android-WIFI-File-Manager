@@ -1,14 +1,10 @@
 // https://github.com/SergioBenitez/Rocket
 // https://api.rocket.rs/v0.5-rc/rocket/
 
-use std::path::{ PathBuf};
-use std::sync::Arc;
-use rocket::{State};
+use std::path::{PathBuf};
 use rocket::fs::NamedFile;
 use urlencoding::decode;
-use crate::asset::Cache;
 use crate::headers::referer::Referer;
-use crate::res::{Asset};
 use crate::strings::StringExt;
 
 

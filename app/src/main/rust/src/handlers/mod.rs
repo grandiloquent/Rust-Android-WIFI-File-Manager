@@ -9,3 +9,4 @@ pub mod api_file_delete;
 pub mod api_zip;
 pub mod video;
 pub mod api_asset_file;
+pub mod api_file_new;

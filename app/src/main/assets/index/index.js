@@ -42,19 +42,7 @@ function substringAfterLast(string, delimiter, missingDelimiterValue) {
     }
 }
 
-async function render(path) {
-    path = path || new URL(window.location).searchParams.get("path");
-    document.title = substringAfterLast(decodeURIComponent(path), "\\")
-    const res = await loadData(path);
-    this.wrapper.innerHTML = res.sort((x, y) => {
-        if (x.is_directory !== y.is_directory) if (x.is_directory) return -1; else return 1;
-        return x.path.localeCompare(y.path)
-    })
-        .map(x => {
-            return `<custom-item bind @submit="submit" ${x.is_directory ? 'folder' : ''} title="${substringAfterLast(x.path, '/')}" path="${encodeURIComponent(x.path)}" isdirectory="${x.is_directory}"></custom-item>`
-        }).join('');
-    bind(this.wrapper);
-}
+
 
 function submit(evt) {
     const encodedPath = evt.detail.path;
@@ -154,32 +142,6 @@ function submit(evt) {
     }
 }
 
-
-function onFavSubmit(evt) {
-
-    let path;
-    switch (evt.detail.id) {
-        case `1`:
-            path = "D:\\Books";
-            break
-        case `2`:
-            path = "D:\\资源";
-            break
-        case `3`:
-            path = "C:\\Users\\Administrator\\Desktop";
-            break
-        case `4`:
-            path = "C:\\Users\\Administrator\\Downloads";
-            break
-        case '5':
-            path = "D:\\Resources\\Videos"
-            break;
-    }
-    const url = new URL(window.location);
-    url.searchParams.set('path', path);
-    window.history.pushState({}, '', url);
-    window.location = url;
-}
 
 async function onMove() {
     launchMoveDialog();

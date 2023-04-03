@@ -2,7 +2,6 @@ use std::error::Error;
 use std::path::{Path};
 use rocket::serde::json::{json, Value};
 use std::{fs, io};
-use std::io::ErrorKind;
 
 
 fn read_file(p: &Path) -> Result<(), Box<dyn Error>> {
@@ -22,7 +21,7 @@ fn read_file(p: &Path) -> Result<(), Box<dyn Error>> {
         Some(v) => v,
         None => Err("Bad request")?,
     };
-   let dx = d.join(to_str);
+    let dx = d.join(to_str);
 
     let file = fs::File::open(p)?;
     let mut archive = zip::ZipArchive::new(file)?;
