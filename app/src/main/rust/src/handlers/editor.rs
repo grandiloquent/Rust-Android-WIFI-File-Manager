@@ -18,3 +18,22 @@ pub fn editor<'a>(cache: &State<Arc<Cache>>) -> Asset {
         }
     }
 }
+
+#[get("/editor/<path>")]
+pub fn editor_file(path: String, cache: &State<Arc<Cache>>) -> Asset {
+    match cache.get(("editor/".to_string() + path.as_str()).as_str()) {
+        None => {
+            Asset::default()
+        }
+        Some(data) => {
+            Asset {
+                data,
+                content_type: if path.ends_with(".js") {
+                    "application/javascript"
+                } else {
+                    "text/css; charset=utf8"
+                },
+            }
+        }
+    }
+}
