@@ -1,9 +1,7 @@
-
 function readStoragePaths() {
     const text = NativeAndroid.getString('favorite_paths');
     return JSON.parse(text || '[]');
 }
-
 function saveStoragePath(path) {
     let paths = readStoragePaths();
     paths.push(path);
