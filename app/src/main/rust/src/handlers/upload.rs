@@ -9,13 +9,13 @@ pub struct UploadData<'f> {
 
 #[derive(FromForm)]
 pub struct Upload<'f> {
-    f: TempFile<'f>,
+    path: &'f str,
+    file: TempFile<'f>,
 }
 
 #[post("/upload", format = "multipart/form-data", data = "<form>")]
 pub async fn upload(mut form: Form<Upload<'_>>) -> std::io::Result<()> {
-    log::error!("{}", "::upload");
-    log::error!("Uploading {}",form.into_inner().f.name().unwrap());
-    //form.upload.persist_to("/tmp/complete/file.txt").await?;
+    let f = form.path.to_string();
+    form.file.persist_to(f).await?;
     Ok(())
 }

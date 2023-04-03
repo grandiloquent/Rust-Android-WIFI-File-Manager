@@ -1,21 +1,23 @@
 use std::sync::Arc;
+use deadpool_postgres::{ManagerConfig, Pool, Runtime};
+use postgres::NoTls;
 use ndk::asset::AssetManager;
 use rocket::{routes};
-use crate::error;
+use crate::{data, Database, error, Server};
 use rocket::config::LogLevel;
 use rocket::figment::Figment;
 use crate::asset::Cache;
+use crate::data::config::Config;
 use crate::handlers;
 
 #[tokio::main]
-pub async fn run_server(host: &str, port: u16, ass: AssetManager) {
-    log::error!("Starting server {}:{}:{}", host, port,std::env::temp_dir().to_str().unwrap());
+pub async fn run_server(srv: Server, db: Database, ass: AssetManager) {
     let figment = Figment::from(rocket::Config::default())
-        .merge((rocket::Config::ADDRESS, host))
-        .merge((rocket::Config::PORT, port))
-        .merge((rocket::Config::TEMP_DIR, "/storage/emulated/0"))
+        .merge((rocket::Config::ADDRESS, srv.host))
+        .merge((rocket::Config::PORT, srv.port))
+        .merge((rocket::Config::TEMP_DIR, srv.temp_dir))
         .merge((rocket::Config::LOG_LEVEL, LogLevel::Critical));
-    let _ = rocket::custom(figment)
+    let mut server = rocket::custom(figment)
         .mount("/",
                routes![
             handlers::index::index,
@@ -34,7 +36,17 @@ pub async fn run_server(host: &str, port: u16, ass: AssetManager) {
             handlers::upload::upload
                ])
         .manage(Arc::new(Cache::new(ass)))
-        .register("/", catchers![error::not_found])
-        .launch().await;
+        .register("/", catchers![error::not_found]);
+    let mut config = deadpool_postgres::Config::new();
+    config.manager = Some(ManagerConfig {
+        recycling_method: deadpool_postgres::RecyclingMethod::Fast,
+    });
+    match config.create_pool(Some(Runtime::Tokio1), NoTls) {
+        Ok(pool) => {
+            server = server.manage(pool);
+        }
+        Err(err) => {}
+    };
+    server.launch().await;
 }
 

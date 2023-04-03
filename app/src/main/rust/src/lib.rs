@@ -14,15 +14,17 @@ mod mimetypes;
 mod strings;
 mod handlers;
 mod headers;
+mod data;
 
 use jni::{JNIEnv};
 use jni::objects::{JObject, JString};
+use crate::data::config::{Config, Database, Server};
 use crate::server::run_server;
-use crate::util::{get_asset_manager};
+use crate::util::{get_asset_manager, get_string};
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "C" fn Java_psycho_euphoria_killer_MainActivity_startServer(
+pub extern "C" unsafe fn Java_psycho_euphoria_killer_MainActivity_startServer(
     env: JNIEnv,
     _class: jni::objects::JClass,
     context: JObject,
@@ -40,6 +42,17 @@ pub extern "C" fn Java_psycho_euphoria_killer_MainActivity_startServer(
     // unsafe {
     //     log::error!("{}",get_string(env,context,"address"));
     // }
-    let ass =get_asset_manager(env, asset_manager);
-    run_server(_host.as_str(), port, ass);
+    let ass = get_asset_manager(env, asset_manager);
+    run_server(Server {
+        host: _host,
+        port: port,
+        temp_dir: "/storage/emulated/0".to_string(),
+    }, Database {
+        host: get_string(env, context, "host"),
+        port: get_string(env, context, "port").parse::<u16>().unwrap_or(5432),
+        db_name: get_string(env, context, "db_name"),
+        user: get_string(env, context, "user"),
+        password: get_string(env, context, "password"),
+    }, ass);
 }
+

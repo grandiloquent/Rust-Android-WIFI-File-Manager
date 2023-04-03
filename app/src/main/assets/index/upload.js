@@ -19,8 +19,8 @@ document.addEventListener("DOMContentLoaded", evt => {
             dialogContext.textContent = `正在上传 (${i++}/${length}) ${file.name} ...`;
             const formData = new FormData;
             let path = new URL(location.href).searchParams.get('path') || "/storage/emulated/0";
-            console.log(path + "/" + file.name)
-            formData.append('file', file, encodeURIComponent(path + "/" + file.name));
+            formData.append('path',  path + "/" + file.name);
+            formData.append('file', file, path + "/" + file.name);
             try {
                 await fetch(`/upload`, {
                     method: "POST",

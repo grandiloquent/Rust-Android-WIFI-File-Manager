@@ -11,6 +11,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 
+import javax.sql.DataSource;
+
 import psycho.euphoria.killer.Shared.Listener;
 import psycho.euphoria.killer.tasks.DownloaderService;
 
@@ -56,7 +58,10 @@ public class MainActivity extends Activity {
         mWebView = Actions.initializeWebView();
         Actions.loadStartPage(false);
         Actions.launchServer();
+
+
     }
+
 
     private void launchDownloadService(String title, String url) {
         Intent service = new Intent(this, DownloaderService.class);
