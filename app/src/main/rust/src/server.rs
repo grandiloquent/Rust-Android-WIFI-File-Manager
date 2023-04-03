@@ -1,9 +1,9 @@
 use std::sync::Arc;
-use deadpool_postgres::{ManagerConfig, Pool, Runtime};
+use deadpool_postgres::{ManagerConfig, Runtime};
 use postgres::NoTls;
 use ndk::asset::AssetManager;
 use rocket::{routes};
-use crate::{data, Database, error, Server};
+use crate::{ Database, error, Server};
 use rocket::config::LogLevel;
 use rocket::figment::Figment;
 use crate::asset::Cache;
@@ -34,11 +34,19 @@ pub async fn run_server(srv: Server, db: Database, ass: AssetManager) {
             handlers::api_zip::api_zip,
             handlers::api_file_new::api_file_new_file,
             handlers::api_file_new::api_file_new_dir,
-            handlers::upload::upload
+            handlers::upload::upload,
+                    handlers:: api_article:: api_article,
+            handlers::note::notes,
+handlers::editor::editor,
                ])
         .manage(Arc::new(Cache::new(ass)))
         .register("/", catchers![error::not_found]);
     let mut config = deadpool_postgres::Config::new();
+    config.host = Some(db.host);
+    config.port = Some(db.port);
+    config.dbname = Some(db.db_name);
+    config.user = Some(db.user);
+    config.password = Some(db.password);
     config.manager = Some(ManagerConfig {
         recycling_method: deadpool_postgres::RecyclingMethod::Fast,
     });
@@ -46,7 +54,9 @@ pub async fn run_server(srv: Server, db: Database, ass: AssetManager) {
         Ok(pool) => {
             server = server.manage(pool);
         }
-        Err(err) => {}
+        Err(err) => {
+            log::error!("Error creating pool")
+        }
     };
     server.launch().await;
 }
