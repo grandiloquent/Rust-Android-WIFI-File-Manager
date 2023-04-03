@@ -57,8 +57,8 @@ public class MainActivity extends Activity {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mWebView = Actions.initializeWebView();
         Actions.loadStartPage(false);
+        Secret.populateSettings(this);
         Actions.launchServer();
-
 
     }
 
