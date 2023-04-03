@@ -29,7 +29,8 @@ pub async fn run_server(host: &str, port: u16, ass: AssetManager) {
             handlers::api_file_rename::api_file_move,
             handlers::api_zip::api_zip,
             handlers::api_file_new::api_file_new_file,
-            handlers::api_file_new::api_file_new_dir
+            handlers::api_file_new::api_file_new_dir,
+            handlers::upload::upload
                ])
         .manage(Arc::new(Cache::new(ass)))
         .register("/", catchers![error::not_found])
