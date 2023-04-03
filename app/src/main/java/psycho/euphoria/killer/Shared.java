@@ -293,14 +293,13 @@ public class Shared {
                 if (isWifiApEnabled)
                     return getWifiApIpAddress();
                 else
-                    return null;
+                    return "0.0.0.0";
             }
             //Log.e("B5aOx2", String.format("getDeviceIP, %s", wifiManager.getConnectionInfo().getSupplicantState().name()));
             InetAddress inetAddress = intToInetAddress(rawIp);
             return inetAddress.getHostAddress();
         } catch (Exception e) {
-            Log.e("TAG", e.getMessage());
-            return null;
+            return "0.0.0.0";
         }
     }
 

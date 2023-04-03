@@ -735,7 +735,7 @@ async function loadFile(path) {
 }
 
 async function loadData(id) {
-    const res = await fetch(`/api/note?action=1&id=${id}`, {cache: "no-cache"});
+    const res = await fetch(`/api/article?id=${id}`, {cache: "no-cache"});
     return res.json();
 }
 

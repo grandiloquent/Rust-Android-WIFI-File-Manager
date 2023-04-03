@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
-          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui">
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui">
     <title>文档列表</title>
     <style>
         html {
@@ -64,7 +65,7 @@
             padding: 0 16px;
         }
 
-        #container > div {
+        #container>div {
             border-top: 1px solid #dadce0;
             padding: 8px 0;
             min-height: 43px;
@@ -76,7 +77,7 @@
             align-items: center;
         }
 
-        div > span {
+        div>span {
             display: flex;
             -webkit-box-align: center;
             align-items: center;
@@ -90,7 +91,7 @@
             white-space: nowrap;
         }
 
-        div > span + span {
+        div>span+span {
             letter-spacing: .01785714em;
             font-family: "Google Sans", Roboto, Arial, sans-serif;
             font-size: .875rem;
@@ -109,15 +110,15 @@
             fill: currentColor;
             flex-shrink: 0
         }
-
     </style>
 
-    <script src="assets/timeago.min.js"></script>
+    <script src="timeago.min.js"></script>
 </head>
-<body>
-<div style="padding: 16px;">
 
-    <div style="
+<body>
+    <div style="padding: 16px;">
+
+        <div style="
 flex: 1;
 background: white;
 outline: none;
@@ -127,12 +128,12 @@ height: 60px;
 padding-left: 54px;
 position: relative;
 ">
-        <div style="
+            <div style="
 display: flex;
 flex: 1;
 height: 100%;
 position: relative;">
-            <input style="
+                <input style="
 display: flex;
 flex: 1;
 position: relative;
@@ -148,65 +149,69 @@ color: #202124;
             margin: 0;
             border: none;
             outline: none;" type="text" autocomplete="off" placeholder="搜索" aria-autocomplete="list"
-                   aria-haspopup="true" aria-expanded="false" role="combobox">
-        </div>
-        <span style="
+                    aria-haspopup="true" aria-expanded="false" role="combobox">
+            </div>
+            <span style="
 color: #5f6368;
 position: absolute;
 top: 18px;
 left: 20px;">
-            <svg width="24" height="24" viewBox="0 0 24 24" focusable="false"><path
-                    d="M20.49 19l-5.73-5.73C15.53 12.2 16 10.91 16 9.5A6.5 6.5 0 1 0 9.5 16c1.41 0 2.7-.47 3.77-1.24L19 20.49 20.49 19zM5 9.5C5 7.01 7.01 5 9.5 5S14 7.01 14 9.5 11.99 14 9.5 14 5 11.99 5 9.5z"></path></svg>
-        </span>
+                <svg width="24" height="24" viewBox="0 0 24 24" focusable="false">
+                    <path
+                        d="M20.49 19l-5.73-5.73C15.53 12.2 16 10.91 16 9.5A6.5 6.5 0 1 0 9.5 16c1.41 0 2.7-.47 3.77-1.24L19 20.49 20.49 19zM5 9.5C5 7.01 7.01 5 9.5 5S14 7.01 14 9.5 11.99 14 9.5 14 5 11.99 5 9.5z">
+                    </path>
+                </svg>
+            </span>
+        </div>
     </div>
-</div>
-<div id="container">
+    <div id="container">
 
-</div>
-<script>
-    async function loadData() {
-        const res = await fetch(`/api/note`);
-        return res.json();
-    }
-    async function searchData(q) {
-        const res = await fetch(`/api/note?action=2&q=${q}`);
-        return res.json();
-    }
-    async function render() {
-        const res = await loadData()
-        const container = document.getElementById("container");
-        for (const note of res) {
-            const div = document.createElement("div");
-            div.innerHTML = `<span>${note.title}</span><span>${timeago.format(parseInt(note.update_at) * 1000, 'zh_CN')}</span>`
-            container.appendChild(div);
-            div.addEventListener('click', evt => {
-                location.href = `/editor?id=${note.id}`;
+    </div>
+    <script>
+        async function loadData() {
+            const res = await fetch(`/api/articles`);
+            return res.json();
+        }
+        async function searchData(q) {
+            const res = await fetch(`/api/articles`);
+            return res.json();
+        }
+        async function render() {
+            const res = await loadData()
+            const container = document.getElementById("container");
+            for (const note of res) {
+                const div = document.createElement("div");
+                div.innerHTML = `<span>${note.title}</span><span>${timeago.format(note.updated_time * 1000, 'zh_CN')}</span>`
+                container.appendChild(div);
+                div.addEventListener('click', evt => {
+                    location.href = `/editor?id=${note.id}`;
+                })
+            }
+        }
+
+        function initialize() {
+            render();
+            const input = document.querySelector('input');
+            input.addEventListener('keydown', async evt => {
+                if (evt.key === 'Enter') {
+                    evt.preventDefault();
+                    const container = document.getElementById("container");
+                    container.innerHTML = '';
+                    const res = await searchData(encodeURIComponent(input.value.trim()))
+                    for (const note of res) {
+                        const div = document.createElement("div");
+                        div.innerHTML = `<span>${note.title}</span><span>${timeago.format(note.updated_time * 1000, 'zh_CN')}</span>`
+                        container.appendChild(div);
+                        div.addEventListener('click', evt => {
+                            location.href = `/editor?id=${note.id}`;
+                        })
+                    }
+                }
             })
         }
-    }
 
-    function initialize() {
-        render();
-        const input = document.querySelector('input');
-        input.addEventListener('keydown',async evt => {
-            if (evt.key === 'Enter') {
-                evt.preventDefault();
-                const container = document.getElementById("container");
-                container.innerHTML = '';
-                const res = await searchData(encodeURIComponent(input.value.trim()))
-                for (const note of res) {
-                    const div = document.createElement("div");
-                    div.innerHTML = `<span>${note.title}</span><span>${timeago.format(parseInt(note.update_at) * 1000, 'zh_CN')}</span>`
-                    container.appendChild(div);
-                    div.addEventListener('click', evt => {
-                        location.href = `/editor?id=${note.id}`;
-                    })
-                }
-            }
-        })
-    }
-
-    initialize();
-</script>
+        initialize();
+    </script>
 </body>
+
 </html>

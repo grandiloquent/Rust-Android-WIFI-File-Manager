@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Environment;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import java.io.File;
 
@@ -34,7 +35,7 @@ public class ServerService extends Service {
         new Thread(() -> {
             int port = Calculations.getUsablePort(Data.DEFAULT_PORT);
             mSharedPreferences.edit().putInt(Data.KEY_PORT, port).apply();
-            String tempHost = Shared.getDeviceIP(this);
+
             MainActivity.startServer(ServerService.this, ServerService.this.getAssets(), Shared.getDeviceIP(ServerService.this), port);
         }).start();
     }
