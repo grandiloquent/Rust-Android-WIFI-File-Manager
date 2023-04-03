@@ -99,7 +99,8 @@ function submit(evt) {
                 "选定",
                 "选定同类文件",
                 "重命名",
-                "压缩"
+                "压缩",
+                "收藏"
             ]
         }
         sheet.addEventListener('submit', evt => {
@@ -146,14 +147,13 @@ function submit(evt) {
                 fetch(`/api/zip?path=${detail.path}`)
             } else if (evt.detail === '重命名') {
                 rename(detail.path)
-            } 
+            } else if (evt.detail === "收藏") {
+                saveStoragePath(detail.path);
+            }
         })
     }
 }
 
-function onFav() {
-    fav.style.display = "block";
-}
 
 function onFavSubmit(evt) {
 

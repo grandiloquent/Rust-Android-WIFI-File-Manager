@@ -27,6 +27,7 @@ postgres = "0.19.5"
 rocket = { version = "=0.5.0-rc.3", features = [ "json"] }
 zip = "0.6.4"
 rocket_seek_stream = {git="https://github.com/rydz/rocket_seek_stream"}
+rsubs-lib = "0.1.7"
 
 [dependencies.regex]
 version = "1.3"
