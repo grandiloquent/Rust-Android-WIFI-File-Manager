@@ -31,9 +31,6 @@ function calculateLoadedPercent(video) {
     return (video.buffered.end(0) / video.duration) * 100 + '%';
 }
 
-function calculateProgressPercent(video) {
-    return ((video.currentTime / video.duration) * 100).toFixed(2) + '%';
-}
 
 
 

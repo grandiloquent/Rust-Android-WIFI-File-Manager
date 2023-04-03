@@ -90,7 +90,7 @@
                         <div class="scrubber">
                             <div class="progress-range__shadow">
                             </div>
-                            <input bind @change="onSeek" value="0" type="range" class="playback-progress" min="0"
+                            <input bind="range" @change="onSeek" value="0" type="range" class="playback-progress" min="0"
                                 class="max=" 100">
                         </div>
                         <div class="remaining" bind="remaining"></div>

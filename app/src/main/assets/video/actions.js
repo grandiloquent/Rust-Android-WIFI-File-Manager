@@ -175,15 +175,34 @@ bind();
 
 function onPlay(evt) {
     evt.stopPropagation();
-    //scheduleHide();
+    scheduleHide();
     play.querySelector('svg').setAttribute('viewBox', '104.23 34.94 74.91 88.23');
     play.querySelector('path').setAttribute('d', 'M113.411 123.175h12.94c6.103 0 9.13-3.027 9.13-9.13V44.073c0-5.86-3.027-8.936-9.13-9.131h-12.94c-6.103 0-9.18 3.027-9.18 9.13v69.971c-.146 6.104 2.881 9.131 9.18 9.131Zm43.604 0h12.939c6.104 0 9.18-3.027 9.18-9.13V44.073c0-5.86-3.076-9.131-9.18-9.131h-12.94c-6.103 0-9.18 3.027-9.18 9.13v69.971c0 6.104 2.93 9.131 9.18 9.131Z');
 }
+
+function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        
+        }
+    }
+}
+function calculateProgressPercent(video) {
+    return ((video.currentTime / video.duration) * 100).toFixed(2) + '%';
+}
+
 function onTimeupdate() {
     //timeFirst.textContent = formatDuration(video.currentTime);
     //const width = calculateProgressPercent(video);
     //progressBarPlayed.style.width = width
     //progressBarPlayhead.style.left = width
+    const width= ((video.currentTime / video.duration) * 100);;
+    range.style.setProperty("--progress",width+"%");
+    range.value=width
     elapsed.textContent = formatDuration(video.currentTime);
 }
 function onProgress() {
