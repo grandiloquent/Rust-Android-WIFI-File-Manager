@@ -7,11 +7,12 @@ use crate::{data, Database, error, Server};
 use rocket::config::LogLevel;
 use rocket::figment::Figment;
 use crate::asset::Cache;
-use crate::data::config::Config;
 use crate::handlers;
 
 #[tokio::main]
 pub async fn run_server(srv: Server, db: Database, ass: AssetManager) {
+    log::error!("host = {},port = {},tempDir = {}",srv.host,srv.port,srv.temp_dir);
+    log::error!("host = {},\nport = {},\ndbName = {},\nuser = {},\npassword = {}",db.host,db.port,db.db_name,db.user,db.password);
     let figment = Figment::from(rocket::Config::default())
         .merge((rocket::Config::ADDRESS, srv.host))
         .merge((rocket::Config::PORT, srv.port))
