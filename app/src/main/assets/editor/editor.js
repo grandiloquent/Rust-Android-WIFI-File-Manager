@@ -55,9 +55,6 @@ async function onCustomBottomSheet(evt) {
         case "1":
             onCopy();
             break;
-        case "2":
-            onPreview();
-            break;
         case "3":
             onTranslateChinese();
             break;
@@ -75,9 +72,6 @@ async function onCustomBottomSheet(evt) {
         case "7":
             customDialog.style.display = 'block';
             break;
-        case "8":
-            insertLink()
-            break;
         case "9":
             onCode();
             break;
@@ -93,9 +87,6 @@ async function onCustomBottomSheet(evt) {
         case "12":
             createFile();
             break
-        case "13":
-            openLink();
-            break;
         case "14":
             replaceText()
             break;

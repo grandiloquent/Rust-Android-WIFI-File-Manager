@@ -105,3 +105,31 @@ function writeText(message) {
     document.execCommand('copy');
     textarea.remove();
 }
+
+function snake(string) {
+    return string.replaceAll(/(?<=[a-z])[A-Z]/g, m => `_${m}`).toLowerCase()
+        .replaceAll(/[ -]([a-z])/g, m => `_${m[1]}`)
+}
+function humanFileSize(size) {
+    if (size === 0) return '0';
+    var i = Math.floor(Math.log(size) / Math.log(1024));
+    return (size / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i]
+}
+async function readText() {
+    // const textarea = document.createElement("textarea");
+    // textarea.style.position = 'fixed';
+    // textarea.style.right = '100%';
+    // document.body.appendChild(textarea);
+    // textarea.value = message;
+    // textarea.select();
+    // document.execCommand('paste');
+    // return textarea.value;
+    let strings;
+    if (typeof NativeAndroid !== 'undefined') {
+        strings = NativeAndroid.readText()
+    } else {
+        strings = await navigator.clipboard.readText()
+    }
+    return strings
+}
+
