@@ -1,53 +1,6 @@
 ///////////////////
 bind();
-customElements.whenDefined('custom-bottom-sheet').then(() => {
-    customBottomSheet.data = [{
-        id: 4,
-        title: "翻译英文"
-    }, {
-        id: 3,
-        title: "翻译中文"
-    }, {
-        id: 5,
-        title: "粘贴代码"
-    }, {
-        id: 1,
-        title: "复制代码块"
-    }, {
-        id: 7,
-        title: "设置代码块"
-    }, {
-        id: 2,
-        title: "预览"
-    }, {
-        id: 6,
-        title: "执行代码"
-    }, {
-        id: 8,
-        title: "插入链接"
-    }, {
-        id: 9,
-        title: "代码"
-    }, {
-        id: 10,
-        title: "翻译"
-    }, {
-        id: 11,
-        title: "剪切代码段"
-    }, {
-        id: 12,
-        title: "创建文件"
-    }, {
-        id: 13,
-        title: "链接"
-    }, {
-        id: 14,
-        title: "替换"
-    }, {
-        id: 15,
-        title: "符号"
-    },]
-})
+
 
 async function onCustomBottomSheet(evt) {
     customBottomSheet.style.display = 'none';

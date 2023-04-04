@@ -367,7 +367,7 @@ async function onSave() {
 }
 
 function onShow() {
-    customBottomSheet.style.display = 'block'
+    actions.style.display = 'block'
 }
 
 function onShowTranslator() {
