@@ -704,8 +704,7 @@ async function insertLink() {
     const strings = await readText();
     let name = '';
     try {
-        const url = new URL(strings);
-        name = await (await fetch(`/api/title?host=${url.host}&path=${encodeURIComponent(`${url.pathname}${url.search}`)}`)).text()
+        name = await (await fetch(`/title?path=${encodeURIComponent(strings)}`)).text()
     } catch (e) {
     }
     textarea.setRangeText(
@@ -817,9 +816,9 @@ async function onSave() {
     });
     const res = await response.text();
     if (id)
-        document.getElementById('toast').setAttribute('message', '成功');
+        toast.setAttribute('message', '成功');
     else
-        window.location = `${window.location.origin}${window.location.pathname}?id=${res}`
+        window.location = `${window.location.origin}${window.location.pathname}?id=${res.id}`
 }
 
 function onShow() {

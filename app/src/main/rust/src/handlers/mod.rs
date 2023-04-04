@@ -16,3 +16,4 @@ pub mod note;
 pub mod editor;
 pub mod subtitle;
 pub mod markdown;
+pub mod title;
