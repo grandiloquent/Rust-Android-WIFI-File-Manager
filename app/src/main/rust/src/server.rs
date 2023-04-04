@@ -41,6 +41,7 @@ pub async fn run_server(srv: Server, db: Database, ass: AssetManager) {
             handlers::note::notes,
             handlers::editor::editor,
             handlers::editor::editor_file,
+            handlers::subtitle::subtitle
                ])
         .manage(Arc::new(Cache::new(ass)))
         .register("/", catchers![error::not_found]);

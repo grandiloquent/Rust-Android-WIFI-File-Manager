@@ -344,9 +344,21 @@ function start(uri) {
         setTitle(substringAfterLast(path, "/"));
         if (path)
             video.src = `/api/file?path=${encodeURIComponent(path)}`
-    }
+            appendSubtitle(video,path)
+        }
+    
 }
-
+function appendSubtitle(video,path) {
+    //document.querySelectorAll('track').forEach(x => x.remove())
+    const track = document.createElement('track');
+    var tracks = video.textTracks;
+    var numTracks = tracks.length;
+    for (var i = numTracks - 1; i >= 0; i--)
+        video.textTracks[i].mode = "disabled";
+    track.src =`/subtitle?path=${encodeURIComponent(path+".srt")}`   
+    track.default = true;
+    video.appendChild(track);
+}
 start()
 // layout.style.height = `${window.innerWidth * 0.5625}px`;
 // let timer, items;
