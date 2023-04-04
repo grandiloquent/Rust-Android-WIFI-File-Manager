@@ -272,9 +272,7 @@ async function loadData(id) {
     return res.json();
 }
 
-function onCode() {
-    pasteCode();
-}
+
 
 function onCopy() {
     const pv = findCodeBlock(textarea);
@@ -402,21 +400,7 @@ async function onTranslateFn() {
 
 
 
-async function pasteCode() {
-    let strings;
-    if (typeof NativeAndroid !== 'undefined') {
-        strings = NativeAndroid.readText()
-    } else {
-        strings = await navigator.clipboard.readText()
-    }
-    textarea.setRangeText(`
-## 
 
-\`\`\`javascript
-${strings}
-\`\`\`
-`, textarea.selectionStart, textarea.selectionEnd, 'end');
-}
 
 
 async function removeLines() {

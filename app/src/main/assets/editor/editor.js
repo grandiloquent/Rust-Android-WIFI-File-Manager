@@ -54,7 +54,7 @@ async function createFile() {
     const s = (await readText()).trim();
     const dir = substringBeforeLast(path, "\\");
     const extension = substringAfterLast(path, ".");
-    fetch(`/api/file?action=1&path=${encodeURIComponent(dir)}&dst=${encodeURIComponent(s .split(',').map(x=>x.trim()+"."+extension).join(","))}`)
+    fetch(`/api/file?action=1&path=${encodeURIComponent(dir)}&dst=${encodeURIComponent(s.split(',').map(x => x.trim() + "." + extension).join(","))}`)
 }
 
 function replaceText() {
@@ -122,7 +122,7 @@ document.addEventListener('keydown', async evt => {
             onEval();
         } else if (evt.key === 'l') {
             evt.preventDefault();
-            onCode()
+            actions.pasteCode()
         } else if (evt.key === 'd') {
             evt.preventDefault();
             createFile();

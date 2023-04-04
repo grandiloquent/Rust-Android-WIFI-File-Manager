@@ -44,3 +44,7 @@ rustup override set nightly
 - https://android.googlesource.com/platform/packages/apps/Gallery2/+/refs/heads/master/src/com/android/gallery3d/app/MoviePlayer.java
 - https://github.com/DrKLO/Telegram
 
+## 相关文档
+
+- [Rust 连接 PostgreSQL 数据库](https://kpkpkp.cn/article?id=9)
+
