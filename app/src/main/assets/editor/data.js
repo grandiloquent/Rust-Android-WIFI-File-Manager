@@ -959,8 +959,7 @@ async function render() {
                 document.title = obj.title;
                 textarea.value = `# ${obj.title}|${JSON.stringify(obj.tags)}
         
-                ${obj.content.trim()}
-                        `
+${obj.content.trim()}`
             } catch (error) {
                 console.log(error)
             }
