@@ -220,9 +220,11 @@ function onSeek(evt) {
 }
 function onBack() {
     video.currentTime = video.currentTime - 10;
+    scheduleHide();
 }
 function onForward() {
     video.currentTime = video.currentTime + 10;
+    scheduleHide();
 }
 function onEnded() {
 
@@ -233,7 +235,7 @@ function scheduleHide() {
     timer = setTimeout(() => {
         gradient.style.display = 'none';
         scrim.style.display = 'none';
-    }, 5000)
+    }, 3000)
 }
 videoContainer.addEventListener('click', evt => {
     gradient.removeAttribute('style');

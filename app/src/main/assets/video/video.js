@@ -112,6 +112,7 @@ function onLayout(evt) {
 function onNext(evt) {
     evt.stopPropagation();
     playIndexedVideo(true)
+    
 }
 
 function onPause() {
@@ -139,7 +140,7 @@ function scheduleHide() {
     timer = setTimeout(() => {
         middle.style.display = 'none';
         bottom.style.display = 'none';
-    }, 5000)
+    }, 3000)
 }
 
 function onPrevious(evt) {
