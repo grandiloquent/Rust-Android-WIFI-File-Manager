@@ -107,7 +107,7 @@ document.addEventListener('keydown', async evt => {
             sortLines();
         } else if (evt.key === 'p') {
             evt.preventDefault();
-            onPreview();
+            actions.onPreview();
         } else if (evt.key === 'k') {
             evt.preventDefault();
             insertLink();
