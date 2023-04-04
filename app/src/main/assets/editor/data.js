@@ -675,7 +675,7 @@ function getLine(extended) {
     if (strings[start] === '\n' && start - 1 > 0) {
         start--;
     }
-    while (start > 0 && strings[start] !== '\n') {
+    while (start > 0 && strings[start-1] !== '\n') {
         start--;
     }
     if (extended) {
@@ -708,7 +708,7 @@ async function insertLink() {
     } catch (e) {
     }
     textarea.setRangeText(
-        `- [${name.trim()}](${strings})`,
+        `[${name.trim()}](${strings})`,
         textarea.selectionStart,
         textarea.selectionEnd,
         'end'
@@ -1095,3 +1095,32 @@ async function uploadImage(image, name) {
     return await response.text();
 }
 
+function formatIndentIncrease() {
+    if (textarea.selectionStart === textarea.selectionEnd) {
+        const line = getLine();
+        textarea.setRangeText(
+            ' '.repeat(2) + line[0],
+            line[1], line[2], 'end'
+        )
+    } else {
+        const string = getSelectedString(textarea);
+        textarea.setRangeText(string.split('\n')
+            // .filter(x => x.trim())
+            .map(x => '  ' + x).join('\n'), textarea.selectionStart, textarea.selectionEnd, 'end');
+    }
+}
+function formatIndentDecrease() {
+    if (textarea.selectionStart === textarea.selectionEnd) {
+        const line = getLine();
+        if(line[0].startsWith("  "))
+        textarea.setRangeText(
+            line[0].slice(2),
+            line[1], line[2], 'end'
+        )
+    } else {
+        const string = getSelectedString(textarea);
+        textarea.setRangeText(string.split('\n')
+            // .filter(x => x.trim())
+            .map(x =>x.startsWith("  ")?  x.slice(2):x).join('\n'), textarea.selectionStart, textarea.selectionEnd, 'end');
+    }
+}

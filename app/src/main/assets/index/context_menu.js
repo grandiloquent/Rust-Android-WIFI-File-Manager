@@ -9,17 +9,19 @@ function showContextMenu(detail) {
             "选定",
             "选定同类文件",
             "重命名",
-            "删除",
-            "解压"
+            "解压",
+                        "删除"
+
         ]
     } else {
         sheet.data = [
             "选定",
             "选定同类文件",
             "重命名",
-            "删除",
             "压缩",
-            "收藏"
+            "收藏",
+                        "删除"
+
         ]
     }
     sheet.addEventListener('submit', evt => {
