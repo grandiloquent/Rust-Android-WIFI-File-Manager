@@ -119,7 +119,7 @@ document.addEventListener('keydown', async evt => {
             actions.onPreview();
         } else if (evt.key === 'k') {
             evt.preventDefault();
-            insertLink();
+            actions.insertLink();
         } else if (evt.key === 'g') {
             evt.preventDefault();
             replaceText();
@@ -134,7 +134,7 @@ document.addEventListener('keydown', async evt => {
             actions.pasteCode()
         } else if (evt.key === 'd') {
             evt.preventDefault();
-            createFile();
+            actions.onFormatCodeBlock();
         } else if (evt.key === '1') {
             evt.preventDefault();
             const pv = findCodeBlock(textarea);
