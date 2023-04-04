@@ -1,3 +1,12 @@
+function onInsertComment(){
+actions.onInsertComment();
+}
+function formatIndentIncrease(){
+actions.formatIndentIncrease();
+}
+function formatIndentDecrease(){
+actions.formatIndentDecrease();
+}
 ///////////////////
 bind();
 

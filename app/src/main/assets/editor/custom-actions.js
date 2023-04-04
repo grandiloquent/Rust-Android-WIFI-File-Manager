@@ -499,6 +499,58 @@ ${strings}
 \`\`\`
   `, textarea.selectionStart, textarea.selectionEnd, 'end');
   }
+   onInsertComment() {
+      let start = textarea.selectionStart;
+      const strings = textarea.value;
+      if (strings[start] === '\n' && start - 1 > 0) {
+          start--;
+      }
+      while (start > 0 && strings[start - 1] !== '\n') {
+          start--;
+      }
+      let end = textarea.selectionEnd;
+      while (end + 1 < strings.length && strings[end] !== '\n') {
+          end++;
+      }
+      if (end < textarea.value.length) {
+          let nexEnd=end+1;
+          while (nexEnd + 1 < strings.length && /\s+/.test(strings[nexEnd])) {
+              nexEnd++;
+          }
+          this.textarea.setRangeText(`${' '.repeat(nexEnd-end-1)}// `, start, start,'end')
+          return
+      }
+      this.textarea.setRangeText(`// `, this.textarea.selectionStart, this.textarea.selectionEnd,'end')
+  }
+ formatIndentIncrease() {
+      if (textarea.selectionStart === textarea.selectionEnd) {
+          const line = getLine();
+          textarea.setRangeText(
+              ' '.repeat(2) + line[0],
+              line[1], line[2], 'end'
+          )
+      } else {
+          const string = getSelectedString(textarea);
+          textarea.setRangeText(string.split('\n')
+              // .filter(x => x.trim())
+              .map(x => '  ' + x).join('\n'), textarea.selectionStart, textarea.selectionEnd, 'end');
+      }
+  }
+   formatIndentDecrease() {
+      if (textarea.selectionStart === textarea.selectionEnd) {
+          const line = getLine();
+          if(line[0].startsWith("  "))
+          textarea.setRangeText(
+              line[0].slice(2),
+              line[1], line[2], 'end'
+          )
+      } else {
+          const string = getSelectedString(textarea);
+          textarea.setRangeText(string.split('\n')
+              // .filter(x => x.trim())
+              .map(x =>x.startsWith("  ")?  x.slice(2):x).join('\n'), textarea.selectionStart, textarea.selectionEnd, 'end');
+      }
+  }
 
   }
 
