@@ -730,12 +730,12 @@ function jumpPage(textarea) {
 
 async function loadFile(path) {
     document.title = substringAfterLast(decodeURIComponent(path), "\\")
-    const res = await fetch(`/api/file?path=${encodeURIComponent(path)}`, {cache: "no-cache"});
+    const res = await fetch(`/api/file?path=${encodeURIComponent(path)}`, { cache: "no-cache" });
     return res.text();
 }
 
 async function loadData(id) {
-    const res = await fetch(`/api/article?id=${id}`, {cache: "no-cache"});
+    const res = await fetch(`/api/article?id=${id}`, { cache: "no-cache" });
     return res.json();
 }
 
@@ -779,33 +779,47 @@ function onPreview() {
 }
 
 async function onSave() {
-    const searchParams = new URL(window.location).searchParams;
-    if (searchParams.has("path")) {
-        const path = searchParams.get("path");
-        if (path.endsWith(".srt")) {
-            textarea.value = textarea.value.replace(/WEBVTT\s+/, "").replaceAll(/\s*\d{2}:\d{2}:\d{2}\.\d{3} --> \d{2}:\d{2}:\d{2}\.\d{3}[\s]+/g, ' ');
-            return;
-        }
-        const res = await fetch(`/api/file?path=${path}`, {
-            method: 'POST', body: textarea.value
-        });
-        toast.setAttribute('message', '成功');
+    const firstLine = textarea.value.trim().split("\n", 2)[0];
+    const obj = {
+
+        content: substringAfter(textarea.value.trim(), "\n"),
+        title: firstLine.replace(/^#+ +/, ''),
+    };
+    const searchParams = new URL(window.location.href).searchParams;
+    const id = searchParams.get('id');
+    let baseUri = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? '' : '';
+
+    if (id) {
+        obj.id = parseInt(id);
+        obj.update_at = new Date().getTime();
     } else {
-        const content = textarea.value
-        if (content.trim().length === 0) return;
-        const id = searchParams.has("id") ? parseInt(searchParams.get("id")) : 0;
-        const title = substringBefore(content.trim(), '\n').trim();
-        const obj = {
-            title, content
-        }
-        if (id) {
-            obj.id = id;
-        }
-        const res = await fetch(`/api/note`, {
-            method: 'POST', body: JSON.stringify(obj)
-        });
-        toast.setAttribute('message', '成功');
+        obj.create_at = new Date().getTime();
+        obj.update_at = new Date().getTime();
     }
+    if (obj.title.indexOf('|') !== -1) {
+        const tags = JSON.parse(substringAfter(obj.title, '|').trim() || '[]');
+        if (tags.length) {
+            obj.tags = tags;
+        }
+        obj.title = substringBefore(obj.title, '|').trim();
+    }
+
+    const m = /!\[]\(([^)]*?)\)/.exec(textarea.value);
+    if (m) {
+        const thumbnail = m[1];
+        if (thumbnail) {
+            obj.thumbnail = thumbnail;
+        }
+    }
+    const response = await fetch(`${baseUri}/api/article`, {
+        method: 'POST',
+        body: JSON.stringify(obj)
+    });
+    const res = await response.text();
+    if (id)
+        document.getElementById('toast').setAttribute('message', '成功');
+    else
+        window.location = `${window.location.origin}${window.location.pathname}?id=${res}`
 }
 
 function onShow() {
@@ -939,13 +953,19 @@ async function render() {
         }
     } else {
         const id = searchParams.get("id");
-        try {
-            const obj = await loadData(id)
-            document.title = obj.title;
-            textarea.value = obj.content;
-        } catch (error) {
-            console.log(error)
+        if (id) {
+            try {
+                const obj = await loadData(id)
+                document.title = obj.title;
+                textarea.value = `# ${obj.title}|${JSON.stringify(obj.tags)}
+        
+                ${obj.content.trim()}
+                        `
+            } catch (error) {
+                console.log(error)
+            }
         }
+
     }
 
 

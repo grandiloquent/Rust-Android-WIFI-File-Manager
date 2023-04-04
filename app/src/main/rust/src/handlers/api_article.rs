@@ -2,7 +2,9 @@ use std::error::Error;
 use deadpool_postgres::{GenericClient, Object, Pool};
 use tokio_postgres::types::{FromSql, Type};
 use rocket::http::Status;
+use rocket::serde::json;
 use rocket::State;
+use serde_json::Value;
 
 async fn get_articles(id: &str, conn: &Object) -> Result<Simple, postgres::Error> {
 // https://docs.rs/tokio-postgres/latest/tokio_postgres/row/struct.Row.html
@@ -21,7 +23,7 @@ async fn get_article(id: i32, conn: &Object) -> Result<Simple, postgres::Error> 
         .try_get(0)
 }
 
-async fn get_article_update(obj: &str, conn: &Object) -> Result<Simple, postgres::Error> {
+async fn get_article_update(obj: Value, conn: &Object) -> Result<Simple, postgres::Error> {
 // https://docs.rs/tokio-postgres/latest/tokio_postgres/row/struct.Row.html
 // https://docs.rs/tokio-postgres/latest/tokio_postgres/types/struct.Json.html
     conn.query_one("select * from _insert_article($1)", &[&obj])
@@ -76,12 +78,12 @@ pub async fn api_article(id: i32, pool: &State<Pool>) -> Result<String, Status> 
         }
     }
 }
-
+// http://192.168.8.55:3000/editor
 #[post("/api/article", data = "<obj>")]
 pub async fn api_article_update(obj: String, pool: &State<Pool>) -> Result<String, Status> {
     match pool.get().await {
         Ok(conn) => {
-            match get_article_update(obj.as_str(), &conn).await {
+            match get_article_update(json::from_str(obj.as_str()).unwrap(), &conn).await {
                 Ok(v) => {
                     return match String::from_utf8(v.0) {
                         Ok(v) => Ok(v),
