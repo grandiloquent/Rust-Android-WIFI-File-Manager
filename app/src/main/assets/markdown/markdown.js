@@ -292,7 +292,7 @@ async function loadData() {
         return res.text();
     } else {
         const id = searchParams.get("id");
-        const res = await fetch(`/api/note?action=1&id=${id}`, {cache: "no-cache"});
+        const res = await fetch(`/api/article?id=${id}`, {cache: "no-cache"});
         const obj = await res.json();
         document.title = obj.title;
         return obj;

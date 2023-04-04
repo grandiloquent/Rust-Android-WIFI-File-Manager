@@ -15,3 +15,4 @@ pub mod api_article;
 pub mod note;
 pub mod editor;
 pub mod subtitle;
+pub mod markdown;
