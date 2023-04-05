@@ -23,7 +23,7 @@ async fn get_article(id: i32, conn: &Object) -> Result<Simple, postgres::Error> 
         .try_get(0)
 }
 
-async fn get_article_update(obj: Value, conn: &Object) -> Result<Simple, postgres::Error> {
+async fn get_article_update(obj: Value, conn: &Object) -> Result<i32, postgres::Error> {
 // https://docs.rs/tokio-postgres/latest/tokio_postgres/row/struct.Row.html
 // https://docs.rs/tokio-postgres/latest/tokio_postgres/types/struct.Json.html
     conn.query_one("select * from _insert_article($1)", &[&obj])
@@ -85,10 +85,7 @@ pub async fn api_article_update(obj: String, pool: &State<Pool>) -> Result<Strin
         Ok(conn) => {
             match get_article_update(json::from_str(obj.as_str()).unwrap(), &conn).await {
                 Ok(v) => {
-                    return match String::from_utf8(v.0) {
-                        Ok(v) => Ok(v),
-                        Err(_) => Err(Status::InternalServerError)
-                    };
+                    return Ok(v.to_string());
                 }
                 Err(error) => {
                     log::error!("{}",error.to_string());
