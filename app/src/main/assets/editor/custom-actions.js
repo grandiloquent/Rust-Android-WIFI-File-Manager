@@ -710,6 +710,9 @@ ${strings}
       textarea.setRangeText(`- ${p[0]}`,
         p[1], p[2], 'end')
     }
+    onFormatHead() {
+      formatHead(textarea, 3)
+    }
   }
 
   customElements.define('custom-actions', CustomActions);
