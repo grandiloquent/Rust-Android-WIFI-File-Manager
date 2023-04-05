@@ -376,6 +376,12 @@
             <div bind @click="onInsertComment" class="menu-item">
               评论
             </div>   
+            <div bind @click="formatIndentIncrease" class="menu-item">
+              缩进
+            </div>   
+            <div bind @click="formatIndentDecrease" class="menu-item">
+              缩退
+            </div>   
             <div bind @click="close" class="menu-item">
               取消
             </div>
@@ -599,7 +605,7 @@ ${strings}
       let start = textarea.selectionStart;
       let end = textarea.selectionEnd;
       // \(\)\[\].!/\?%-
-      const re = new RegExp("[a-zA-Z0-9+%'#*=()!?|^&\\[\\]{}\" -]");
+      const re = new RegExp("[a-zA-Z0-9.+%'#*=()!?|^&\\[\\]{}\" -]");
       while (start > -1 && re.test(textarea.value[start - 1])) {
         start--;
       }
@@ -607,7 +613,22 @@ ${strings}
         end++;
       }
       const value = textarea.value.substring(start, end);
-      textarea.setRangeText(` ${value.trim()} `, start, end, 'end');
+      textarea.setRangeText(` \`${value.trim()}\` `, start, end, 'end');
+      writeText('`')
+    }
+    onFormatBold() {
+      let start = textarea.selectionStart;
+      let end = textarea.selectionEnd;
+      // \(\)\[\].!/\?%-
+      const re = new RegExp("[a-zA-Z0-9.+%'#*=()!?|^&\\[\\]{}\" -]");
+      while (start > -1 && re.test(textarea.value[start - 1])) {
+        start--;
+      }
+      while (end + 1 < textarea.value.length && re.test(textarea.value[end])) {
+        end++;
+      }
+      const value = textarea.value.substring(start, end);
+      textarea.setRangeText(` **${value.trim()}** `, start, end, 'end');
       writeText('`')
     }
   }

@@ -7,6 +7,9 @@ function formatIndentIncrease() {
 function formatIndentDecrease() {
     actions.formatIndentDecrease();
 }
+function onFormatBold(){
+    actions.onFormatBold();
+}
 async function render() {
     textarea.value = localStorage.getItem("content");
 
