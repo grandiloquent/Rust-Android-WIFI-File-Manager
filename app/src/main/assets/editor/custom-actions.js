@@ -163,9 +163,6 @@ textarea {
     _close(evt) {
       evt.stopPropagation();
       this.remove();
-      this.dispatchEvent(new CustomEvent('submit', {
-        detail: 1
-      }));
     }
 
     _submit(evt) {
@@ -860,7 +857,7 @@ ${strings}
       let start = textarea.selectionStart;
       let end = textarea.selectionEnd;
       // \(\)\[\].!/\?%-
-      const re = new RegExp("[a-zA-Z0-9.+%'#*=()!?|^&\\[\\]{}\" -]");
+      const re = new RegExp("[a-zA-Z0-9_.+%'#*=()!?|^&\\[\\]{}\" -]");
       while (start > -1 && re.test(textarea.value[start - 1])) {
         start--;
       }
@@ -952,8 +949,8 @@ ${strings}
       customDialog.title = ""
       window.customDialog = customDialog;
       customDialog.addEventListener('submit', evt => {
-        this.setPatterns(evt.detail);
-        this.loadPatterns(evt.detail)
+        this.setPatterns(customDialog.content );
+        this.loadPatterns(customDialog.content )
       });
       const patterns = this.getPatterns();
       if (patterns) {
