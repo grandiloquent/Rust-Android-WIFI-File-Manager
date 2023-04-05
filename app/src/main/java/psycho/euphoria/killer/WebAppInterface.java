@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
@@ -152,5 +153,15 @@ public class WebAppInterface {
         ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("demo", text);
         clipboard.setPrimaryClip(clip);
+    }
+
+    @JavascriptInterface
+    public void openFile(String path) {
+
+        mContext.runOnUiThread(() -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.fromFile(new File(path)));
+            mContext.startActivity(Intent.createChooser(intent, "打开"));
+        });
     }
 }

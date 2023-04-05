@@ -25,6 +25,7 @@ pub async fn run_server(srv: Server, db: Database, ass: AssetManager) {
             handlers::index_file::index_file,
             handlers::file::file,
             handlers::api_files::api_files,
+            handlers::api_files::api_files_clear,
             handlers::api_asset_file::api_asset_file,
             handlers::api_file::api_file,
             handlers::video::video,
