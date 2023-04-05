@@ -12,7 +12,11 @@ function bind(elememnt) {
         [...element.attributes].filter(attr => attr.nodeName.startsWith('@')).forEach(attr => {
             if (!attr.value) return;
             element.addEventListener(attr.nodeName.slice(1), evt => {
-                window[attr.value](evt);
+                if (window[attr.value])
+                    window[attr.value](evt);
+                else {
+                    window['actions'][attr.value](evt);
+                }
             });
         });
     })

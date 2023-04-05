@@ -87,6 +87,7 @@ public class Actions {
     }
 
     public static boolean requestPermission() {
+
         List<String> needPermissions = filterNeedPermissions(sContext);
         if (needPermissions.size() > 0) {
             sContext.requestPermissions(needPermissions.toArray(new String[0]), ITEM_ID_REFRESH);

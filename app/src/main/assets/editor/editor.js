@@ -1,15 +1,4 @@
-function onFormatCode() {
-    actions.onFormatCode();
-}
-function formatIndentIncrease() {
-    actions.formatIndentIncrease();
-}
-function formatIndentDecrease() {
-    actions.formatIndentDecrease();
-}
-function onFormatBold(){
-    actions.onFormatBold();
-}
+
 async function render() {
     textarea.value = localStorage.getItem("content");
 
@@ -39,7 +28,6 @@ ${obj.content.trim()}`
 
 
 }
-
 async function onSave() {
     const firstLine = textarea.value.trim().split("\n", 2)[0];
     const obj = {
