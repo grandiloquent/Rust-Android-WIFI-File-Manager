@@ -1,5 +1,5 @@
-function onInsertComment() {
-    actions.onInsertComment();
+function onFormatCode() {
+    actions.onFormatCode();
 }
 function formatIndentIncrease() {
     actions.formatIndentIncrease();
@@ -86,8 +86,8 @@ async function loadData(id) {
     return res.json();
 }
 
-function onCutLine() {
-    actions.onCutLine();
+function onDeleteLine() {
+    actions.onDeleteLine();
 }
 
 function onTranslateChinese() {

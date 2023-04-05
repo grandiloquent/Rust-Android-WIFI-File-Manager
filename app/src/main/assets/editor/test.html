@@ -9,15 +9,8 @@
 </head>
 
 <body>
-    <textarea bind="textarea" style="width: 100%;height: 300px;resize: none;">```rust
-        let figment = Figment::from(rocket::Config::default())
-            .merge((rocket::Config::ADDRESS, srv.host))
-            .merge((rocket::Config::PORT, srv.port))
-            .merge((rocket::Config::TEMP_DIR, srv.temp_dir))
-            .merge((rocket::Config::LOG_LEVEL, LogLevel::Critical));
-        let mut server = rocket::custom(figment)
-```</textarea>
-    <button bind @click="onFormatCodeBlock">插入</button>
+    <textarea bind="textarea" style="width: 100%;height: 300px;resize: none;">你 xyz + 5 = 3 它们</textarea>
+    <button bind @click="onFormatCode">插入</button>
 
     <script>
         function bind(elememnt) {
@@ -63,20 +56,20 @@
             return [start, end];
         }
         bind();
-        function onFormatCodeBlock() {
-            const indexs = findCodeBlock(textarea);
-            if (textarea.selectionStart !== textarea.selectionEnd) {
-                const selected = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
-                let s = textarea.value.substring(indexs[0], indexs[1])
-                    .split('\n').map(x => {
-                        if (x.startsWith(selected)) {
-                            x = x.substring(selected.length);
-                        }
-                        return x;
-                    }).join('\n');
-                textarea.setRangeText(s,indexs[0], indexs[1], 'end');
+        function onFormatCode() {
+            let start = textarea.selectionStart;
+            let end = textarea.selectionEnd;
+            // \(\)\[\].!/\?%-
+            const re = new RegExp("[a-zA-Z0-9+%'#*=()!?|^&\\[\\]{}\" -]");
+            while (start > -1 && re.test(textarea.value[start - 1])) {
+                start--;
             }
-
+            while (end + 1 < textarea.value.length && re.test(textarea.value[end])) {
+                end++;
+            }
+            const value = textarea.value.substring(start, end);
+            textarea.setRangeText(` ${value.trim()} `, start, end, 'end');
+            writeText('`')
         }
         function onShow() {
             actions.style.display = 'block';

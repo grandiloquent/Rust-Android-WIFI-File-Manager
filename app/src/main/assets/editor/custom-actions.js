@@ -367,6 +367,15 @@
             <div bind @click="onCopyLine" class="menu-item">
               复制行
             </div>
+            <div bind @click="onCutLine" class="menu-item">
+              剪切行
+            </div>
+            <div bind @click="pasteCode" class="menu-item">
+              粘贴代码
+            </div>
+            <div bind @click="onInsertComment" class="menu-item">
+              评论
+            </div>   
             <div bind @click="close" class="menu-item">
               取消
             </div>
@@ -580,6 +589,26 @@ ${strings}
       writeText(p[0]);
       textarea.setRangeText(``,
         p[1], p[2], 'end')
+    }
+    onDeleteLine() {
+      const p = getLine(textarea);
+      textarea.setRangeText(``,
+        p[1], p[2], 'end')
+    }
+    onFormatCode() {
+      let start = textarea.selectionStart;
+      let end = textarea.selectionEnd;
+      // \(\)\[\].!/\?%-
+      const re = new RegExp("[a-zA-Z0-9+%'#*=()!?|^&\\[\\]{}\" -]");
+      while (start > -1 && re.test(textarea.value[start - 1])) {
+        start--;
+      }
+      while (end + 1 < textarea.value.length && re.test(textarea.value[end])) {
+        end++;
+      }
+      const value = textarea.value.substring(start, end);
+      textarea.setRangeText(` ${value.trim()} `, start, end, 'end');
+      writeText('`')
     }
   }
 
