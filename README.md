@@ -4,10 +4,10 @@
 
 1. 添加工具链
 
-    rustup target add aarch64-linux-android
+        rustup target add aarch64-linux-android
 2. 安装 **cargo-ndk** 工具
 
-    cargo install cargo-ndk
+        cargo install cargo-ndk
 
 更多信息可参阅 https://github.com/willir/cargo-ndk-android-gradle
 

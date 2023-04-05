@@ -1,11 +1,11 @@
-function onInsertComment(){
-actions.onInsertComment();
+function onInsertComment() {
+    actions.onInsertComment();
 }
-function formatIndentIncrease(){
-actions.formatIndentIncrease();
+function formatIndentIncrease() {
+    actions.formatIndentIncrease();
 }
-function formatIndentDecrease(){
-actions.formatIndentDecrease();
+function formatIndentDecrease() {
+    actions.formatIndentDecrease();
 }
 async function render() {
     textarea.value = localStorage.getItem("content");
@@ -191,7 +191,7 @@ document.addEventListener('keydown', async evt => {
             await onSave();
         } else if (evt.key === 'j') {
             evt.preventDefault();
-            openLink();
+            actions.openLink();
         } else if (evt.key === 'o') {
             evt.preventDefault();
             sortLines();
@@ -215,7 +215,7 @@ document.addEventListener('keydown', async evt => {
             actions.pasteCode()
         } else if (evt.key === 'd') {
             evt.preventDefault();
-            actions.onFormatCodeBlock();
+            actions.onInsertComment();
         } else if (evt.key === '1') {
             evt.preventDefault();
             const pv = findCodeBlock(textarea);
@@ -236,6 +236,9 @@ document.addEventListener('keydown', async evt => {
         } else if (evt.key === 'h') {
             evt.preventDefault();
             formatHead(textarea, 3);
+        }else if (evt.key === 'r') {
+            evt.preventDefault();
+            actions.onFormatCodeBlock();
         }
 
     } else if (evt.key === 'Tab') {
