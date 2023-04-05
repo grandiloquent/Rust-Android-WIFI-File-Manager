@@ -42,56 +42,26 @@ public class MainActivity extends Activity {
       */
     public static native void startServer(ServerService service, AssetManager assetManager, String host, int port);
 
-    private void downloadM3u8Video() {
-        CharSequence url = Shared.getText(this);
-        if (url == null) return;
-        Shared.openTextContentDialog(this, "Download", new Listener() {
-            @Override
-            public void onSuccess(String value) {
-                launchDownloadService(value.trim(), url.toString());
-            }
-        });
-    }
-
     private void initialize() {
-        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-        StrictMode.setVmPolicy(builder.build());
+        Actions.aroundFileUriExposedException();
         Actions.requestStorageManagerPermission();
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mWebView = Actions.initializeWebView();
         Actions.loadStartPage(false);
-        Secret.populateSettings(this);
+        //Secret.populateSettings(this);
         Actions.launchServer();
-
     }
-
-
-    private void launchDownloadService(String title, String url) {
-        Intent service = new Intent(this, DownloaderService.class);
-        service.putExtra(DownloaderService.EXTRA_VIDEO_TITLE, title);
-        service.putExtra(DownloaderService.EXTRA_VIDEO_ADDRESS, url);
-        startService(service);
-    }
-
-    private void mergeVideo() {
-        Intent service = new Intent(this, DownloaderService.class);
-        service.setAction("merge");
-        startService(service);
-    }
-
 
     private void refresh() {
         Actions.clearWebViewCachesCustom();
         mWebView.reload();
     }
 
-
     private void restartService() {
         Intent service = new Intent(this, DownloaderService.class);
         service.setAction("stop");
         startService(service);
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

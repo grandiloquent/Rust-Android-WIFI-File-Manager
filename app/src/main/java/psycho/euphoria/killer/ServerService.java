@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Environment;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import java.io.File;
 
@@ -33,8 +32,8 @@ public class ServerService extends Service {
 
     private void startServer() {
         new Thread(() -> {
-            int port = Calculations.getUsablePort(Data.DEFAULT_PORT);
-            mSharedPreferences.edit().putInt(Data.KEY_PORT, port).apply();
+            int port = Calculations.getUsablePort(psycho.euphoria.killer.Actions.DEFAULT_PORT);
+            mSharedPreferences.edit().putInt(psycho.euphoria.killer.Actions.KEY_PORT, port).apply();
 
             MainActivity.startServer(ServerService.this, ServerService.this.getAssets(), Shared.getDeviceIP(ServerService.this), port);
         }).start();

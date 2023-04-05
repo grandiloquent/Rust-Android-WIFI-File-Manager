@@ -64,10 +64,10 @@ function submit(evt) {
             else if (decodeURIComponent(evt.detail.path).indexOf("/Books/") === -1 && /\.(?:bat|c|cc|cmd|conf|cpp|cs|css|gitignore|gradle|h|html|java|js|json|jsx|md|properties|rs|service|sql|srt|toml|txt|vtt|xml|au3)$/.test(evt.detail.path)) {
                 window.open(`/editor?path=${encodedPath}`)
             } else {
-             if ( (/\.(?:pdf|epub)$/.test(encodedPath))&&(typeof NativeAndroid !== 'undefined')) {
-                                NativeAndroid.openFile(encodedPath);
-                                return
-                            }
+                if ((/\.(?:pdf|epub|apk)$/.test(encodedPath)) && (typeof NativeAndroid !== 'undefined')) {
+                    NativeAndroid.openFile(encodedPath);
+                    return
+                }
                 window.location = `/api/file?path=${encodedPath}`
             }
         }

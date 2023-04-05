@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
@@ -113,7 +112,7 @@ public class WebAppInterface {
         mContext.runOnUiThread(() -> {
             mContext.getWebView().loadUrl("http://" + Shared.getDeviceIP(mContext) + ":" +
                     mSharedPreferences.getInt(
-                            Data.KEY_PORT, Data.DEFAULT_PORT
+                            Actions.KEY_PORT, Actions.DEFAULT_PORT
                     ));
         });
     }
