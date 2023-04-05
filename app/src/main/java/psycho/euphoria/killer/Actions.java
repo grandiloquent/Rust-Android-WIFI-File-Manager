@@ -26,13 +26,16 @@ public class Actions {
     private static final String FILE_ANDROID_ASSET_HOME_INDEX_HTML = "file:///android_asset/home/index.html";
     private static MainActivity sContext;
 
+    
     public static void aroundFileUriExposedException() {
+        // 调用 Intent 可能出现 android.os.FileUriExposedException 异常
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
     }
 
     public static void clearWebViewCachesCustom() {
         try {
+            // 通过删除 WebView 缓存目录来清空访问网页后留下的缓存
             String dataDir = sContext.getPackageManager().getPackageInfo(sContext.getPackageName(), 0).applicationInfo.dataDir;
             new File(dataDir + "/app_webview/").delete();
         } catch (Exception e) {
@@ -94,6 +97,9 @@ public class Actions {
 
     public static void requestStorageManagerPermission() {
         if (VERSION.SDK_INT >= VERSION_CODES.R) {
+            // 测试是否已获取所有文件访问权限 Manifest.permission.MANAGE_EXTERNAL_STORAGE 
+            // 该权限允许程序访问储存中的大部分文件
+            // 但不包括 Android/data 目录下程序的私有数据目录
             if (!Environment.isExternalStorageManager()) {
                 try {
                     Uri uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID);

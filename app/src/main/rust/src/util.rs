@@ -10,13 +10,16 @@ use rocket::serde::Serialize;
 
 pub fn get_asset_manager(env: JNIEnv, asset_manager_object: JObject) -> AssetManager {
     let aasset_manager_pointer = unsafe {
+        // https://docs.rs/android-ndk-sys/latest/android_ndk_sys/
         ndk_sys::AAssetManager_fromJava(env.get_native_interface(), *asset_manager_object)
     };
     let asset_manager = unsafe {
+        // https://docs.rs/ndk/latest/ndk/asset/struct.AssetManager.html#method.from_ptr
         ndk::asset::AssetManager::from_ptr(NonNull::<ndk_sys::AAssetManager>::new_unchecked(
             aasset_manager_pointer,
         ))
     };
+    // https://docs.rs/ndk-sys/0.4.0/ndk_sys/struct.AAssetManager.html
     asset_manager
 }
 
