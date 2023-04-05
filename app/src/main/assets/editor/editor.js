@@ -226,7 +226,7 @@ document.addEventListener('keydown', async evt => {
             }
             case 'h': {
                 evt.preventDefault();
-                formatHead(textarea, 3);
+               actions.onFormatHead()
                 break;
             }
             case 'j': {

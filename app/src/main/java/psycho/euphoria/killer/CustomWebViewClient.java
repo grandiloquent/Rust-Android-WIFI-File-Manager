@@ -72,7 +72,8 @@ public class CustomWebViewClient extends WebViewClient {
 //        if (Arrays.stream(mBlocks).anyMatch(url::contains)) {
 //            return mEmptyResponse;
 //        }
-        if (url.contains(".m3u8") || url.contains(".m3u8?")) {
+        //Log.e("B5aOx2", String.format("shouldInterceptRequest, %s", url));
+        if ( !url.contains("ping.gif?")&&(url.contains(".m3u8") || url.contains(".m3u8?"))) {
             Shared.setText(mContext, url);
             mContext.runOnUiThread(new Runnable() {
                 @Override
