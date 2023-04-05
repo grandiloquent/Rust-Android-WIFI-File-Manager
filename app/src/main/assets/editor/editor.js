@@ -86,7 +86,13 @@ async function loadData(id) {
     return res.json();
 }
 
+function onCutLine() {
+    actions.onCutLine();
+}
 
+function onTranslateChinese() {
+    actions.onTranslateChinese();
+}
 
 ///////////////////
 bind();
@@ -186,59 +192,92 @@ function insertBound() {
 document.addEventListener('keydown', async evt => {
     console.log(evt.key)
     if (evt.ctrlKey) {
-        if (evt.key === 's') {
-            evt.preventDefault();
-            await onSave();
-        } else if (evt.key === 'j') {
-            evt.preventDefault();
-            actions.openLink();
-        } else if (evt.key === 'o') {
-            evt.preventDefault();
-            sortLines();
-        } else if (evt.key === 'p') {
-            evt.preventDefault();
-            actions.onPreview();
-        } else if (evt.key === 'k') {
-            evt.preventDefault();
-            actions.insertLink();
-        } else if (evt.key === 'g') {
-            evt.preventDefault();
-            replaceText();
-        } else if (evt.key === 'f') {
-            evt.preventDefault();
-            insertBound();
-        } else if (evt.key === 'e') {
-            evt.preventDefault();
-            onEval();
-        } else if (evt.key === 'l') {
-            evt.preventDefault();
-            actions.pasteCode()
-        } else if (evt.key === 'd') {
-            evt.preventDefault();
-            actions.onInsertComment();
-        } else if (evt.key === '1') {
-            evt.preventDefault();
-            const pv = findCodeBlock(textarea);
-            navigator.clipboard.writeText(textarea.value.substring(pv[0], pv[1]));
-        } else if (evt.key === '2') {
-            evt.preventDefault();
-            const p = findCodeBlock(textarea);
-            textarea.setRangeText(await navigator.clipboard.readText(), p[0], p[1], "end");
-        } else if (evt.key === '3') {
-            evt.preventDefault();
-            const p = findCodeBlockExtend(textarea);
-            textarea.setRangeText(textarea.value.substring(p[0], p[1])
-                .split('\n')
-                .map(x => `    ${x.trimEnd()}`).join('\n'), p[0], p[1]);
-        } else if (evt.key === 'u') {
-            evt.preventDefault();
-            uploadHanlder(textarea)
-        } else if (evt.key === 'h') {
-            evt.preventDefault();
-            formatHead(textarea, 3);
-        }else if (evt.key === 'r') {
-            evt.preventDefault();
-            actions.onFormatCodeBlock();
+        switch (evt.key) {
+            case '1': {
+                evt.preventDefault();
+                const pv = findCodeBlock(textarea);
+                navigator.clipboard.writeText(textarea.value.substring(pv[0], pv[1]));
+                break;
+            }
+            case '2': {
+                evt.preventDefault();
+                const p = findCodeBlock(textarea);
+                textarea.setRangeText(await navigator.clipboard.readText(), p[0], p[1], "end");
+                break;
+            }
+            case '3': {
+                evt.preventDefault();
+                const p = findCodeBlockExtend(textarea);
+                textarea.setRangeText(textarea.value.substring(p[0], p[1])
+                    .split('\n')
+                    .map(x => `    ${x.trimEnd()}`).join('\n'), p[0], p[1]);
+                break;
+            }
+            case 'd': {
+                evt.preventDefault();
+                actions.onInsertComment();
+                break;
+            }
+            case 'e': {
+                evt.preventDefault();
+                onEval();
+                break;
+            }
+            case 'f': {
+                evt.preventDefault();
+                insertBound();
+                break;
+            }
+            case 'g': {
+                evt.preventDefault();
+                replaceText();
+                break;
+            }
+            case 'h': {
+                evt.preventDefault();
+                formatHead(textarea, 3);
+                break;
+            }
+            case 'j': {
+                evt.preventDefault();
+                actions.openLink();
+                break;
+            }
+            case 'k': {
+                evt.preventDefault();
+                actions.insertLink();
+                break;
+            }
+            case 'l': {
+                evt.preventDefault();
+                actions.pasteCode()
+                break;
+            }
+            case 'o': {
+                evt.preventDefault();
+                sortLines();
+                break;
+            }
+            case 'p': {
+                evt.preventDefault();
+                actions.onPreview();
+                break;
+            }
+            case 'r': {
+                evt.preventDefault();
+                actions.onFormatCodeBlock();
+                break;
+            }
+            case 's': {
+                evt.preventDefault();
+                await onSave();
+                break;
+            }
+            case 'u': {
+                evt.preventDefault();
+                uploadHanlder(textarea)
+                break;
+            }
         }
 
     } else if (evt.key === 'Tab') {

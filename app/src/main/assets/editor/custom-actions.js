@@ -364,7 +364,9 @@
             <div bind @click="onFormatCodeBlock" class="menu-item">
               格式化代码
             </div>
-            
+            <div bind @click="onCopyLine" class="menu-item">
+              复制行
+            </div>
             <div bind @click="close" class="menu-item">
               取消
             </div>
@@ -379,6 +381,7 @@
         [...element.attributes].filter(attr => attr.nodeName.startsWith('@')).forEach(attr => {
           if (!attr.value) return;
           element.addEventListener(attr.nodeName.slice(1), evt => {
+            this.style.display = 'none';
             this[attr.value](evt);
           });
         });
@@ -558,18 +561,26 @@ ${strings}
     onFormatCodeBlock() {
       const indexs = findCodeBlock(textarea);
       if (textarea.selectionStart !== textarea.selectionEnd) {
-          const selected = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
-          let s = textarea.value.substring(indexs[0], indexs[1])
-              .split('\n').map(x => {
-                  if (x.startsWith(selected)) {
-                      x = x.substring(selected.length);
-                  }
-                  return x;
-              }).join('\n');
-          textarea.setRangeText(s,indexs[0], indexs[1], 'end');
+        const selected = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
+        let s = textarea.value.substring(indexs[0], indexs[1])
+          .split('\n').map(x => {
+            if (x.startsWith(selected)) {
+              x = x.substring(selected.length);
+            }
+            return x;
+          }).join('\n');
+        textarea.setRangeText(s, indexs[0], indexs[1], 'end');
       }
-
-  }
+    }
+    onCopyLine() {
+      copyLine(textarea);
+    }
+    onCutLine() {
+      const p = getLine(textarea);
+      writeText(p[0]);
+      textarea.setRangeText(``,
+        p[1], p[2], 'end')
+    }
   }
 
   customElements.define('custom-actions', CustomActions);
