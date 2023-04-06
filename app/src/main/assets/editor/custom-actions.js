@@ -704,7 +704,7 @@ textarea {
     }
     async onTranslateChinese() {
       let array1 = getLine();
-      let strings = await translate(array1[0], 'zh');
+      let strings = (typeof NativeAndroid !== 'undefined') ?NativeAndroid.translate(array1[0]):(await translate(array1[0], 'zh'));
       if (this.patterns) {
         for (let index = 0; index < this.patterns.length; index++) {
           const element = this.patterns[index];

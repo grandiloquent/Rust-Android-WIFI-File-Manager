@@ -13,10 +13,21 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
+import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.Proxy.Type;
+import java.net.SocketAddress;
 import java.net.URL;
+import java.util.zip.GZIPInputStream;
 
 import psycho.euphoria.killer.video.PlayerActivity;
 import psycho.euphoria.killer.video.VideoListActivity;
@@ -156,11 +167,47 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public void openFile(String path) {
-
         mContext.runOnUiThread(() -> {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.fromFile(new File(path)));
             mContext.startActivity(Intent.createChooser(intent, "打开"));
         });
+    }
+
+    @JavascriptInterface
+    public String translate(String s) {
+        final StringBuilder sb = new StringBuilder();
+        try {
+            Thread thread = new Thread(() -> {
+                String uri = "http://translate.google.com/translate_a/single?client=gtx&sl=auto&tl="
+                        + "zh" + "&dt=t&dt=bd&ie=UTF-8&oe=UTF-8&dj=1&source=icon&q=" + Uri.encode(s);
+                try {
+                    HttpURLConnection h = (HttpURLConnection) new URL(uri).openConnection(
+                            new Proxy(Type.HTTP, new InetSocketAddress("127.0.0.1", 10809))
+                    );
+                    h.addRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Edg/88.0.705.74");
+                    h.addRequestProperty("Accept-Encoding", "gzip, deflate, br");
+                    String line = null;
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(
+                            new GZIPInputStream(h.getInputStream())
+                    ));
+                    StringBuilder sb1 = new StringBuilder();
+                    while ((line = reader.readLine()) != null) {
+                        sb1.append(line).append('\n');
+                    }
+                    JSONObject object = new JSONObject(sb1.toString());
+                    JSONArray array = object.getJSONArray("sentences");
+                    for (int i = 0; i < array.length(); i++) {
+                        sb.append(array.getJSONObject(i).getString("trans")).append('\n');
+                    }
+                } catch (Exception e) {
+                }
+            });
+            thread.start();
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
     }
 }
