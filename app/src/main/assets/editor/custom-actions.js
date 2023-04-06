@@ -527,7 +527,37 @@ textarea {
     });
     return await response.text();
   }
+  function getContinueBlock(textarea) {
+    let start = textarea.selectionStart;
+    const strings = textarea.value;
+    if (strings[start] === '\n' && start - 1 > 0) {
+      start--;
+    }
+    while (start > 0) {
+      if (strings[start - 1] === '\n') {
+        let j = start - 1;
+        while (j > 0 && strings[j - 1] !== '\n')
+          j--;
+        if (!strings.substring(start, j).trim()) {
+          break
+        }
+      }
+      start--;
+    }
+    let end = textarea.selectionEnd;
 
+    while (end + 1 < strings.length) {
+      if (strings[end] === '\n') {
+        let j = end;
+        while (j + 1 < strings.length && strings[++j] !== '\n');
+        if (!strings.substring(end, j).trim()) {
+          break
+        }
+      }
+      end++;
+    }
+    return [start, end];
+  }
   class CustomActions extends HTMLElement {
 
     constructor() {
@@ -949,8 +979,8 @@ ${strings}
       customDialog.title = ""
       window.customDialog = customDialog;
       customDialog.addEventListener('submit', evt => {
-        this.setPatterns(customDialog.content );
-        this.loadPatterns(customDialog.content )
+        this.setPatterns(customDialog.content);
+        this.loadPatterns(customDialog.content)
       });
       const patterns = this.getPatterns();
       if (patterns) {
@@ -979,6 +1009,14 @@ ${strings}
         localStorage.setItem('pattern', patterns)
       }
 
+    }
+    formatCodeBlock() {
+      let p = getContinueBlock(textarea);
+      textarea.setRangeText(`\`\`\`
+${textarea.value.substring(p[0], p[1])}
+\`\`\`
+`,
+        p[0], p[1], 'end')
     }
   }
 

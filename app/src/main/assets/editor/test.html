@@ -9,54 +9,24 @@
 </head>
 
 <body>
-    <textarea bind="textarea"
-        style="width: 100%;height: 300px;resize: none;"># Excel|[]
-
-打开或关闭筛选
-                  
-1. 选择数据区域或表格中的任意单元格。
-             
-2. 执行以下任一操作：
-                
-在“开始”选项卡上的“编辑”组中，选择“排序和筛选”，然后选择“筛选”。        
-按 Ctrl+Shift+L。
-                  
-        
-        To create a selection filter
-        
-        Turn on filtering.
-        
-        Select the filter arrow for the column by which you want to filter the data range or table.
-        
-        Do either of the following:
-        
-        Clear the checkboxes next to the items you want to hide.
-        
-        Clear the Select All checkbox and then select the checkboxes next to the items you want to display.
-        
-        Select OK to apply the filter.
-        
-        To create a filter rule
-        
-        With filtering turned on, select the filter arrow for the column by which you want to filter the data range or table.
-        
-        Select Type Filters to display the available filters for the column’s data type.
-        
-        Select the filter you want to create.
-        
-        Enter the arguments required to define the rule, and then select OK to apply the filter.
-        
-        To display the highest or lowest numeric values in a column
-        
-        With filtering turned on, select the filter arrow for a column that contains numeric values, select Number Filters, and then select Top 10.
-        
-        In the Top 10 AutoFilter dialog, do the following:
-        
-        In the first Show list, select Top or Bottom.
-        
-        In the second list, enter or select the number or percentage of items you want to display.
-        
-        In the third list, select Items to display the selected number of items or Percent to display the selected percentage of items.</textarea>
+    <textarea bind="textarea" style="width: 100%;height: 300px;resize: none;">test=# CREATE INDEX idx_id ON t_test (id);
+        CREATE INDEX
+        test=# SELECT * FROM t_test WHERE id = 43242;
+        id    | name
+        -------+------
+         43242 | hans
+        (1 row)
+        Time: 0.259 ms
+    
+        test=# CREATE INDEX idx_id ON t_test (id);
+CREATE INDEX
+test=# SELECT * FROM t_test WHERE id = 43242;
+id    | name
+-------+------
+ 43242 | hans
+(1 row)
+Time: 0.259 ms
+    </textarea>
     <button bind @click="onFormatCode">插入</button>
 
     <script>
@@ -118,35 +88,72 @@
             }
             return [strings.substring(start, end), start, end]
         }
-        function onFormatCode() {
-            let p = getIndexLine(textarea);
-            let p1 = p;
-            while (true) {
-                if (p1[1] <= 0) {
-                    break;
-                }
-                let p2 = getIndexLine(textarea, p1[1] - 1);
-                if (p2[0].trim()) {
-                    
-                    if (/(\d+). /.test(p2[0])) {
-                        textarea.setRangeText(`    - ${p[0]}`,
-                            p[1], p[2], 'end')
-                        return;
-                    } else  if (/ +- /.test(p2[0])){
-                        textarea.setRangeText(`${/( +)- /.exec(p2[0])[1]}- ${p[0]}`,
-                            p[1], p[2], 'end')
-                        return;
-                    }else{
-                        textarea.setRangeText(`- ${p[0]}`,
-                            p[1], p[2], 'end')
-                        return;  
+        function getContinueBlock(textarea) {
+            let start = textarea.selectionStart;
+            const strings = textarea.value;
+            if (strings[start] === '\n' && start - 1 > 0) {
+                start--;
+            }
+            while (start > 0) {
+                if (strings[start - 1] === '\n') {
+                    let j = start - 1;
+                    while (j > 0 && strings[j - 1] !== '\n')
+                        j--;
+                    if (!strings.substring(start, j).trim()) {
+                        break
                     }
                 }
-                p1 = p2;
-
+                start--;
             }
-            textarea.setRangeText(`- ${p[0]}`,
-                            p[1], p[2], 'end')
+            let end = textarea.selectionEnd;
+
+            while (end + 1 < strings.length) {
+                if (strings[end] === '\n') {
+                    let j = end;
+                    while (j + 1 < strings.length && strings[++j] !== '\n');
+                    if (!strings.substring(end, j).trim()) {
+                        break
+                    }
+                }
+                end++;
+            }
+            return [start, end];
+        }
+        function onFormatCode() {
+            let p = getContinueBlock(textarea);
+            textarea.setRangeText(`\`\`\`
+${textarea.value.substring(p[0],p[1])}
+\`\`\`
+`,
+                p[0], p[1], 'end')
+            // let p1 = p;
+            // while (true) {
+            //     if (p1[1] <= 0) {
+            //         break;
+            //     }
+            //     let p2 = getIndexLine(textarea, p1[1] - 1);
+            //     if (p2[0].trim()) {
+
+            //         if (/(\d+). /.test(p2[0])) {
+            //             textarea.setRangeText(`    - ${p[0]}`,
+            //                 p[1], p[2], 'end')
+            //             return;
+            //         } else  if (/ +- /.test(p2[0])){
+            //             textarea.setRangeText(`${/( +)- /.exec(p2[0])[1]}- ${p[0]}`,
+            //                 p[1], p[2], 'end')
+            //             return;
+            //         }else{
+            //             textarea.setRangeText(`- ${p[0]}`,
+            //                 p[1], p[2], 'end')
+            //             return;  
+            //         }
+            //     }
+            //     p1 = p2;
+
+            // }
+            // textarea.setRangeText(`- ${p[0]}`,
+            //                 p[1], p[2], 'end')
+
 
         }
         function onShow() {
