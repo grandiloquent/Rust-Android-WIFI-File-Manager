@@ -3,8 +3,9 @@ use deadpool_postgres::{ManagerConfig, Runtime};
 use postgres::NoTls;
 use ndk::asset::AssetManager;
 use rocket::{routes};
-use crate::{ Database, error, Server};
+use crate::{Database, error, Server};
 use rocket::config::LogLevel;
+use rocket::data::{Limits, ToByteUnit};
 use rocket::figment::Figment;
 use crate::asset::Cache;
 use crate::handlers;
@@ -13,10 +14,14 @@ use crate::handlers;
 pub async fn run_server(srv: Server, db: Database, ass: AssetManager) {
     log::error!("host = {},port = {},tempDir = {}",srv.host,srv.port,srv.temp_dir);
     log::error!("host = {},\nport = {},\ndbName = {},\nuser = {},\npassword = {}",db.host,db.port,db.db_name,db.user,db.password);
+    let limits = Limits::default()
+        .limit("json", 3.mebibytes())
+        .limit("file", 5.gibibytes());
     let figment = Figment::from(rocket::Config::default())
         .merge((rocket::Config::ADDRESS, srv.host))
         .merge((rocket::Config::PORT, srv.port))
         .merge((rocket::Config::TEMP_DIR, srv.temp_dir))
+        .merge((rocket::Config::LIMITS, limits))
         .merge((rocket::Config::LOG_LEVEL, LogLevel::Critical));
     let mut server = rocket::custom(figment)
         .mount("/",
