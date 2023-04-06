@@ -2,6 +2,8 @@
 
 使用 Rust 编写的一个在 Android 上运行的 Web 服务器。 
 
+[电脑版](https://github.com/grandiloquent/WebBrowser-FileManager)
+
 1. 添加工具链
 
         rustup target add aarch64-linux-android
@@ -23,7 +25,7 @@ TARGET_CC = "C:\\Users\\Administrator\\AppData\\Local\\Android\\Sdk\\ndk\\23.1.7
 TARGET_AR= "C:\\Users\\Administrator\\AppData\\Local\\Android\\Sdk\\ndk\\23.1.7779620\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\llvm-ar.exe"
 ```
 
-### rustup override set nightly
+### Error: Pear requires a 'dev' or 'nightly' version of rustc.
 
 ```
 rustup override set nightly
