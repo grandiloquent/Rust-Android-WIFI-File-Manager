@@ -187,7 +187,7 @@ function toggleFullScreen() {
     } else {
         if (document.exitFullscreen) {
             document.exitFullscreen();
-        
+
         }
     }
 }
@@ -200,9 +200,9 @@ function onTimeupdate() {
     //const width = calculateProgressPercent(video);
     //progressBarPlayed.style.width = width
     //progressBarPlayhead.style.left = width
-    const width= ((video.currentTime / video.duration) * 100);;
-    range.style.setProperty("--progress",width+"%");
-    range.value=width
+    const width = ((video.currentTime / video.duration) * 100);;
+    range.style.setProperty("--progress", width + "%");
+    range.value = width
     elapsed.textContent = formatDuration(video.currentTime);
 }
 function onProgress() {
@@ -347,19 +347,20 @@ function start(uri) {
         setTitle(substringAfterLast(path, "/"));
         if (path)
             video.src = `/api/file?path=${encodeURIComponent(path)}`
-            appendSubtitle(video,path)
-        }
-    
+        appendSubtitle(video, path)
+    }
+
 }
-function appendSubtitle(video,path) {
+function appendSubtitle(video, path) {
     //document.querySelectorAll('track').forEach(x => x.remove())
     const track = document.createElement('track');
     var tracks = video.textTracks;
     var numTracks = tracks.length;
     for (var i = numTracks - 1; i >= 0; i--)
         video.textTracks[i].mode = "disabled";
-    track.src =`/subtitle?path=${encodeURIComponent(path+".srt")}`   
+    track.src = `/subtitle?path=${encodeURIComponent(path + ".srt")}`
     track.default = true;
+    track.activeCues[0].line = -5;
     video.appendChild(track);
 }
 start()
