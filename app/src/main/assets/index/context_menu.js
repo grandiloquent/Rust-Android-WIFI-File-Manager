@@ -10,7 +10,8 @@ function showContextMenu(detail) {
             "选定同类文件",
             "重命名",
             "解压",
-                        "删除"
+            "删除",
+            "复制"
 
         ]
     } else {
@@ -20,7 +21,8 @@ function showContextMenu(detail) {
             "重命名",
             "压缩",
             "收藏",
-                        "删除"
+            "删除",
+            "复制"
 
         ]
     }
@@ -38,6 +40,8 @@ function showContextMenu(detail) {
             saveStoragePath(detail.path);
         } else if (evt.detail === "删除") {
             showDeleteDialog(detail)
+        }else if (evt.detail === "复制") {
+            writeText(detail.path)
         }
     })
 }

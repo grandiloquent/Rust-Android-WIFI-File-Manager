@@ -207,7 +207,8 @@
         </div>
         <div class="field__value">
             <div class="field__body">
-                <input class="field__control" type="text" placeholder="设置视频目录">
+                <input bind="upload_directory" data-value="/storage/emulated/0" class="field__control" type="text"
+                    placeholder="设置上传文件暂存目录">
             </div>
         </div>
     </div>
@@ -217,14 +218,14 @@
         </div>
         <div class="field__value">
             <div class="field__body">
-                <input class="field__control" type="text" placeholder="设置视频目录">
+                <input bind="video_directory" data-value class="field__control" type="text" placeholder="设置视频目录">
             </div>
         </div>
     </div>
     <div class="switch--on">
     </div>
 
-    
+
     <div class="block__title">
         文档编辑
     </div>
@@ -250,7 +251,7 @@
             </div>
         </div>
     </div>
-   
+
     <div class="field">
         <div class="field__label">
             用户
@@ -282,11 +283,11 @@
         </div>
     </div>
     <div class="buttons">
-        <div class="button">
+        <button bind="save" class="button">
             <div class="button__content">
                 保存
             </div>
-        </div>
+        </button>
     </div>
     <script>
         function bind(elememnt) {
@@ -310,6 +311,34 @@
             else
                 element.className = 'switch switch--on'
         }
+
+
+        function initialize() {
+            const array = [...document.querySelectorAll('[data-value]')];
+            array.forEach(element => {
+                if (typeof NativeAndroid !== 'undefined') {
+                    if (element.tagName.toLowerCase() === "input") {
+                        element.value = NativeAndroid.getString(element.getAttribute('bind'))
+                            || element.dataset.value;
+                    }
+                }
+            });
+        }
+        function save() {
+            const array = [...document.querySelectorAll('[data-value]')];
+            array.forEach(element => {
+                if (typeof NativeAndroid !== 'undefined') {
+                    if (element.tagName.toLowerCase() === "input") {
+                        const value = element.value.trim();
+                        if (value) {
+                            NativeAndroid.setString(element.getAttribute('bind'), value)
+                        }
+                    }
+
+                }
+            });
+        }
+        initialize();
     </script>
 </body>
 
