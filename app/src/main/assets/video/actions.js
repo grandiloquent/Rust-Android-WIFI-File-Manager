@@ -183,7 +183,7 @@ function onPlay(evt) {
 function toggleFullScreen() {
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen();
-
+        video.style.height = 'inherit';
     } else {
         if (document.exitFullscreen) {
             document.exitFullscreen();
@@ -214,6 +214,13 @@ function onPause() {
 }
 function onDurationChange() {
     remaining.textContent = formatDuration(video.duration);
+    if (window.innerWidth < window.innerHeight) {
+        const ratio = video.videoWidth / window.innerWidth;
+        video.style.height = `${video.videoHeight / ratio}px`;
+    } else {
+        const ratio = video.videoHeight / window.innerHeight;
+        video.style.height = `${video.videoHeight / ratio}px`;
+    }
 }
 function onSeek(evt) {
     video.currentTime = video.duration * (parseInt(evt.target.value) / 100);
@@ -360,7 +367,7 @@ function appendSubtitle(video, path) {
         video.textTracks[i].mode = "disabled";
     track.src = `/subtitle?path=${encodeURIComponent(path + ".srt")}`
     track.default = true;
-    track.activeCues[0].line = -5;
+
     video.appendChild(track);
 }
 start()

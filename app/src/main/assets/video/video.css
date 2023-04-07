@@ -266,6 +266,8 @@ input[type=range]:disabled::-ms-thumb {
     position: relative;
     z-index: 1;
     align-self: center;
+    display: flex;
+    align-items: center;
 }
 
 .video {
