@@ -645,7 +645,9 @@ textarea {
             <div bind @click="onShowDialog" class="menu-item">
               替换模式
             </div>        
-            
+            <div bind @click="cutBefore" class="menu-item">
+              剪切前
+            </div>  
             <div bind @click="close" class="menu-item">
               取消
             </div>
@@ -668,6 +670,7 @@ textarea {
       const patterns = this.getPatterns();
       if (patterns)
         this.loadPatterns(patterns);
+      this.regex = "[a-zA-Z0-9_:.+%'#*=()!?|^&\\[\\]{}\" -]";
     }
     async insertLink() {
       const strings = await readText();
@@ -704,7 +707,7 @@ textarea {
     }
     async onTranslateChinese() {
       let array1 = getLine();
-      let strings = (typeof NativeAndroid !== 'undefined') ?NativeAndroid.translate(array1[0]):(await translate(array1[0], 'zh'));
+      let strings = (typeof NativeAndroid !== 'undefined') ? NativeAndroid.translate(array1[0]) : (await translate(array1[0], 'zh'));
       if (this.patterns) {
         for (let index = 0; index < this.patterns.length; index++) {
           const element = this.patterns[index];
@@ -791,10 +794,11 @@ textarea {
         strings = await navigator.clipboard.readText()
       }
       textarea.setRangeText(`
-\`\`\`
+\`\`\`rust
 ${strings}
 \`\`\`
   `, textarea.selectionStart, textarea.selectionEnd, 'end');
+  writeText("```")
     }
     onInsertComment() {
       let start = textarea.selectionStart;
@@ -887,7 +891,7 @@ ${strings}
       let start = textarea.selectionStart;
       let end = textarea.selectionEnd;
       // \(\)\[\].!/\?%-
-      const re = new RegExp("[a-zA-Z0-9_.+%'#*=()!?|^&\\[\\]{}\" -]");
+      const re = new RegExp(this.regex);
       while (start > -1 && re.test(textarea.value[start - 1])) {
         start--;
       }
@@ -902,7 +906,7 @@ ${strings}
       let start = textarea.selectionStart;
       let end = textarea.selectionEnd;
       // \(\)\[\].!/\?%-
-      const re = new RegExp("[a-zA-Z0-9.+%'#*=()!?|^&\\[\\]{}\" -]");
+      const re = new RegExp(this.regex);
       while (start > -1 && re.test(textarea.value[start - 1])) {
         start--;
       }
@@ -1017,6 +1021,11 @@ ${textarea.value.substring(p[0], p[1])}
 \`\`\`
 `,
         p[0], p[1], 'end')
+    }
+    cutBefore() {
+      const before = textarea.value.substring(0, textarea.value.selectionStart);
+      writeText(before);
+      textarea.value = textarea.value.substring(textarea.selectionStart);
     }
   }
 
