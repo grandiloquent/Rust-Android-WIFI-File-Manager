@@ -1023,7 +1023,7 @@ ${textarea.value.substring(p[0], p[1])}
         p[0], p[1], 'end')
     }
     cutBefore() {
-      const before = textarea.value.substring(0, textarea.value.selectionStart);
+      const before = textarea.value.substring(0, textarea.selectionStart);
       writeText(before);
       textarea.value = textarea.value.substring(textarea.selectionStart);
     }
