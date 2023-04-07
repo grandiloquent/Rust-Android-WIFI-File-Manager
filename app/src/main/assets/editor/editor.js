@@ -1,34 +1,4 @@
 
-async function render() {
-    textarea.value = localStorage.getItem("content");
-
-    const searchParams = new URL(window.location).searchParams;
-    if (searchParams.has("path")) {
-        const path = searchParams.get("path");
-        try {
-            textarea.value = await loadFile(path);
-        } catch (error) {
-            console.log(error)
-        }
-    } else {
-        const id = searchParams.get("id");
-        if (id) {
-            try {
-                const obj = await loadData(id)
-                document.title = obj.title;
-                textarea.value = `# ${obj.title}|${JSON.stringify(obj.tags)}
-
-${obj.content.trim()}`
-            } catch (error) {
-                console.log(error)
-            }
-        }
-
-    }
-
-
-}
-
 
 function onDeleteLine() {
     actions.onDeleteLine();

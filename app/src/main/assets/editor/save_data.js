@@ -3,7 +3,7 @@ async function saveData() {
     if (searchParams.get("id")) {
         submitServer()
     } else if (searchParams.get("path")) {
-        await fetch(`/api/file?path=${getSearchParams("path")}`, {
+        await fetch(`/api/file?path=${searchParams.get("path")}`, {
             method: 'POST',
             body: textarea.value
         })

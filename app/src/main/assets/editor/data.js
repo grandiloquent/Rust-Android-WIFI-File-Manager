@@ -27,11 +27,7 @@ function jumpPage(textarea) {
     window.open(src, '_blank');
 }
 
-async function loadFile(path) {
-    document.title = substringAfterLast(decodeURIComponent(path), "\\")
-    const res = await fetch(`/api/file?path=${encodeURIComponent(path)}`, { cache: "no-cache" });
-    return res.text();
-}
+
 
 
 
