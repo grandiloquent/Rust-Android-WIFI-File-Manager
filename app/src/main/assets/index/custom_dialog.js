@@ -170,4 +170,13 @@ class CustomDialog extends HTMLElement {
         }
     }
 }
+
 customElements.define('custom-dialog', CustomDialog);
+/*
+Useage: https://github.com
+    const dialog = document.createElement('custom-dialog');
+    const input = document.createElement('input');
+    input.type = 'text';
+    dialog.appendChild(input);
+    document.body.appendChild(dialog);
+ */

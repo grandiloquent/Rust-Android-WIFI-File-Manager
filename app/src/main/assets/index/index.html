@@ -20,7 +20,7 @@
     <div bind="wrapper" class="wrapper"></div>
     <div style="height: 49px"></div>
     <div class="bar-renderer">
-        <div bind @click="onNewFile" class="bar-item-renderer">
+        <div bind @click="newFile" class="bar-item-renderer">
             <svg viewBox="0 0 24 24">
                 <path
                     d="M12.984 9h5.531l-5.531-5.484v5.484zM6 2.016h8.016l6 6v12q0 0.797-0.609 1.383t-1.406 0.586h-12q-0.797 0-1.406-0.586t-0.609-1.383l0.047-16.031q0-0.797 0.586-1.383t1.383-0.586z">
@@ -30,7 +30,7 @@
                 新建文件
             </div>
         </div>
-        <div bind @click="onNewFolder" class="bar-item-renderer">
+        <div bind @click="newDirectory" class="bar-item-renderer">
             <svg viewBox="0 0 24 24">
                 <path
                     d="M9.984 3.984l2.016 2.016h8.016q0.797 0 1.383 0.609t0.586 1.406v9.984q0 0.797-0.586 1.406t-1.383 0.609h-16.031q-0.797 0-1.383-0.609t-0.586-1.406v-12q0-0.797 0.586-1.406t1.383-0.609h6z">
@@ -77,7 +77,10 @@
     <script src="index/data.js"></script>
     <custom-toast bind="customToast"></custom-toast>
     <script src="custom-toast.js"></script>
-    <script src="index/calculations.js"></script>
+    <script src="index/utils.js"></script>
+    <script src="index/custom_dialog.js"></script>
+    <script src="index/new_directory.js"></script>
+    <script src="index/new_file.js"></script>
     <script src="index/move_files.js"></script>
     <script src="index/delete_files.js"></script>
     <script src="index/index.js"></script>

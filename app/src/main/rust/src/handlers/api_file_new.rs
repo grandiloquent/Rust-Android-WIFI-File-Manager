@@ -2,32 +2,29 @@ use std::path::{Path};
 use rocket::serde::json::{json, Value};
 // https://doc.rust-lang.org/std/fs/
 use std::fs;
+use rocket::http::Status;
+
 #[get("/api/file/new_file?<path>")]
-pub fn api_file_new_file(path: String) -> Value {
+pub fn api_file_new_file(path: String) -> Result<(), Status> {
     let p = Path::new(path.as_str());
 // https://doc.rust-lang.org/std/path/struct.Path.html#method.is_file
     if !p.is_file() {
         return match fs::write(p, b"") {
             Ok(_) => {
-                json!({
-                        "error":0
-                    })
+                Ok(())
             }
+
             // https://doc.rust-lang.org/std/io/struct.Error.html
             Err(error) => {
-                json!({
-                        "error":1,
-                        "message":""
-                    })
+                log::error!("{}: {}",error.to_string(),path);
+                Err(Status::InternalServerError)
             }
         };
     } else {
-        json!({
-            "error":1,
-            "message":""
-        })
+        Err(Status::NotFound)
     }
 }
+
 #[get("/api/file/new_dir?<path>")]
 pub fn api_file_new_dir(path: String) -> Value {
     let p = Path::new(path.as_str());
