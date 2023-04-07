@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            overflow-x: auto;
+            color: #323233;
+            font-size: 16px;
+            font-family: Open Sans, -apple-system, BlinkMacSystemFont, Helvetica Neue, Helvetica, Segoe UI, Arial, Roboto, PingFang SC, miui, Hiragino Sans GB, Microsoft Yahei, sans-serif;
+            background-color: #eff2f5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        input,
+        button,
+        textarea {
+            color: inherit;
+            font: inherit
+        }
+
+        a:focus,
+        input:focus,
+        button:focus,
+        textarea:focus {
+            outline: none
+        }
+
+        ol,
+        ul {
+            margin: 0;
+            padding: 0;
+            list-style: none
+        }
+
+        .cell {
+            position: relative;
+            display: flex;
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 16px;
+            overflow: hidden;
+            color: #323233;
+            font-size: 14px;
+            line-height: 24px;
+            background: #fff;
+            align-items: center;
+            user-select: none;
+        }
+
+        .cell__title {
+            flex: 1;
+        }
+
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            box-sizing: content-box;
+            width: calc(1.8em + 4px);
+            height: calc(1em + 4px);
+            font-size: 26px;
+            background: rgba(120, 120, 128, .16);
+            border-radius: 1em;
+            cursor: pointer;
+            transition: background-color .3s;
+            margin-left: 16px;
+        }
+
+        .switch__node {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 1em;
+            height: 1em;
+            font-size: inherit;
+            background: #fff;
+            border-radius: 100%;
+            box-shadow: 0 3px 1px 0 rgba(0, 0, 0, .05);
+            transition: transform .3s cubic-bezier(.3, 1.05, .4, 1.05);
+        }
+
+        .switch--on {
+            background: #1989fa;
+        }
+
+        .switch--on .switch__node {
+            transform: translate(calc(calc(1.8em + 4px) - 1em - 4px));
+        }
+
+        .block__title {
+            margin: 0;
+            padding: 32px 16px 16px;
+            color: #969799;
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 16px;
+            padding: 20px 16px 16px;
+        }
+
+        .field {
+            position: relative;
+            display: flex;
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 16px;
+            overflow: hidden;
+            color: #323233;
+            font-size: 14px;
+            line-height: 24px;
+            background: #fff;
+            flex-wrap: wrap;
+        }
+
+        .field__label {
+            box-sizing: border-box;
+            margin-right: 12px;
+            color: #323233;
+            text-align: left;
+            word-wrap: break-word;
+            width: 4.1em;
+        }
+
+        .field__value {
+            position: relative;
+            color: #969799;
+            text-align: right;
+            vertical-align: middle;
+            word-wrap: break-word;
+            overflow: visible;
+        }
+
+        .field__body {
+            display: flex;
+            align-items: center;
+        }
+
+        .field__control {
+            font: inherit;
+            display: block;
+            box-sizing: border-box;
+            width: 100%;
+            min-width: 0;
+            margin: 0;
+            padding: 0;
+            color: #323233;
+            line-height: inherit;
+            text-align: left;
+            background-color: transparent;
+            border: 0;
+            resize: none;
+            user-select: auto;
+        }
+
+        .field__control::placeholder {
+            color: #CCC
+        }
+
+        .buttons {
+            padding: 32px 16px;
+        }
+
+        .button {
+            font: inherit;
+            position: relative;
+            box-sizing: border-box;
+            height: 44px;
+            margin: 0;
+            line-height: 1.2;
+            text-align: center;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            -webkit-appearance: none;
+            -webkit-font-smoothing: auto;
+            color: #fff;
+            background: #1989fa;
+            border: 1px solid #1989fa;
+            padding: 0 15px;
+            display: block;
+            width: 100%;
+            border-radius: 999px;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .button__content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="block__title">
+        基本设置
+    </div>
+    <div class="field">
+        <div class="field__label">
+            上传目录
+        </div>
+        <div class="field__value">
+            <div class="field__body">
+                <input class="field__control" type="text" placeholder="设置视频目录">
+            </div>
+        </div>
+    </div>
+    <div class="field">
+        <div class="field__label">
+            视频目录
+        </div>
+        <div class="field__value">
+            <div class="field__body">
+                <input class="field__control" type="text" placeholder="设置视频目录">
+            </div>
+        </div>
+    </div>
+    <div class="switch--on">
+    </div>
+
+    
+    <div class="block__title">
+        文档编辑
+    </div>
+    <div class="cell">
+        <div class="cell__title">
+            远程翻译
+        </div>
+        <div bind @click="onClick" class="switch">
+            <div class="switch__node">
+            </div>
+        </div>
+    </div>
+    <div class="block__title">
+        PostgreSQL 数据库
+    </div>
+    <div class="field">
+        <div class="field__label">
+            主机名
+        </div>
+        <div class="field__value">
+            <div class="field__body">
+                <input class="field__control" type="text" placeholder="设置数据库所在的公网IP">
+            </div>
+        </div>
+    </div>
+   
+    <div class="field">
+        <div class="field__label">
+            用户
+        </div>
+        <div class="field__value">
+            <div class="field__body">
+                <input class="field__control" type="text" placeholder="设置用户名称">
+            </div>
+        </div>
+    </div>
+    <div class="field">
+        <div class="field__label">
+            密码
+        </div>
+        <div class="field__value">
+            <div class="field__body">
+                <input class="field__control" type="text" placeholder="设置数据库用户密码">
+            </div>
+        </div>
+    </div>
+    <div class="field">
+        <div class="field__label">
+            数据库
+        </div>
+        <div class="field__value">
+            <div class="field__body">
+                <input class="field__control" type="text" placeholder="设置连接数据库的名称">
+            </div>
+        </div>
+    </div>
+    <div class="buttons">
+        <div class="button">
+            <div class="button__content">
+                保存
+            </div>
+        </div>
+    </div>
+    <script>
+        function bind(elememnt) {
+            (elememnt || document).querySelectorAll('[bind]').forEach(element => {
+                if (element.getAttribute('bind')) {
+                    window[element.getAttribute('bind')] = element;
+                }
+                [...element.attributes].filter(attr => attr.nodeName.startsWith('@')).forEach(attr => {
+                    if (!attr.value) return;
+                    element.addEventListener(attr.nodeName.slice(1), evt => {
+                        window[attr.value](evt);
+                    });
+                });
+            })
+        }
+        bind();
+        function onClick(evt) {
+            const element = evt.currentTarget;
+            if (element.classList.contains('switch--on'))
+                element.className = 'switch'
+            else
+                element.className = 'switch switch--on'
+        }
+    </script>
+</body>
+
+</html>

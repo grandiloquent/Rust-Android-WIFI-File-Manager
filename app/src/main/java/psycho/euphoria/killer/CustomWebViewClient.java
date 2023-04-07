@@ -90,7 +90,7 @@ public class CustomWebViewClient extends WebViewClient {
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
         String url = request.getUrl().toString();
         if (url.equals("about:blank")||url.contains("glersakr.com")) return false;
-        if ((url.startsWith("https://") || url.startsWith("http://") )) {
+        if ((url.startsWith("https://") || url.startsWith("http://")|| url.startsWith("file://") )) {
             view.loadUrl(url);
         }
         return true;

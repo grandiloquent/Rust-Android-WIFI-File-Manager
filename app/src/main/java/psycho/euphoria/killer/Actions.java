@@ -4,6 +4,8 @@ import android.Manifest.permission;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
@@ -14,6 +16,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,7 +29,29 @@ public class Actions {
     private static final String FILE_ANDROID_ASSET_HOME_INDEX_HTML = "file:///android_asset/home/index.html";
     private static MainActivity sContext;
 
-    
+    public Thread generateVideoThumbnails(File dir) {
+        return new Thread(() -> {
+            File parent = new File(dir, ".images");
+            if (!parent.exists()) {
+                parent.mkdirs();
+            }
+            File[] files = dir.listFiles(file -> file.isFile() && file.getName().endsWith(".mp4"));
+            for (File file : files) {
+                String output = parent + "/" + Shared.md5(file.getAbsolutePath());
+                if (new File(output).exists()) continue;
+                try {
+                    FileOutputStream fileOutputStream = new FileOutputStream(output);
+                    Bitmap bitmap = Shared.createVideoThumbnail(file.getAbsolutePath());
+                    bitmap.compress(CompressFormat.JPEG, 75, fileOutputStream);
+                    bitmap.recycle();
+                    fileOutputStream.close();
+                } catch (Exception ignored) {
+                }
+
+            }
+        });
+    }
+
     public static void aroundFileUriExposedException() {
         // 调用 Intent 可能出现 android.os.FileUriExposedException 异常
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
@@ -87,7 +112,6 @@ public class Actions {
     }
 
     public static boolean requestPermission() {
-
         List<String> needPermissions = filterNeedPermissions(sContext);
         if (needPermissions.size() > 0) {
             sContext.requestPermissions(needPermissions.toArray(new String[0]), ITEM_ID_REFRESH);

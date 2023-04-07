@@ -67,6 +67,9 @@ function setFavorite() {
     })
     document.body.appendChild(dialog);
 }
+function settings(){
+    location.href='file:///android_asset/home/settings.html'
+}
 // 
 
 bind();
