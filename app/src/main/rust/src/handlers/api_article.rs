@@ -5,7 +5,6 @@ use rocket::http::Status;
 use rocket::serde::json;
 use rocket::State;
 use serde_json::Value;
-
 async fn get_articles(id: &str, conn: &Object) -> Result<Simple, postgres::Error> {
 // https://docs.rs/tokio-postgres/latest/tokio_postgres/row/struct.Row.html
 // https://docs.rs/tokio-postgres/latest/tokio_postgres/types/struct.Json.html
@@ -13,7 +12,6 @@ async fn get_articles(id: &str, conn: &Object) -> Result<Simple, postgres::Error
         .await?
         .try_get(0)
 }
-
 // https://maurer.github.io/holmes/postgres/types/trait.FromSql.html
 async fn get_article(id: i32, conn: &Object) -> Result<Simple, postgres::Error> {
 // https://docs.rs/tokio-postgres/latest/tokio_postgres/row/struct.Row.html
@@ -22,7 +20,6 @@ async fn get_article(id: i32, conn: &Object) -> Result<Simple, postgres::Error> 
         .await?
         .try_get(0)
 }
-
 async fn get_article_update(obj: Value, conn: &Object) -> Result<i32, postgres::Error> {
 // https://docs.rs/tokio-postgres/latest/tokio_postgres/row/struct.Row.html
 // https://docs.rs/tokio-postgres/latest/tokio_postgres/types/struct.Json.html
@@ -30,7 +27,6 @@ async fn get_article_update(obj: Value, conn: &Object) -> Result<i32, postgres::
         .await?
         .try_get(0)
 }
-
 #[get("/api/articles?<id>")]
 pub async fn api_articles(id: Option<String>, pool: &State<Pool>) -> Result<String, Status> {
     match pool.get().await {
@@ -54,7 +50,6 @@ pub async fn api_articles(id: Option<String>, pool: &State<Pool>) -> Result<Stri
         }
     }
 }
-
 #[get("/api/article?<id>")]
 pub async fn api_article(id: i32, pool: &State<Pool>) -> Result<String, Status> {
     match pool.get().await {
@@ -99,15 +94,12 @@ pub async fn api_article_update(obj: String, pool: &State<Pool>) -> Result<Strin
         }
     }
 }
-
 #[derive(Debug, PartialEq)]
 struct Simple(Vec<u8>);
-
 impl<'a> FromSql<'a> for Simple {
     fn from_sql(ty: &Type, raw: &[u8]) -> Result<Self, Box<dyn Error + Sync + Send>> {
         Vec::<u8>::from_sql(ty, raw).map(Simple)
     }
-
     fn accepts(ty: &Type) -> bool {
         true
     }

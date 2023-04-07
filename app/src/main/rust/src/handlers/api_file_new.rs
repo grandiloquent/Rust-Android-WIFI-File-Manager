@@ -2,7 +2,6 @@ use std::path::{Path};
 use rocket::serde::json::{json, Value};
 // https://doc.rust-lang.org/std/fs/
 use std::fs;
-
 #[get("/api/file/new_file?<path>")]
 pub fn api_file_new_file(path: String) -> Value {
     let p = Path::new(path.as_str());
@@ -29,7 +28,6 @@ pub fn api_file_new_file(path: String) -> Value {
         })
     }
 }
-
 #[get("/api/file/new_dir?<path>")]
 pub fn api_file_new_dir(path: String) -> Value {
     let p = Path::new(path.as_str());

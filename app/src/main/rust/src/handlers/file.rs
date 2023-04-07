@@ -2,7 +2,6 @@ use std::sync::Arc;
 use rocket::State;
 use crate::asset::Cache;
 use crate::res::Asset;
-
 #[get("/<b>")]
 pub fn file<'a>(b: String, cache: &State<Arc<Cache>>) -> Asset {
     match cache.get(b.as_str()) {

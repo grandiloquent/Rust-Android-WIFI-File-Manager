@@ -2,7 +2,6 @@ use std::sync::Arc;
 use rocket::State;
 use crate::asset::Cache;
 use crate::res::Asset;
-
 #[get("/index/<path>")]
 pub fn index_file(path: String, cache: &State<Arc<Cache>>) -> Asset {
     match cache.get(("index/".to_string() + path.as_str()).as_str()) {

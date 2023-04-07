@@ -2,7 +2,6 @@ use std::sync::Arc;
 use rocket::State;
 use crate::asset::Cache;
 use crate::res::Asset;
-
 // http://192.168.8.55:3000/markdown
 #[get("/markdown")]
 pub fn markdown<'a>(cache: &State<Arc<Cache>>) -> Asset {
@@ -18,7 +17,6 @@ pub fn markdown<'a>(cache: &State<Arc<Cache>>) -> Asset {
         }
     }
 }
-
 #[get("/markdown/<path>")]
 pub fn markdown_file(path: String, cache: &State<Arc<Cache>>) -> Asset {
     match cache.get(("markdown/".to_string() + path.as_str()).as_str()) {

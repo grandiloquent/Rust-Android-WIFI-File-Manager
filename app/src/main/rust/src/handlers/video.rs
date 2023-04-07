@@ -2,7 +2,6 @@ use std::sync::Arc;
 use rocket::State;
 use crate::asset::Cache;
 use crate::res::Asset;
-
 #[get("/video/<path>")]
 pub fn video(path: String, cache: &State<Arc<Cache>>) -> Asset {
     let extension = match path.rfind(".") {

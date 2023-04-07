@@ -4,7 +4,6 @@ use std::path::Path;
 use rocket::http::Status;
 use rocket::response::content::RawJson;
 use crate::util::get_file_list;
-
 fn remove_files_extension(path: &str) -> Result<(), Box<dyn Error>> {
     let p = Path::new(&path);
     if !p.is_dir() {
@@ -30,12 +29,10 @@ fn remove_files_extension(path: &str) -> Result<(), Box<dyn Error>> {
     }
     Ok(())
 }
-
 #[get("/api/files?<path>")]
 pub fn api_files(path: String) -> RawJson<String> {
     RawJson(serde_json::to_string(&get_file_list(path, "/storage/emulated/0")).unwrap_or("".to_string()))
 }
-
 #[get("/api/files/clear?<path>")]
 pub fn api_files_clear(path: String) -> Result<String, Status> {
     let dir = Path::new(&path);
@@ -59,7 +56,6 @@ pub fn api_files_clear(path: String) -> Result<String, Status> {
         .for_each(|x| { fs::remove_dir(x.path()); });
     Ok("Success".to_string())
 }
-
 #[get("/api/files/rename?<path>")]
 pub fn api_files_rename(path: String) -> Result<String, Status> {
     remove_files_extension(&path);

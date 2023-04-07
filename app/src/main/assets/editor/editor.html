@@ -8,6 +8,7 @@
     <title>编辑器</title>
     <link rel="stylesheet" href="editor/editor.css">
     <script src="../custom-toast.js"></script>
+
 </head>
 
 <body>
@@ -87,6 +88,16 @@
                 翻译中文
             </div>
         </div>
+        <div bind @click="onDeleteLine" class="bar-item-renderer">
+            <svg viewBox="0 0 24 24">
+                <path
+                        d="M18.984 6.422l-5.578 5.578 5.578 5.578-1.406 1.406-5.578-5.578-5.578 5.578-1.406-1.406 5.578-5.578-5.578-5.578 1.406-1.406 5.578 5.578 5.578-5.578z">
+                </path>
+            </svg>
+            <div class="bar-item-title">
+                删除
+            </div>
+        </div>
         <div bind @click="onSave" class="bar-item-renderer">
             <svg viewBox="0 0 24 24">
                 <path
@@ -97,16 +108,7 @@
                 保存
             </div>
         </div>
-        <div bind @click="onDeleteLine" class="bar-item-renderer">
-            <svg viewBox="0 0 24 24">
-                <path
-                    d="M18.984 6.422l-5.578 5.578 5.578 5.578-1.406 1.406-5.578-5.578-5.578 5.578-1.406-1.406 5.578-5.578-5.578-5.578 1.406-1.406 5.578 5.578 5.578-5.578z">
-                </path>
-            </svg>
-            <div class="bar-item-title">
-                删除
-            </div>
-        </div>
+
         <div bind @click="onFormatCode" class="bar-item-renderer">
             <svg viewBox="0 0 24 24">
                 <path

@@ -1,13 +1,10 @@
 // https://github.com/SergioBenitez/Rocket
 // https://api.rocket.rs/v0.5-rc/rocket/
-
 use std::path::{PathBuf};
 use rocket::fs::NamedFile;
 use urlencoding::decode;
 use crate::headers::referer::Referer;
 use crate::strings::StringExt;
-
-
 #[get("/api/<sub_path..>?<path>")]
 pub async fn api_asset_file(sub_path: PathBuf, referer: Option<Referer>, path: Option<String>) -> Option<NamedFile> {
     match referer {
@@ -21,4 +18,3 @@ pub async fn api_asset_file(sub_path: PathBuf, referer: Option<Referer>, path: O
         }
     }
 }
-

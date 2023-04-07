@@ -4,15 +4,12 @@ use regex::Regex;
 use std::fs::File;
 use std::io::{Write, BufReader, BufRead};
 use rocket::fs;
-
 fn is_timecode(line: &str) -> bool {
     line.contains("-->")
 }
-
 fn delete_cue_settings(line: &str) -> String {
     let mut output = String::new();
     let comma_line = line.replace(".", ",");
-
     for ch in comma_line.chars() {
         let ch_lower = ch.to_ascii_lowercase();
         if ch_lower >= 'a' && ch_lower <= 'z' {
@@ -20,11 +17,8 @@ fn delete_cue_settings(line: &str) -> String {
         }
         output.push(ch_lower)
     }
-
     output.trim().to_string()
 }
-
-
 pub fn transform(input_path: &Path)
                  -> String
 {
@@ -38,19 +32,15 @@ pub fn transform(input_path: &Path)
             Regex::new("").unwrap()
         }
     };
-
     let mut skip: bool = false;
     let mut deleted_subs = 0;
     let mut s = "WEBVTT\n".to_string();
-
     for line in reader.lines() {
         let mut new_line = line.unwrap_or(String::new());
         let is_timeline: bool = timing.is_match(&new_line);
-
         if is_timeline {
             new_line = new_line.replace(",", ".");
             new_line = process_line(new_line);
-
             if new_line == "(DELETED)\n" {
                 deleted_subs += 1;
                 skip = true; // skip/delete upcoming subtitles
@@ -66,10 +56,8 @@ pub fn transform(input_path: &Path)
         // Add \n to the lines before writing them:
         s = s + new_line.as_str() + "\n"
     }
-
     return s;
 }
-
 fn process_line(time_line: String) -> String
 {
     let (line_start, line_end): (f64, f64);
@@ -77,15 +65,11 @@ fn process_line(time_line: String) -> String
     {
         let start_str = &time_line[0..12];
         let end_str = &time_line[17..29];
-
         line_start = get_secs(start_str);
         line_end = get_secs(end_str);
     }
-
-
     let start_string = build_time_string(line_start);
     let end_string = build_time_string(line_end);
-
     if end_string == "(DELETED)\n" {
         end_string
     } else if start_string == "(DELETED)\n" {
@@ -94,7 +78,6 @@ fn process_line(time_line: String) -> String
         format!("{} --> {}", start_string, end_string)
     }
 }
-
 /// Processes a &str of the form 'hh:mm:ss.sss'
 /// into the total number of seconds as f64.
 pub fn get_secs(time_string: &str) -> f64 {
@@ -105,7 +88,6 @@ pub fn get_secs(time_string: &str) -> f64 {
         .map(|(a, b)| a * b)
         .sum()
 }
-
 fn build_time_string(seconds: f64) -> String {
     if seconds >= 0.0 {
         let hours = seconds as u64 / 3600;
@@ -118,7 +100,6 @@ fn build_time_string(seconds: f64) -> String {
         String::from("(DELETED)\n")
     }
 }
-
 #[get("/subtitle?<path>")]
 pub fn subtitle<'a>(path: String) -> Result<String, Status> {
     let p = Path::new(path.as_str());
@@ -126,6 +107,5 @@ pub fn subtitle<'a>(path: String) -> Result<String, Status> {
         return Err(Status::NotFound);
     }
     Ok(transform(p))
-
     // converts file to WEBVTT
 }

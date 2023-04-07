@@ -2,7 +2,6 @@ use std::sync::Arc;
 use rocket::State;
 use crate::asset::Cache;
 use crate::res::Asset;
-
 // http://192.168.8.55:3000/editor
 #[get("/editor")]
 pub fn editor<'a>(cache: &State<Arc<Cache>>) -> Asset {
@@ -18,7 +17,6 @@ pub fn editor<'a>(cache: &State<Arc<Cache>>) -> Asset {
         }
     }
 }
-
 #[get("/editor/<path>")]
 pub fn editor_file(path: String, cache: &State<Arc<Cache>>) -> Asset {
     match cache.get(("editor/".to_string() + path.as_str()).as_str()) {
