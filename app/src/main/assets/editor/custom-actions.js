@@ -648,6 +648,9 @@ textarea {
             <div bind @click="cutBefore" class="menu-item">
               剪切前
             </div>  
+            <div bind @click="pasteEnd" class="menu-item">
+              粘贴后
+            </div>         
             <div bind @click="close" class="menu-item">
               取消
             </div>
@@ -670,7 +673,7 @@ textarea {
       const patterns = this.getPatterns();
       if (patterns)
         this.loadPatterns(patterns);
-      this.regex = "[a-zA-Z0-9_:.+%'#*=()!?|^&\\[\\]{}\" -]";
+      this.regex = "[a-zA-Z0-9_<>;:.+%'#*=()!?|^&\\[\\]{}\" -]";
     }
     async insertLink() {
       const strings = await readText();
@@ -798,7 +801,7 @@ textarea {
 ${strings}
 \`\`\`
   `, textarea.selectionStart, textarea.selectionEnd, 'end');
-  writeText("```")
+      writeText("```")
     }
     onInsertComment() {
       let start = textarea.selectionStart;
@@ -1015,18 +1018,25 @@ ${strings}
 
     }
     formatCodeBlock() {
-      let p = getContinueBlock(textarea);
+      //       let p = getContinueBlock(textarea);
+      //       textarea.setRangeText(`\`\`\`rust
+      // ${textarea.value.substring(p[0], p[1])}
+      // \`\`\`
+      // `,
+      //         p[0], p[1], 'end')
       textarea.setRangeText(`\`\`\`rust
-${textarea.value.substring(p[0], p[1])}
-\`\`\`
-`,
-        p[0], p[1], 'end')
-        writeText("```")
+      `,
+        textarea.selectionStart, textarea.selectionEnd, 'end')
+      writeText("```")
     }
     cutBefore() {
       const before = textarea.value.substring(0, textarea.selectionStart);
       writeText(before);
       textarea.value = textarea.value.substring(textarea.selectionStart);
+    }
+   async pasteEnd(){
+      textarea.value=textarea.value.trim()+
+      (await readText())
     }
   }
 
