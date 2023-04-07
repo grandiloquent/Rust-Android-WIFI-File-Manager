@@ -17,7 +17,8 @@ pub async fn run_server(srv: Server, db: Database, ass: AssetManager) {
     let limits = Limits::default()
         .limit("json", 3.mebibytes())
         .limit("string", 3.mebibytes())
-        .limit("file", 5.gibibytes());
+        .limit("data-form", 5.gibibytes())
+    .limit("file", 5.gibibytes());
     let figment = Figment::from(rocket::Config::default())
         .merge((rocket::Config::ADDRESS, srv.host))
         .merge((rocket::Config::PORT, srv.port))

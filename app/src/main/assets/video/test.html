@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <style>
+        .emoji-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            font-size: 30px;
+            background-color: rgb(218, 220, 224);
+            gap: 1px;
+        }
+
+        .emoji-container>div {
+            padding: 10px;
+            background-color: #fff;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+<div class="emoji-container">
+</div>
+<script>
+const emojiContainer = document.querySelector('.emoji-container');
+const s = '🤑 🙃 🤗';
+console.log(s);
+        s.split(' ').forEach(x => {
+            console.log(x)
+            emojiContainer.insertAdjacentHTML('afterbegin', `<div>${x}</div>`)
+        })
+</script>
+</body>
+
+</html>

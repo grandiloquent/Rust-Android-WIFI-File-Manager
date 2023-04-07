@@ -217,6 +217,7 @@ function onDurationChange() {
 }
 function onSeek(evt) {
     video.currentTime = video.duration * (parseInt(evt.target.value) / 100);
+    scheduleHide();
 }
 function onBack() {
     video.currentTime = video.currentTime - 10;

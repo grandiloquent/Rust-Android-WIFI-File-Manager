@@ -12,6 +12,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 
+import java.io.File;
+
 import javax.sql.DataSource;
 
 import psycho.euphoria.killer.Shared.Listener;
@@ -50,6 +52,9 @@ public class MainActivity extends Activity {
         Actions.loadStartPage(false);
         //Secret.populateSettings(this);
         Actions.launchServer();
+        String dir = mSharedPreferences.getString("video_directory", null);
+        if (dir != null)
+            Actions.generateVideoThumbnails(new File(dir)).start();
     }
 
     private void refresh() {

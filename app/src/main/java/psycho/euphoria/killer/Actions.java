@@ -29,25 +29,30 @@ public class Actions {
     private static final String FILE_ANDROID_ASSET_HOME_INDEX_HTML = "file:///android_asset/home/index.html";
     private static MainActivity sContext;
 
-    public Thread generateVideoThumbnails(File dir) {
+    public static Thread generateVideoThumbnails(File dir) {
         return new Thread(() -> {
             File parent = new File(dir, ".images");
             if (!parent.exists()) {
                 parent.mkdirs();
             }
-            File[] files = dir.listFiles(file -> file.isFile() && file.getName().endsWith(".mp4"));
-            for (File file : files) {
-                String output = parent + "/" + Shared.md5(file.getAbsolutePath());
-                if (new File(output).exists()) continue;
-                try {
-                    FileOutputStream fileOutputStream = new FileOutputStream(output);
-                    Bitmap bitmap = Shared.createVideoThumbnail(file.getAbsolutePath());
-                    bitmap.compress(CompressFormat.JPEG, 75, fileOutputStream);
-                    bitmap.recycle();
-                    fileOutputStream.close();
-                } catch (Exception ignored) {
-                }
+            File[] files = dir.listFiles(file -> file.isFile() && !file.getName().endsWith(".srt"));
+            if (files != null) {
+                for (File file : files) {
+                    File output = new File(parent,file.getName());
+                    if (output.exists()) continue;
+                    try {
+                        Bitmap bitmap = Shared.createVideoThumbnail(file.getAbsolutePath());
+                        if (bitmap != null) {
+                            FileOutputStream fileOutputStream = new FileOutputStream(output);
+                            bitmap.compress(CompressFormat.JPEG, 75, fileOutputStream);
+                            bitmap.recycle();
+                            fileOutputStream.close();
+                        }
 
+                    } catch (Exception ignored) {
+                    }
+
+                }
             }
         });
     }
