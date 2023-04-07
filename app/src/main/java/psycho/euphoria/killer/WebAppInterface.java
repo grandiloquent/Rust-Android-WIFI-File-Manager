@@ -198,7 +198,7 @@ public class WebAppInterface {
                     JSONObject object = new JSONObject(sb1.toString());
                     JSONArray array = object.getJSONArray("sentences");
                     for (int i = 0; i < array.length(); i++) {
-                        sb.append(array.getJSONObject(i).getString("trans")).append('\n');
+                        sb.append(array.getJSONObject(i).getString("trans"));
                     }
                 } catch (Exception e) {
                 }

@@ -1016,11 +1016,12 @@ ${strings}
     }
     formatCodeBlock() {
       let p = getContinueBlock(textarea);
-      textarea.setRangeText(`\`\`\`
+      textarea.setRangeText(`\`\`\`rust
 ${textarea.value.substring(p[0], p[1])}
 \`\`\`
 `,
         p[0], p[1], 'end')
+        writeText("```")
     }
     cutBefore() {
       const before = textarea.value.substring(0, textarea.selectionStart);
