@@ -41,7 +41,7 @@ function showContextMenu(detail) {
         } else if (evt.detail === "删除") {
             showDeleteDialog(detail)
         }else if (evt.detail === "复制") {
-            writeText(detail.path)
+            writeText(decodeURIComponent(detail.path))
         }
     })
 }
