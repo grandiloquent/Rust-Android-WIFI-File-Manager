@@ -3,7 +3,6 @@ use rocket::serde::json::{json, Value};
 // https://doc.rust-lang.org/std/fs/
 use std::fs;
 use rocket::http::Status;
-
 #[get("/api/file/new_file?<path>")]
 pub fn api_file_new_file(path: String) -> Result<(), Status> {
     let p = Path::new(path.as_str());
@@ -13,7 +12,6 @@ pub fn api_file_new_file(path: String) -> Result<(), Status> {
             Ok(_) => {
                 Ok(())
             }
-
             // https://doc.rust-lang.org/std/io/struct.Error.html
             Err(error) => {
                 log::error!("{}: {}",error.to_string(),path);
@@ -24,7 +22,6 @@ pub fn api_file_new_file(path: String) -> Result<(), Status> {
         Err(Status::NotFound)
     }
 }
-
 #[get("/api/file/new_dir?<path>")]
 pub fn api_file_new_dir(path: String) -> Value {
     let p = Path::new(path.as_str());
