@@ -1,6 +1,7 @@
 package psycho.euphoria.killer;
 
 import android.util.Log;
+import android.webkit.CookieManager;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -73,7 +74,9 @@ public class CustomWebViewClient extends WebViewClient {
 //            return mEmptyResponse;
 //        }
        //Log.e("B5aOx2", String.format("shouldInterceptRequest, %s", url));
-        if ( !url.contains("ping.gif?")&&(url.contains(".m3u8") || url.contains(".m3u8?"))) {
+        if ( !url.contains("ping.gif?")&&(url.contains(".m3u8") || url.contains(".m3u8?")
+        || url.contains("cdn.me") )) {
+            Log.e("B5aOx2", String.format("shouldInterceptRequest, %s", url));
             Shared.setText(mContext, url);
             mContext.runOnUiThread(new Runnable() {
                 @Override
