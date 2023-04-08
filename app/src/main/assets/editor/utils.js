@@ -537,6 +537,8 @@ async function submitServer() {
         content: substringAfter(textarea.value.trim(), "\n"),
         title: firstLine.replace(/^#+ +/, ''),
     };
+    const searchParams = new URL(window.location.href).searchParams;
+    const id = searchParams.get('id');
     let baseUri = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? '' : '';
     if (id) {
         obj.id = parseInt(id);
