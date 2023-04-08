@@ -1,12 +1,10 @@
 package psycho.euphoria.killer;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,9 +12,6 @@ import android.webkit.WebView;
 
 import java.io.File;
 
-import javax.sql.DataSource;
-
-import psycho.euphoria.killer.Shared.Listener;
 import psycho.euphoria.killer.tasks.DownloaderService;
 
 public class MainActivity extends Activity {
@@ -45,20 +40,20 @@ public class MainActivity extends Activity {
     public static native void startServer(ServerService service, AssetManager assetManager, String host, int port);
 
     private void initialize() {
-        Actions.aroundFileUriExposedException();
-        Actions.requestStorageManagerPermission();
+        Utils.aroundFileUriExposedException();
+        Utils.requestStorageManagerPermission();
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        mWebView = Actions.initializeWebView();
-        Actions.loadStartPage(false);
+        mWebView = Utils.initializeWebView();
+        Utils.loadStartPage(false);
         //Secret.populateSettings(this);
-        Actions.launchServer();
+        Utils.launchServer();
         String dir = mSharedPreferences.getString("video_directory", null);
         if (dir != null)
-            Actions.generateVideoThumbnails(new File(dir)).start();
+            Utils.generateVideoThumbnails(new File(dir)).start();
     }
 
     private void refresh() {
-        Actions.clearWebViewCachesCustom();
+        Utils.clearWebViewCachesCustom();
         mWebView.reload();
     }
 
@@ -71,8 +66,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Actions.setContext(this);
-        if (!Actions.requestPermission())
+        Utils.setContext(this);
+        if (!Utils.requestPermission())
             initialize();
     }
 
@@ -111,13 +106,13 @@ public class MainActivity extends Activity {
                 refresh();
                 break;
             case 3:
-                Actions.saveRenderedWebPage();
+                Utils.saveRenderedWebPage();
                 break;
             case 5:
                 restartService();
                 break;
             case 6:
-                Actions.loadStartPage(true);
+                Utils.loadStartPage(true);
                 break;
             case 7:
                 Shared.setText(this, mWebView.getUrl());

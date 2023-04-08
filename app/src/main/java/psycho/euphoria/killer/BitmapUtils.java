@@ -60,7 +60,7 @@ public class BitmapUtils {
                 width, height, minSideLength, maxNumOfPixels);
 
         return initialSize <= 8
-                ? Utils.nextPowerOf2(initialSize)
+                ? Shared.nextPowerOf2(initialSize)
                 : (initialSize + 7) / 8 * 8;
     }
 
@@ -88,7 +88,7 @@ public class BitmapUtils {
         if (initialSize <= 1) return 1;
 
         return initialSize <= 8
-                ? Utils.prevPowerOf2(initialSize)
+                ? Shared.prevPowerOf2(initialSize)
                 : initialSize / 8 * 8;
     }
 
@@ -98,16 +98,16 @@ public class BitmapUtils {
         if (initialSize <= 1) return 1;
 
         return initialSize <= 8
-                ? Utils.prevPowerOf2(initialSize)
+                ? Shared.prevPowerOf2(initialSize)
                 : initialSize / 8 * 8;
     }
 
     // Find the max x that 1 / x <= scale.
     public static int computeSampleSize(float scale) {
-        Utils.assertTrue(scale > 0);
+        Shared.assertTrue(scale > 0);
         int initialSize = Math.max(1, (int) Math.ceil(1 / scale));
         return initialSize <= 8
-                ? Utils.nextPowerOf2(initialSize)
+                ? Shared.nextPowerOf2(initialSize)
                 : (initialSize + 7) / 8 * 8;
     }
 

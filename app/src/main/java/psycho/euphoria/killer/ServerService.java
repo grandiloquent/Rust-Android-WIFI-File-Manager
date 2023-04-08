@@ -32,8 +32,8 @@ public class ServerService extends Service {
 
     private void startServer() {
         new Thread(() -> {
-            int port = Calculations.getUsablePort(psycho.euphoria.killer.Actions.DEFAULT_PORT);
-            mSharedPreferences.edit().putInt(psycho.euphoria.killer.Actions.KEY_PORT, port).apply();
+            int port = Calculations.getUsablePort(Utils.DEFAULT_PORT);
+            mSharedPreferences.edit().putInt(Utils.KEY_PORT, port).apply();
 
             MainActivity.startServer(ServerService.this, ServerService.this.getAssets(), Shared.getDeviceIP(ServerService.this), port);
         }).start();

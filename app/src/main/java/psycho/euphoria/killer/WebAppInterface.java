@@ -13,7 +13,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -25,7 +24,6 @@ import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Proxy.Type;
-import java.net.SocketAddress;
 import java.net.URL;
 import java.util.zip.GZIPInputStream;
 
@@ -123,7 +121,7 @@ public class WebAppInterface {
         mContext.runOnUiThread(() -> {
             mContext.getWebView().loadUrl("http://" + Shared.getDeviceIP(mContext) + ":" +
                     mSharedPreferences.getInt(
-                            Actions.KEY_PORT, Actions.DEFAULT_PORT
+                            Utils.KEY_PORT, Utils.DEFAULT_PORT
                     ));
         });
     }
@@ -143,7 +141,7 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public void startServer() {
-        Actions.launchServer();
+        Utils.launchServer();
     }
 
     @JavascriptInterface
