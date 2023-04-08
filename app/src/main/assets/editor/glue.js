@@ -119,8 +119,14 @@ document.addEventListener('keydown', async evt => {
                 // .filter(x => x.trim())
                 .map(x => '    ' + x.trim()).join('\n'), textarea.selectionStart, textarea.selectionEnd, 'end');
         }
-    } else if (evt.key === 'F3') {
+    } else if (evt.key === 'F1') {
         evt.preventDefault();
         onTranslateChinese();
+    } else if (evt.key === 'F2') {
+        evt.preventDefault();
+        onFormatCode()
+    }else if (evt.key === 'F3') {
+        evt.preventDefault();
+        onDeleteLine()
     }
 });

@@ -187,8 +187,8 @@ function formatCodeBlock() {
     // \`\`\`
     // `,
     //         p[0], p[1], 'end')
-    textarea.setRangeText(`\`\`\`rust
-      `,
+    textarea.setRangeText(`
+\`\`\`rust`,
         textarea.selectionStart, textarea.selectionEnd, 'end')
     writeText("```")
 }
@@ -647,9 +647,9 @@ async function onSnippet() {
 async function onTranslateChinese() {
     let array1 = getLine();
     let strings = (typeof NativeAndroid !== 'undefined') ? NativeAndroid.translate(array1[0]) : (await translate(array1[0], 'zh'));
-    if (this.patterns) {
-        for (let index = 0; index < this.patterns.length; index++) {
-            const element = this.patterns[index];
+    if (patterns) {
+        for (let index = 0; index <patterns.length; index++) {
+            const element = patterns[index];
             strings = strings.replaceAll(new RegExp(
                 element[0], 'g'
             ), element[1])
