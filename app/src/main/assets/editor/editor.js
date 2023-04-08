@@ -184,7 +184,7 @@ document.addEventListener('keydown', async evt => {
             }
             case 's': {
                 evt.preventDefault();
-                actions.saveData();
+                saveData();
                 break;
             }
             case 'u': {
