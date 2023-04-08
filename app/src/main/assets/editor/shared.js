@@ -21,98 +21,8 @@ function bind(elememnt) {
         });
     })
 }
-
 function camel(string) {
     return string.replaceAll(/[ _-]([a-zA-Z])/g, m => m[1].toUpperCase());
-}
-
-function substring(strings, prefix, suffix) {
-    let start = strings.indexOf(prefix);
-    if (start === -1) {
-        return [0, 0]
-    }
-    start += prefix.length;
-    let end = strings.indexOf(suffix, start);
-    if (end === -1) {
-        return [0, 0]
-    }
-    return [start, end]
-}
-
-function substringAfter(string, delimiter, missingDelimiterValue) {
-    const index = string.indexOf(delimiter);
-    if (index === -1) {
-        return missingDelimiterValue || string;
-    } else {
-        return string.substring(index + delimiter.length);
-    }
-}
-
-function substringAfterLast(string, delimiter, missingDelimiterValue) {
-    const index = string.lastIndexOf(delimiter);
-    if (index === -1) {
-        return missingDelimiterValue || string;
-    } else {
-        return string.substring(index + delimiter.length);
-    }
-}
-
-function substringBefore(string, delimiter, missingDelimiterValue) {
-    const index = string.indexOf(delimiter);
-    if (index === -1) {
-        return missingDelimiterValue || string;
-    } else {
-        return string.substring(0, index);
-    }
-}
-
-function substringBeforeLast(string, delimiter, missingDelimiterValue) {
-    const index = string.lastIndexOf(delimiter);
-    if (index === -1) {
-        return missingDelimiterValue || string;
-    } else {
-        return string.substring(0, index);
-    }
-}
-
-function substringNearest(string, index, start, end) {
-    let j = index;
-    while (j > -1) {
-        if (start.indexOf(string[j]) !== -1) {
-            j++
-            break;
-        }
-        j--;
-    }
-    let k = index;
-    while (k < string.length) {
-        if (end.indexOf(string[k]) !== -1) {
-            break;
-        }
-        k++;
-    }
-    return string.substring(j, k);
-}
-
-function upperCamel(string) {
-    string = camel(string);
-    return string.slice(0, 1).toUpperCase() + string.slice(1);
-}
-
-function writeText(message) {
-    const textarea = document.createElement("textarea");
-    textarea.style.position = 'fixed';
-    textarea.style.right = '100%';
-    document.body.appendChild(textarea);
-    textarea.value = message;
-    textarea.select();
-    document.execCommand('copy');
-    textarea.remove();
-}
-
-function snake(string) {
-    return string.replaceAll(/(?<=[a-z])[A-Z]/g, m => `_${m}`).toLowerCase()
-        .replaceAll(/[ -]([a-z])/g, m => `_${m[1]}`)
 }
 function humanFileSize(size) {
     if (size === 0) return '0';
@@ -136,4 +46,101 @@ async function readText() {
     }
     return strings
 }
-
+function snake(string) {
+    return string.replaceAll(/(?<=[a-z])[A-Z]/g, m => `_${m}`).toLowerCase()
+        .replaceAll(/[ -]([a-z])/g, m => `_${m[1]}`)
+}
+function substring(strings, prefix, suffix) {
+    let start = strings.indexOf(prefix);
+    if (start === -1) {
+        return [0, 0]
+    }
+    start += prefix.length;
+    let end = strings.indexOf(suffix, start);
+    if (end === -1) {
+        return [0, 0]
+    }
+    return [start, end]
+}
+function substringAfter(string, delimiter, missingDelimiterValue) {
+    const index = string.indexOf(delimiter);
+    if (index === -1) {
+        return missingDelimiterValue || string;
+    } else {
+        return string.substring(index + delimiter.length);
+    }
+}
+function substringAfterLast(string, delimiter, missingDelimiterValue) {
+    const index = string.lastIndexOf(delimiter);
+    if (index === -1) {
+        return missingDelimiterValue || string;
+    } else {
+        return string.substring(index + delimiter.length);
+    }
+}
+function substringBefore(string, delimiter, missingDelimiterValue) {
+    const index = string.indexOf(delimiter);
+    if (index === -1) {
+        return missingDelimiterValue || string;
+    } else {
+        return string.substring(0, index);
+    }
+}
+function substringBeforeLast(string, delimiter, missingDelimiterValue) {
+    const index = string.lastIndexOf(delimiter);
+    if (index === -1) {
+        return missingDelimiterValue || string;
+    } else {
+        return string.substring(0, index);
+    }
+}
+function substringNearest(string, index, start, end) {
+    let j = index;
+    while (j > -1) {
+        if (start.indexOf(string[j]) !== -1) {
+            j++
+            break;
+        }
+        j--;
+    }
+    let k = index;
+    while (k < string.length) {
+        if (end.indexOf(string[k]) !== -1) {
+            break;
+        }
+        k++;
+    }
+    return string.substring(j, k);
+}
+function toBlocks(string) {
+    let count = 0;
+    let buf = [];
+    const blocks = [];
+    for (let i = 0; i < string.length; i++) {
+        buf.push(string[i])
+        if (string[i] === '{') {
+            count++;
+        } else if (string[i] === '}') {
+            count--;
+            if (count === 0) {
+                blocks.push(buf.join(''))
+                buf = [];
+            }
+        }
+    }
+    return blocks;
+}
+function upperCamel(string) {
+    string = camel(string);
+    return string.slice(0, 1).toUpperCase() + string.slice(1);
+}
+function writeText(message) {
+    const textarea = document.createElement("textarea");
+    textarea.style.position = 'fixed';
+    textarea.style.right = '100%';
+    document.body.appendChild(textarea);
+    textarea.value = message;
+    textarea.select();
+    document.execCommand('copy');
+    textarea.remove();
+}

@@ -276,6 +276,23 @@ function getLine(extended) {
 function getSelectedString(textarea) {
     return textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
 }
+async function insertLink() {
+    const strings = await readText();
+    let name = '';
+    try {
+        name = await (await fetch(`/title?path=${encodeURIComponent(strings)}`)).text()
+    } catch (e) {
+    }
+    textarea.setRangeText(
+        `[${name.trim()}](${strings})`,
+        textarea.selectionStart,
+        textarea.selectionEnd,
+        'end'
+    )
+}
+function isObject(obj) {
+    return obj !== undefined && obj !== null && obj.constructor == Object;
+}
 function jumpPage(textarea) {
     const line = getLine(textarea);
     const value = /(?<=(href|src)=")[^"]+(?=")/.exec(line);
@@ -341,6 +358,15 @@ async function onTranslateFn() {
     }
           `, array1[2], array1[2], 'end');
 }
+function preview() {
+    const searchParams = new URL(window.location).searchParams;
+    if (searchParams.has("path")) {
+        const path = searchParams.get("path");
+        window.open(`/markdown?path=${path}`, '_blank')
+    } else {
+        window.open(`/markdown?id=${searchParams.get("id")}`, '_blank')
+    }
+}
 async function removeLines() {
     if (textarea.selectionStart === textarea.selectionEnd) {
         const p = findExtendPosition(textarea);
@@ -365,6 +391,21 @@ async function removeLines() {
         textarea.scrollTop = 0;
     }
 }
+async function render() {
+    const obj = await loadData();
+    if (isObject(obj)) {
+        try {
+            const obj = await loadData(id)
+            document.title = obj.title;
+            textarea.value = `# ${obj.title}|${JSON.stringify(obj.tags)}
+${obj.content.trim()}`
+        } catch (error) {
+            console.log(error)
+        }
+    } else {
+        textarea.value = obj;
+    }
+}
 async function saveData() {
     const searchParams = new URL(window.location).searchParams;
     if (searchParams.get("path")) {
@@ -376,6 +417,18 @@ async function saveData() {
     } else {
         submitServer()
     }
+}
+function sortLines() {
+    const points = findBlock(textarea);
+    const lines = textarea.value.substring(points[0], points[1]).split('\n')
+        .sort((x, y) => {
+            let v1 = /\d{4}\)/.exec(x);
+            let v2 = /\d{4}\)/.exec(y)
+            if (v1 && v2)
+                return v1[0].localeCompare(v2[0])
+            return x.localeCompare(y);
+        });
+    textarea.setRangeText(`\n\n${lines.join('\n')}`, points[0], points[1], 'end');
 }
 async function submitServer() {
     const firstLine = textarea.value.trim().split("\n", 2)[0];
@@ -434,24 +487,6 @@ function tab(textarea) {
             e.preventDefault();
         }
     }, false);
-}
-function toBlocks(string) {
-    let count = 0;
-    let buf = [];
-    const blocks = [];
-    for (let i = 0; i < string.length; i++) {
-        buf.push(string[i])
-        if (string[i] === '{') {
-            count++;
-        } else if (string[i] === '}') {
-            count--;
-            if (count === 0) {
-                blocks.push(buf.join(''))
-                buf = [];
-            }
-        }
-    }
-    return blocks;
 }
 async function translate(value, to) {
     try {

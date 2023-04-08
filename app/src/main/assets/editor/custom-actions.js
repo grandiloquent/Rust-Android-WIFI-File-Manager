@@ -214,7 +214,7 @@ textarea {
 
 })();
 (() => {
- 
+
   class CustomActions extends HTMLElement {
 
     constructor() {
@@ -257,7 +257,7 @@ textarea {
             <div bind @click="openLink" class="menu-item">
               打开链接
             </div>
-            <div bind @click="onPreview" class="menu-item">
+            <div bind @click="preview" class="menu-item">
               预览
             </div>
             <div bind @click="onTranslateChinese" class="menu-item">
@@ -323,7 +323,11 @@ textarea {
           if (!attr.value) return;
           element.addEventListener(attr.nodeName.slice(1), evt => {
             this.style.display = 'none';
-            this[attr.value](evt);
+            if (this[attr.value])
+              this[attr.value](evt);
+            else {
+              [attr.value](evt)
+            }
           });
         });
       });
@@ -332,39 +336,8 @@ textarea {
         this.loadPatterns(patterns);
       this.regex = "[a-zA-Z0-9_<>;:.+%'#*=()!?|^&\\[\\]{}\" -]";
     }
-    async insertLink() {
-      const strings = await readText();
-      let name = '';
-      try {
-        name = await (await fetch(`/title?path=${encodeURIComponent(strings)}`)).text()
-      } catch (e) {
-      }
-      textarea.setRangeText(
-        `[${name.trim()}](${strings})`,
-        textarea.selectionStart,
-        textarea.selectionEnd,
-        'end'
-      )
-    }
-    async onEval() {
-      const p = findBlock(textarea);
-      const s = textarea.value.substring(p[0], p[1]);
-      textarea.setRangeText(
-        ` = ${eval(s)}`,
-        p[1],
-        p[1],
-        'end'
-      )
-    }
-    onPreview() {
-      const searchParams = new URL(window.location).searchParams;
-      if (searchParams.has("path")) {
-        const path = searchParams.get("path");
-        window.open(`/markdown?path=${path}`, '_blank')
-      } else {
-        window.open(`/markdown?id=${searchParams.get("id")}`, '_blank')
-      }
-    }
+    
+   
     async onTranslateChinese() {
       let array1 = getLine();
       let strings = (typeof NativeAndroid !== 'undefined') ? NativeAndroid.translate(array1[0]) : (await translate(array1[0], 'zh'));
@@ -398,18 +371,7 @@ textarea {
         textarea.setRangeText(` [](${textarea.value.substring(start, end).trim()})`, start, end, 'end');
       }
     }
-    sortLines() {
-      const points = findBlock(textarea);
-      const lines = textarea.value.substring(points[0], points[1]).split('\n')
-        .sort((x, y) => {
-          let v1 = /\d{4}\)/.exec(x);
-          let v2 = /\d{4}\)/.exec(y)
-          if (v1 && v2)
-            return v1[0].localeCompare(v2[0])
-          return x.localeCompare(y);
-        });
-      textarea.setRangeText(`\n\n${lines.join('\n')}`, points[0], points[1], 'end');
-    }
+
     async translate(value, to) {
       try {
         const response = await fetch(`${window.location.protocol}//kpkpkp.cn/api/trans?q=${encodeURIComponent(value.trim())}&to=${to}`);
@@ -691,9 +653,9 @@ ${strings}
       writeText(before);
       textarea.value = textarea.value.substring(textarea.selectionStart);
     }
-   async pasteEnd(){
-      textarea.value=textarea.value.trim()+
-      (await readText())
+    async pasteEnd() {
+      textarea.value = textarea.value.trim() +
+        (await readText())
     }
   }
 
