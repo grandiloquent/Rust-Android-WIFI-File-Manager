@@ -40,6 +40,11 @@ async function createFile() {
     const extension = substringAfterLast(path, ".");
     fetch(`/api/file?action=1&path=${encodeURIComponent(dir)}&dst=${encodeURIComponent(s.split(',').map(x => x.trim() + "." + extension).join(","))}`)
 }
+function cutBefore() {
+    const before = textarea.value.substring(0, textarea.selectionStart);
+    writeText(before);
+    textarea.value = textarea.value.substring(textarea.selectionStart);
+}
 function findBlock(textarea) {
     let start = textarea.selectionStart;
     let end = textarea.selectionEnd;
@@ -175,6 +180,18 @@ function findExtendPosition(editor) {
     // }
     return [offsetStart, offsetEnd];
 }
+function formatCodeBlock() {
+    //       let p = getContinueBlock(textarea);
+    //       textarea.setRangeText(`\`\`\`rust
+    // ${textarea.value.substring(p[0], p[1])}
+    // \`\`\`
+    // `,
+    //         p[0], p[1], 'end')
+    textarea.setRangeText(`\`\`\`rust
+      `,
+        textarea.selectionStart, textarea.selectionEnd, 'end')
+    writeText("```")
+}
 function formatHead(editor, count) {
     // console.log("formatHead, ");
     // let start = editor.selectionStart;
@@ -214,6 +231,35 @@ function formatHead(editor, count) {
     }
     editor.setRangeText(`\n\n${'#'.repeat(count)} ${string.substring(offsetStart, offsetEnd).trim()}\n`, offsetStart,
         offsetEnd, 'end');
+}
+function formatIndentDecrease() {
+    if (textarea.selectionStart === textarea.selectionEnd) {
+        const line = getLine();
+        if (line[0].startsWith("  "))
+            textarea.setRangeText(
+                line[0].slice(2),
+                line[1], line[2], 'end'
+            )
+    } else {
+        const string = getSelectedString(textarea);
+        textarea.setRangeText(string.split('\n')
+            // .filter(x => x.trim())
+            .map(x => x.startsWith("  ") ? x.slice(2) : x).join('\n'), textarea.selectionStart, textarea.selectionEnd, 'end');
+    }
+}
+function formatIndentIncrease() {
+    if (textarea.selectionStart === textarea.selectionEnd) {
+        const line = getLine();
+        textarea.setRangeText(
+            ' '.repeat(2) + line[0],
+            line[1], line[2], 'end'
+        )
+    } else {
+        const string = getSelectedString(textarea);
+        textarea.setRangeText(string.split('\n')
+            // .filter(x => x.trim())
+            .map(x => '  ' + x).join('\n'), textarea.selectionStart, textarea.selectionEnd, 'end');
+    }
 }
 function getContinueBlock(textarea) {
     let start = textarea.selectionStart;
@@ -280,6 +326,15 @@ function getLine(extended) {
     }
     return [strings.substring(start, end), start, end]
 }
+function getPatterns() {
+    let strings;
+    if (typeof NativeAndroid !== 'undefined') {
+        strings = NativeAndroid.getString("pattern")
+    } else {
+        strings = localStorage.getItem('pattern')
+    }
+    return strings;
+}
 function getSelectedString(textarea) {
     return textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
 }
@@ -324,9 +379,17 @@ async function loadData() {
         return res.text();
     }
 }
+function loadPatterns(patterns) {
+    this.patterns = patterns.split('\n')
+        .filter(x => x.trim())
+        .map(x => x.trim().split('|'))
+}
 function onCopy() {
     const pv = findCodeBlock(textarea);
     writeText(textarea.value.substring(pv[0], pv[1]));
+}
+function onCopyLine() {
+    copyLine(textarea);
 }
 function onCopyLine() {
     copyLine(textarea);
@@ -377,6 +440,12 @@ async function onCustomBottomSheet(evt) {
             break;
     }
 }
+function onCutLine() {
+    const p = getLine(textarea);
+    writeText(p[0]);
+    textarea.setRangeText(``,
+        p[1], p[2], 'end')
+}
 function onDeleteLine() {
     const p = getLine(textarea);
     let start = p[1];
@@ -389,6 +458,15 @@ function onDeleteLine() {
     textarea.setRangeText(`\n\n`,
         start, end, 'end');
 }
+function onDeleteString() {
+    const start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+    while (end + 1 < textarea.value.length && textarea.value[end] !== ']') {
+        end++;
+    }
+    textarea.setRangeText('', start, end, 'end');
+    console.log(start);
+}
 async function onEval() {
     const p = findBlock(textarea);
     const s = textarea.value.substring(p[0], p[1]);
@@ -399,8 +477,147 @@ async function onEval() {
         'end'
     )
 }
+function onFormatBold() {
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+    // \(\)\[\].!/\?%-
+    const re = new RegExp(this.regex);
+    while (start > -1 && re.test(textarea.value[start - 1])) {
+        start--;
+    }
+    while (end + 1 < textarea.value.length && re.test(textarea.value[end])) {
+        end++;
+    }
+    const value = textarea.value.substring(start, end);
+    textarea.setRangeText(` **${value.trim()}** `, start, end, 'end');
+    writeText('`')
+}
+function onFormatCode() {
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+    // \(\)\[\].!/\?%-
+    const re = new RegExp(this.regex);
+    while (start > -1 && re.test(textarea.value[start - 1])) {
+        start--;
+    }
+    while (end + 1 < textarea.value.length && re.test(textarea.value[end])) {
+        end++;
+    }
+    const value = textarea.value.substring(start, end);
+    textarea.setRangeText(` \`${value.trim()}\` `, start, end, 'end');
+    writeText('`')
+}
+function onFormatCodeBlock() {
+    const indexs = findCodeBlock(textarea);
+    if (textarea.selectionStart !== textarea.selectionEnd) {
+        const selected = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
+        let s = textarea.value.substring(indexs[0], indexs[1])
+            .split('\n').map(x => {
+                if (x.startsWith(selected)) {
+                    x = x.substring(selected.length);
+                }
+                return x;
+            }).join('\n');
+        textarea.setRangeText(s, indexs[0], indexs[1], 'end');
+    }
+}
+function onFormatHead() {
+    formatHead(textarea, 3)
+}
+function onFormatList() {
+    let p = getIndexLine(textarea);
+    let p1 = p;
+    while (true) {
+        if (p1[1] <= 0) {
+            break;
+        }
+        let p2 = getIndexLine(textarea, p1[1] - 1);
+        if (p2[0].trim()) {
+            if (/(\d+). /.test(p2[0])) {
+                textarea.setRangeText(`    - ${p[0]}`,
+                    p[1], p[2], 'end')
+                return;
+            } else if (/ +- /.test(p2[0])) {
+                textarea.setRangeText(`${/( +)- /.exec(p2[0])[1]}- ${p[0]}`,
+                    p[1], p[2], 'end')
+                return;
+            } else {
+                textarea.setRangeText(`- ${p[0]}`,
+                    p[1], p[2], 'end')
+                return;
+            }
+        }
+        p1 = p2;
+    }
+    textarea.setRangeText(`- ${p[0]}`,
+        p[1], p[2], 'end')
+}
+function onFormatNumberList() {
+    let p = getIndexLine(textarea);
+    let p1 = p;
+    while (true) {
+        if (p1[1] <= 0) {
+            break;
+        }
+        let p2 = getIndexLine(textarea, p1[1] - 1);
+        if (p2[0].trim()) {
+            let index = 1;
+            if (/(\d+). /.test(p2[0])) {
+                index = parseInt(/(\d+). /.exec(p2[0])[1]) + 1;
+                textarea.setRangeText(`${index}. ${p[0]}`,
+                    p[1], p[2], 'end')
+                return;
+            } else {
+                textarea.setRangeText(`${index}. ${p[0]}`,
+                    p[1], p[2], 'end')
+                return;
+            }
+        }
+        p1 = p2;
+    }
+    textarea.setRangeText(`1. ${p[0]}`,
+        p[1], p[2], 'end')
+}
+function onInsertComment() {
+    let start = textarea.selectionStart;
+    const strings = textarea.value;
+    if (strings[start] === '\n' && start - 1 > 0) {
+        start--;
+    }
+    while (start > 0 && strings[start - 1] !== '\n') {
+        start--;
+    }
+    let end = textarea.selectionEnd;
+    while (end + 1 < strings.length && strings[end] !== '\n') {
+        end++;
+    }
+    if (end < textarea.value.length) {
+        let nexEnd = end + 1;
+        while (nexEnd + 1 < strings.length && /\s+/.test(strings[nexEnd])) {
+            nexEnd++;
+        }
+        textarea.setRangeText(`${' '.repeat(nexEnd - end - 1)}// `, start, start, 'end')
+        return
+    }
+    textarea.setRangeText(`// `, this.textarea.selectionStart, this.textarea.selectionEnd, 'end')
+}
 function onShow() {
     actions.style.display = 'block'
+}
+function onShowDialog() {
+    const customDialog = document.createElement('custom-dialog');
+    document.body.appendChild(customDialog);
+    customDialog.title = ""
+    window.customDialog = customDialog;
+    customDialog.addEventListener('submit', evt => {
+        this.setPatterns(customDialog.content);
+        this.loadPatterns(customDialog.content)
+    });
+    const patterns = this.getPatterns();
+    if (patterns) {
+        customDialog.content = patterns;
+    }
+    //customDialog.style.display = 'none';
 }
 function onShowTranslator() {
     onInsert();
@@ -433,11 +650,49 @@ async function onTranslateChinese() {
     }
     textarea.setRangeText(`\n\n${(strings)}`, array1[2], array1[2], 'end');
 }
+async function onTranslateEnglish() {
+    let array1 = getLine();
+    textarea.setRangeText(`\n\n${await translate(array1[0], 'en')}
+        `, array1[2], array1[2], 'end');
+}
 async function onTranslateFn() {
     let array1 = getLine();
     textarea.setRangeText(`\n\nfn ${snake(await translate(array1[0], 'en'))}(){
     }
           `, array1[2], array1[2], 'end');
+}
+function openLink() {
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+    while (start > -1 && textarea.value[start] !== ' ' && textarea.value[start] !== '(' && textarea.value[start] !== '\n') {
+        start--;
+    }
+    while (end < textarea.value.length && textarea.value[end] !== ' ' && textarea.value[end] !== ')' && textarea.value[end] !== '\n') {
+        end++;
+    }
+    if (textarea.selectionStart === textarea.selectionEnd) {
+        window.open(textarea.value.substring(start + 1, end));
+    } else {
+        textarea.setRangeText(` [](${textarea.value.substring(start, end).trim()})`, start, end, 'end');
+    }
+}
+async function pasteCode() {
+    let strings;
+    if (typeof NativeAndroid !== 'undefined') {
+        strings = NativeAndroid.readText()
+    } else {
+        strings = await navigator.clipboard.readText()
+    }
+    textarea.setRangeText(`
+\`\`\`rust
+${strings}
+\`\`\`
+`, textarea.selectionStart, textarea.selectionEnd, 'end');
+    writeText("```")
+}
+async function pasteEnd() {
+    textarea.value = textarea.value.trim() +
+        (await readText())
 }
 function preview() {
     const searchParams = new URL(window.location).searchParams;
@@ -517,6 +772,13 @@ async function saveData() {
         toast.setAttribute('message', '成功');
     } else {
         submitServer()
+    }
+}
+function setPatterns(patterns) {
+    if (typeof NativeAndroid !== 'undefined') {
+        NativeAndroid.setString("pattern", patterns)
+    } else {
+        localStorage.setItem('pattern', patterns)
     }
 }
 function sortLines() {
@@ -600,6 +862,17 @@ async function translate(value, to) {
         console.log(error);
     }
 }
+async function translate(value, to) {
+    try {
+        const response = await fetch(`${window.location.protocol}//kpkpkp.cn/api/trans?q=${encodeURIComponent(value.trim())}&to=${to}`);
+        const obj = await response.json();
+        return obj.sentences.map((element, index) => {
+            return element.trans;
+        }).join(' ');
+    } catch (error) {
+        console.log(error);
+    }
+}
 function tryUploadImageFromClipboard(success, error) {
     navigator.permissions.query({
         name: "clipboard-read"
@@ -629,6 +902,22 @@ function tryUploadImageFromClipboard(success, error) {
         } else {
             error(new Error());
         }
+    });
+}
+function uploadHanlder(editor) {
+    tryUploadImageFromClipboard((ok) => {
+        const string = `![](https://static.lucidu.cn/images/${ok})\n\n`;
+        editor.setRangeText(string, editor.selectionStart, editor.selectionStart);
+    }, () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.addEventListener('change', async ev => {
+            const file = input.files[0];
+            const imageFile = await uploadImage(file, file.name);
+            const string = `![](https://static.lucidu.cn/images/${imageFile})\n\n`;
+            editor.setRangeText(string, editor.selectionStart, editor.selectionStart);
+        });
+        input.click();
     });
 }
 async function uploadImage(image, name) {

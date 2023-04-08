@@ -1,16 +1,10 @@
-
-
-
 ///////////////////
 bind();
-
-
 
 document.addEventListener('visibilitychange', () => {
     localStorage.setItem('contents', textarea.value);
 })
 textarea.value = localStorage.getItem('contents') || '';
-let baseUri = window.location.host === '127.0.0.1:5500' ? 'http://192.168.8.55:10808' : '';
 render();
 
 function insertBound() {

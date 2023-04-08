@@ -11,118 +11,118 @@
       wrapper.setAttribute("class", "wrapper");
       const style = document.createElement('style');
       style.textContent = `.wrapper {
-position: fixed;
-top: 0;
-left: 0;
-right: 0;
-bottom: 0;
-display: flex;
--webkit-box-align: center;
-align-items: center;
--webkit-box-pack: center;
-justify-content: center;
-z-index: 4;
-margin: 0 40px;
-padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  z-index: 4;
+  margin: 0 40px;
+  padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 .dialog {
-position: relative;
-z-index: 2;
-display: flex;
--webkit-box-orient: vertical;
--webkit-box-direction: normal;
-flex-direction: column;
-max-height: 100%;
-box-sizing: border-box;
-padding: 16px;
-margin: 0 auto;
-overflow-x: hidden;
-overflow-y: auto;
-font-size: 13px;
-color: #0f0f0f;
-border: none;
-min-width: 250px;
-max-width: 356px;
-box-shadow: 0 0 24px 12px rgba(0, 0, 0, 0.25);
-border-radius: 12px;
-background-color: #fff;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  flex-direction: column;
+  max-height: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+  margin: 0 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  font-size: 13px;
+  color: #0f0f0f;
+  border: none;
+  min-width: 250px;
+  max-width: 356px;
+  box-shadow: 0 0 24px 12px rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  background-color: #fff;
 }
 
 .dialog-header {
-display: flex;
--webkit-box-orient: vertical;
--webkit-box-direction: normal;
-flex-direction: column;
-flex-shrink: 0;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  flex-direction: column;
+  flex-shrink: 0;
 }
 
 .h2 {
-margin: 0 0 3px;
-display: -webkit-box;
--webkit-box-orient: vertical;
-max-height: 2.5em;
--webkit-line-clamp: 2;
-overflow: hidden;
-line-height: 1.25;
-text-overflow: ellipsis;
-font-weight: normal;
-font-size: 18px;
+  margin: 0 0 3px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  max-height: 2.5em;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  font-weight: normal;
+  font-size: 18px;
 }
 
 .dialog-body {
-overflow-y: auto;
-overflow-x: hidden;
-max-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 100vh;
 }
 
 .dialog-buttons {
-display: flex;
--webkit-box-align: center;
-align-items: center;
--webkit-box-pack: end;
-justify-content: flex-end;
-margin-top: 12px;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: end;
+  justify-content: flex-end;
+  margin-top: 12px;
 }
 
 .button {
-display: flex;
-align-items: center;
-justify-content: center;
-padding: 0 16px;
-height: 36px;
-font-size: 14px;
-line-height: 36px;
-border-radius: 18px;
-color: #0f0f0f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  height: 36px;
+  font-size: 14px;
+  line-height: 36px;
+  border-radius: 18px;
+  color: #0f0f0f;
 }
 
 .disabled {
-color: #909090
+  color: #909090
 }
 
 .overlay {
-position: fixed;
-top: 0;
-bottom: 0;
-left: 0;
-right: 0;
-z-index: 1;
-cursor: pointer;
-background-color: rgba(0, 0, 0, 0.3);
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 input,
 textarea {
-background-color: transparent;
-padding-bottom: 4px;
-outline: none;
-box-sizing: border-box;
-border: none;
-border-radius: 0;
-margin-bottom: 1px;
-font: inherit;
-color: #0f0f0f
+  background-color: transparent;
+  padding-bottom: 4px;
+  outline: none;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 0;
+  margin-bottom: 1px;
+  font: inherit;
+  color: #0f0f0f
 }
 
 textarea {
@@ -130,10 +130,9 @@ textarea {
   appearance: none;
   min-height: 8.4rem;
   width: 100%;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   padding: 8px
-}
-`;
+}`;
       this.wrapper = wrapper;
       this.shadowRoot.append(style, wrapper);
     }
@@ -175,20 +174,20 @@ textarea {
 
     connectedCallback() {
       this.wrapper.innerHTML = `<div class="dialog">
-<div class="dialog-header">
-  <h2 bind="_title" class="h2">${this.getAttribute("title")}</h2>
-</div>
-<div bind="_message" class="dialog-body">
-  <textarea bind="textarea"></textarea>
-</div>
-<div class="dialog-buttons">
-  <div bind class="button" @click="_close">
-    取消
+  <div class="dialog-header">
+    <h2 bind="_title" class="h2">${this.getAttribute("title")}</h2>
   </div>
-  <div bind class="button disabled" @click="_submit">
-    确定
+  <div bind="_message" class="dialog-body">
+    <textarea bind="textarea"></textarea>
   </div>
-</div>
+  <div class="dialog-buttons">
+    <div bind class="button" @click="_close">
+      取消
+    </div>
+    <div bind class="button disabled" @click="_submit">
+      确定
+    </div>
+  </div>
 </div>
 <div bind class="overlay" @click="_close">
 </div>`;
@@ -339,301 +338,6 @@ textarea {
     
    
  
-    async onTranslateEnglish() {
-      let array1 = getLine();
-      textarea.setRangeText(`\n\n${await translate(array1[0], 'en')}
-          `, array1[2], array1[2], 'end');
-    }
-    openLink() {
-      let start = textarea.selectionStart;
-      let end = textarea.selectionEnd;
-      while (start > -1 && textarea.value[start] !== ' ' && textarea.value[start] !== '(' && textarea.value[start] !== '\n') {
-        start--;
-      }
-      while (end < textarea.value.length && textarea.value[end] !== ' ' && textarea.value[end] !== ')' && textarea.value[end] !== '\n') {
-        end++;
-      }
-      if (textarea.selectionStart === textarea.selectionEnd) {
-        window.open(textarea.value.substring(start + 1, end));
-      } else {
-        textarea.setRangeText(` [](${textarea.value.substring(start, end).trim()})`, start, end, 'end');
-      }
-    }
-
-    async translate(value, to) {
-      try {
-        const response = await fetch(`${window.location.protocol}//kpkpkp.cn/api/trans?q=${encodeURIComponent(value.trim())}&to=${to}`);
-        const obj = await response.json();
-        return obj.sentences.map((element, index) => {
-          return element.trans;
-        }).join(' ');
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    uploadHanlder(editor) {
-      tryUploadImageFromClipboard((ok) => {
-        const string = `![](https://static.lucidu.cn/images/${ok})\n\n`;
-        editor.setRangeText(string, editor.selectionStart, editor.selectionStart);
-      }, () => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.addEventListener('change', async ev => {
-          const file = input.files[0];
-          const imageFile = await uploadImage(file, file.name);
-          const string = `![](https://static.lucidu.cn/images/${imageFile})\n\n`;
-          editor.setRangeText(string, editor.selectionStart, editor.selectionStart);
-        });
-        input.click();
-      });
-    }
-    onDeleteString() {
-      const start = textarea.selectionStart;
-      let end = textarea.selectionEnd;
-      while (end + 1 < textarea.value.length && textarea.value[end] !== ']') {
-        end++;
-      }
-      textarea.setRangeText('', start, end, 'end');
-      console.log(start);
-    }
-    async pasteCode() {
-      let strings;
-      if (typeof NativeAndroid !== 'undefined') {
-        strings = NativeAndroid.readText()
-      } else {
-        strings = await navigator.clipboard.readText()
-      }
-      textarea.setRangeText(`
-\`\`\`rust
-${strings}
-\`\`\`
-  `, textarea.selectionStart, textarea.selectionEnd, 'end');
-      writeText("```")
-    }
-    onInsertComment() {
-      let start = textarea.selectionStart;
-      const strings = textarea.value;
-      if (strings[start] === '\n' && start - 1 > 0) {
-        start--;
-      }
-      while (start > 0 && strings[start - 1] !== '\n') {
-        start--;
-      }
-      let end = textarea.selectionEnd;
-      while (end + 1 < strings.length && strings[end] !== '\n') {
-        end++;
-      }
-      if (end < textarea.value.length) {
-        let nexEnd = end + 1;
-        while (nexEnd + 1 < strings.length && /\s+/.test(strings[nexEnd])) {
-          nexEnd++;
-        }
-        textarea.setRangeText(`${' '.repeat(nexEnd - end - 1)}// `, start, start, 'end')
-        return
-      }
-      textarea.setRangeText(`// `, this.textarea.selectionStart, this.textarea.selectionEnd, 'end')
-    }
-    formatIndentIncrease() {
-      if (textarea.selectionStart === textarea.selectionEnd) {
-        const line = getLine();
-        textarea.setRangeText(
-          ' '.repeat(2) + line[0],
-          line[1], line[2], 'end'
-        )
-      } else {
-        const string = getSelectedString(textarea);
-        textarea.setRangeText(string.split('\n')
-          // .filter(x => x.trim())
-          .map(x => '  ' + x).join('\n'), textarea.selectionStart, textarea.selectionEnd, 'end');
-      }
-    }
-    formatIndentDecrease() {
-      if (textarea.selectionStart === textarea.selectionEnd) {
-        const line = getLine();
-        if (line[0].startsWith("  "))
-          textarea.setRangeText(
-            line[0].slice(2),
-            line[1], line[2], 'end'
-          )
-      } else {
-        const string = getSelectedString(textarea);
-        textarea.setRangeText(string.split('\n')
-          // .filter(x => x.trim())
-          .map(x => x.startsWith("  ") ? x.slice(2) : x).join('\n'), textarea.selectionStart, textarea.selectionEnd, 'end');
-      }
-    }
-    onFormatCodeBlock() {
-      const indexs = findCodeBlock(textarea);
-      if (textarea.selectionStart !== textarea.selectionEnd) {
-        const selected = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
-        let s = textarea.value.substring(indexs[0], indexs[1])
-          .split('\n').map(x => {
-            if (x.startsWith(selected)) {
-              x = x.substring(selected.length);
-            }
-            return x;
-          }).join('\n');
-        textarea.setRangeText(s, indexs[0], indexs[1], 'end');
-      }
-    }
-    onCopyLine() {
-      copyLine(textarea);
-    }
-    onCutLine() {
-      const p = getLine(textarea);
-      writeText(p[0]);
-      textarea.setRangeText(``,
-        p[1], p[2], 'end')
-    }
-    
-    onFormatCode() {
-      let start = textarea.selectionStart;
-      let end = textarea.selectionEnd;
-      // \(\)\[\].!/\?%-
-      const re = new RegExp(this.regex);
-      while (start > -1 && re.test(textarea.value[start - 1])) {
-        start--;
-      }
-      while (end + 1 < textarea.value.length && re.test(textarea.value[end])) {
-        end++;
-      }
-      const value = textarea.value.substring(start, end);
-      textarea.setRangeText(` \`${value.trim()}\` `, start, end, 'end');
-      writeText('`')
-    }
-    onFormatBold() {
-      let start = textarea.selectionStart;
-      let end = textarea.selectionEnd;
-      // \(\)\[\].!/\?%-
-      const re = new RegExp(this.regex);
-      while (start > -1 && re.test(textarea.value[start - 1])) {
-        start--;
-      }
-      while (end + 1 < textarea.value.length && re.test(textarea.value[end])) {
-        end++;
-      }
-      const value = textarea.value.substring(start, end);
-      textarea.setRangeText(` **${value.trim()}** `, start, end, 'end');
-      writeText('`')
-    }
-    onFormatNumberList() {
-      let p = getIndexLine(textarea);
-      let p1 = p;
-      while (true) {
-        if (p1[1] <= 0) {
-          break;
-        }
-        let p2 = getIndexLine(textarea, p1[1] - 1);
-        if (p2[0].trim()) {
-          let index = 1;
-          if (/(\d+). /.test(p2[0])) {
-            index = parseInt(/(\d+). /.exec(p2[0])[1]) + 1;
-            textarea.setRangeText(`${index}. ${p[0]}`,
-              p[1], p[2], 'end')
-            return;
-          } else {
-            textarea.setRangeText(`${index}. ${p[0]}`,
-              p[1], p[2], 'end')
-            return;
-          }
-        }
-        p1 = p2;
-
-      }
-      textarea.setRangeText(`1. ${p[0]}`,
-        p[1], p[2], 'end')
-    }
-    onFormatList() {
-      let p = getIndexLine(textarea);
-      let p1 = p;
-      while (true) {
-        if (p1[1] <= 0) {
-          break;
-        }
-        let p2 = getIndexLine(textarea, p1[1] - 1);
-        if (p2[0].trim()) {
-
-          if (/(\d+). /.test(p2[0])) {
-            textarea.setRangeText(`    - ${p[0]}`,
-              p[1], p[2], 'end')
-            return;
-          } else if (/ +- /.test(p2[0])) {
-            textarea.setRangeText(`${/( +)- /.exec(p2[0])[1]}- ${p[0]}`,
-              p[1], p[2], 'end')
-            return;
-          } else {
-            textarea.setRangeText(`- ${p[0]}`,
-              p[1], p[2], 'end')
-            return;
-          }
-        }
-        p1 = p2;
-
-      }
-      textarea.setRangeText(`- ${p[0]}`,
-        p[1], p[2], 'end')
-    }
-    onFormatHead() {
-      formatHead(textarea, 3)
-    }
-    onShowDialog() {
-      const customDialog = document.createElement('custom-dialog');
-      document.body.appendChild(customDialog);
-      customDialog.title = ""
-      window.customDialog = customDialog;
-      customDialog.addEventListener('submit', evt => {
-        this.setPatterns(customDialog.content);
-        this.loadPatterns(customDialog.content)
-      });
-      const patterns = this.getPatterns();
-      if (patterns) {
-        customDialog.content = patterns;
-      }
-      //customDialog.style.display = 'none';
-    }
-    loadPatterns(patterns) {
-      this.patterns = patterns.split('\n')
-        .filter(x => x.trim())
-        .map(x => x.trim().split('|'))
-    }
-    getPatterns() {
-      let strings;
-      if (typeof NativeAndroid !== 'undefined') {
-        strings = NativeAndroid.getString("pattern")
-      } else {
-        strings = localStorage.getItem('pattern')
-      }
-      return strings;
-    }
-    setPatterns(patterns) {
-      if (typeof NativeAndroid !== 'undefined') {
-        NativeAndroid.setString("pattern", patterns)
-      } else {
-        localStorage.setItem('pattern', patterns)
-      }
-
-    }
-    formatCodeBlock() {
-      //       let p = getContinueBlock(textarea);
-      //       textarea.setRangeText(`\`\`\`rust
-      // ${textarea.value.substring(p[0], p[1])}
-      // \`\`\`
-      // `,
-      //         p[0], p[1], 'end')
-      textarea.setRangeText(`\`\`\`rust
-      `,
-        textarea.selectionStart, textarea.selectionEnd, 'end')
-      writeText("```")
-    }
-    cutBefore() {
-      const before = textarea.value.substring(0, textarea.selectionStart);
-      writeText(before);
-      textarea.value = textarea.value.substring(textarea.selectionStart);
-    }
-    async pasteEnd() {
-      textarea.value = textarea.value.trim() +
-        (await readText())
-    }
   }
 
   customElements.define('custom-actions', CustomActions);
