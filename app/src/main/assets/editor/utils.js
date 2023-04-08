@@ -33,6 +33,13 @@ function copyLine(editor, count) {
     writeText(str);
     editor.focus()
 }
+async function createFile() {
+    const path = decodeURIComponent(new URL(window.location).searchParams.get("path"));
+    const s = (await readText()).trim();
+    const dir = substringBeforeLast(path, "\\");
+    const extension = substringAfterLast(path, ".");
+    fetch(`/api/file?action=1&path=${encodeURIComponent(dir)}&dst=${encodeURIComponent(s.split(',').map(x => x.trim() + "." + extension).join(","))}`)
+}
 function findBlock(textarea) {
     let start = textarea.selectionStart;
     let end = textarea.selectionEnd;
@@ -276,6 +283,9 @@ function getLine(extended) {
 function getSelectedString(textarea) {
     return textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
 }
+function insertBound() {
+    textarea.setRangeText('```', textarea.selectionStart, textarea.selectionEnd, 'end');
+}
 async function insertLink() {
     const strings = await readText();
     let name = '';
@@ -321,6 +331,64 @@ function onCopy() {
 function onCopyLine() {
     copyLine(textarea);
 }
+async function onCustomBottomSheet(evt) {
+    customBottomSheet.style.display = 'none';
+    switch (evt.detail.id) {
+        case "1":
+            onCopy();
+            break;
+        case "3":
+            onTranslateChinese();
+            break;
+        case "4":
+            onTranslateEnglish();
+            break;
+        case "5":
+            evt.preventDefault();
+            const p = findCodeBlock(textarea);
+            textarea.setRangeText(await navigator.clipboard.readText(), p[0], p[1], "end");
+            break;
+        case "6":
+            onEval();
+            break;
+        case "7":
+            customDialog.style.display = 'block';
+            break;
+        case "9":
+            onCode();
+            break;
+        case "10":
+            onShowTranslator()
+            break
+        case "11":
+            evt.preventDefault();
+            const pv = findCodeBlockExtend(textarea);
+            writeText(textarea.value.substring(pv[0] + 3, pv[1] - 3));
+            textarea.setRangeText('', pv[0], pv[1] + 1, "end");
+            break
+        case "12":
+            createFile();
+            break
+        case "14":
+            replaceText()
+            break;
+        case "15":
+            insertBound();
+            break;
+    }
+}
+function onDeleteLine() {
+    const p = getLine(textarea);
+    let start = p[1];
+    let end = p[2];
+    const re = new RegExp("[\\s\t]");
+    while (start > -1 && re.test(textarea.value[start - 1]))
+        start--
+    while (end + 1 < textarea.value.length && re.test(textarea.value[end]))
+        end++;
+    textarea.setRangeText(`\n\n`,
+        start, end, 'end');
+}
 async function onEval() {
     const p = findBlock(textarea);
     const s = textarea.value.substring(p[0], p[1]);
@@ -351,6 +419,19 @@ async function onSnippet() {
         textarea.selectionEnd,
         'end'
     )
+}
+function onTranslateChinese() {
+    let array1 = getLine();
+    let strings = (typeof NativeAndroid !== 'undefined') ? NativeAndroid.translate(array1[0]) : (await translate(array1[0], 'zh'));
+    if (this.patterns) {
+        for (let index = 0; index < this.patterns.length; index++) {
+            const element = this.patterns[index];
+            strings = strings.replaceAll(new RegExp(
+                element[0], 'g'
+            ), element[1])
+        }
+    }
+    textarea.setRangeText(`\n\n${(strings)}`, array1[2], array1[2], 'end');
 }
 async function onTranslateFn() {
     let array1 = getLine();
@@ -404,6 +485,26 @@ ${obj.content.trim()}`
         }
     } else {
         textarea.value = obj;
+    }
+}
+function replaceText() {
+    const founded = textarea.value.indexOf("```") !== -1;
+    if (founded) {
+        const pv = findCodeBlockExtend(textarea);
+        let str = textarea.value.substring(pv[0] + 3, pv[1] - 3).trim();
+        const firstLine = substringBefore(str, "\n");
+        str = substringAfter(str, "\n");
+        const secondLine = substringBefore(str, "\n");
+        str = substringAfter(str, "\n").trim();
+        textarea.setRangeText(str.replaceAll(new RegExp(firstLine, 'g'), secondLine), pv[0], pv[1] + 1, "end");
+    } else {
+        let str = textarea.value;
+        const firstLine = substringBefore(str, "\n");
+        str = substringAfter(str, "\n");
+        const secondLine = substringBefore(str, "\n");
+        str = substringAfter(str, "\n").trim();
+        textarea.value = firstLine + "\n" + secondLine + "\n" + str.replaceAll(new RegExp(firstLine, 'g'), secondLine)
+            .replaceAll(new RegExp(upperCamel(firstLine), 'g'), upperCamel(secondLine));
     }
 }
 async function saveData() {

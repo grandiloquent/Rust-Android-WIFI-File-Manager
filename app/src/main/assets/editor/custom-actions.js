@@ -338,19 +338,7 @@ textarea {
     }
     
    
-    async onTranslateChinese() {
-      let array1 = getLine();
-      let strings = (typeof NativeAndroid !== 'undefined') ? NativeAndroid.translate(array1[0]) : (await translate(array1[0], 'zh'));
-      if (this.patterns) {
-        for (let index = 0; index < this.patterns.length; index++) {
-          const element = this.patterns[index];
-          strings = strings.replaceAll(new RegExp(
-            element[0], 'g'
-          ), element[1])
-        }
-      }
-      textarea.setRangeText(`\n\n${(strings)}`, array1[2], array1[2], 'end');
-    }
+ 
     async onTranslateEnglish() {
       let array1 = getLine();
       textarea.setRangeText(`\n\n${await translate(array1[0], 'en')}
@@ -497,18 +485,7 @@ ${strings}
       textarea.setRangeText(``,
         p[1], p[2], 'end')
     }
-    onDeleteLine() {
-      const p = getLine(textarea);
-      let start = p[1];
-      let end = p[2];
-      const re = new RegExp("[\\s\t]");
-      while (start > -1 && re.test(textarea.value[start - 1]))
-        start--
-      while (end + 1 < textarea.value.length && re.test(textarea.value[end]))
-        end++;
-      textarea.setRangeText(`\n\n`,
-        start, end, 'end');
-    }
+    
     onFormatCode() {
       let start = textarea.selectionStart;
       let end = textarea.selectionEnd;

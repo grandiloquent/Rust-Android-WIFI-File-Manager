@@ -1,95 +1,10 @@
 
 
-function onDeleteLine() {
-    actions.onDeleteLine();
-}
-
-function onTranslateChinese() {
-    actions.onTranslateChinese();
-}
 
 ///////////////////
 bind();
 
 
-async function onCustomBottomSheet(evt) {
-    customBottomSheet.style.display = 'none';
-    switch (evt.detail.id) {
-        case "1":
-            onCopy();
-            break;
-        case "3":
-            onTranslateChinese();
-            break;
-        case "4":
-            onTranslateEnglish();
-            break;
-        case "5":
-            evt.preventDefault();
-            const p = findCodeBlock(textarea);
-            textarea.setRangeText(await navigator.clipboard.readText(), p[0], p[1], "end");
-            break;
-        case "6":
-            onEval();
-            break;
-        case "7":
-            customDialog.style.display = 'block';
-            break;
-        case "9":
-            onCode();
-            break;
-        case "10":
-            onShowTranslator()
-            break
-        case "11":
-            evt.preventDefault();
-            const pv = findCodeBlockExtend(textarea);
-            writeText(textarea.value.substring(pv[0] + 3, pv[1] - 3));
-            textarea.setRangeText('', pv[0], pv[1] + 1, "end");
-            break
-        case "12":
-            createFile();
-            break
-        case "14":
-            replaceText()
-            break;
-        case "15":
-            insertBound();
-            break;
-    }
-}
-
-async function createFile() {
-    const path = decodeURIComponent(new URL(window.location).searchParams.get("path"));
-    const s = (await readText()).trim();
-    const dir = substringBeforeLast(path, "\\");
-    const extension = substringAfterLast(path, ".");
-    fetch(`/api/file?action=1&path=${encodeURIComponent(dir)}&dst=${encodeURIComponent(s.split(',').map(x => x.trim() + "." + extension).join(","))}`)
-}
-
-function replaceText() {
-    const founded = textarea.value.indexOf("```") !== -1;
-    if (founded) {
-        const pv = findCodeBlockExtend(textarea);
-        let str = textarea.value.substring(pv[0] + 3, pv[1] - 3).trim();
-        const firstLine = substringBefore(str, "\n");
-        str = substringAfter(str, "\n");
-        const secondLine = substringBefore(str, "\n");
-        str = substringAfter(str, "\n").trim();
-
-        textarea.setRangeText(str.replaceAll(new RegExp(firstLine, 'g'), secondLine), pv[0], pv[1] + 1, "end");
-    } else {
-        let str = textarea.value;
-        const firstLine = substringBefore(str, "\n");
-        str = substringAfter(str, "\n");
-        const secondLine = substringBefore(str, "\n");
-        str = substringAfter(str, "\n").trim();
-        textarea.value = firstLine + "\n" + secondLine + "\n" + str.replaceAll(new RegExp(firstLine, 'g'), secondLine)
-            .replaceAll(new RegExp(upperCamel(firstLine), 'g'), upperCamel(secondLine));
-
-    }
-
-}
 
 document.addEventListener('visibilitychange', () => {
     localStorage.setItem('contents', textarea.value);
@@ -174,7 +89,7 @@ document.addEventListener('keydown', async evt => {
             }
             case 'p': {
                 evt.preventDefault();
-                actions.onPreview();
+                preview();
                 break;
             }
             case 'r': {
