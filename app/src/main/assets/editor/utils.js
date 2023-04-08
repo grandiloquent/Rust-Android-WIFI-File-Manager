@@ -481,7 +481,7 @@ function onFormatBold() {
     let start = textarea.selectionStart;
     let end = textarea.selectionEnd;
     // \(\)\[\].!/\?%-
-    const re = new RegExp(this.regex);
+    const re = new RegExp(codeRegex);
     while (start > -1 && re.test(textarea.value[start - 1])) {
         start--;
     }
@@ -496,7 +496,7 @@ function onFormatCode() {
     let start = textarea.selectionStart;
     let end = textarea.selectionEnd;
     // \(\)\[\].!/\?%-
-    const re = new RegExp(this.regex);
+    const re = new RegExp(codeRegex);
     while (start > -1 && re.test(textarea.value[start - 1])) {
         start--;
     }
@@ -507,7 +507,7 @@ function onFormatCode() {
     textarea.setRangeText(` \`${value.trim()}\` `, start, end, 'end');
     writeText('`')
 }
-function onFormatCodeBlock() {
+function indentCodeBlock() {
     const indexs = findCodeBlock(textarea);
     if (textarea.selectionStart !== textarea.selectionEnd) {
         const selected = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
@@ -516,6 +516,13 @@ function onFormatCodeBlock() {
                 if (x.startsWith(selected)) {
                     x = x.substring(selected.length);
                 }
+                return x;
+            }).join('\n');
+        textarea.setRangeText(s, indexs[0], indexs[1], 'end');
+    } else {
+        let s = textarea.value.substring(indexs[0], indexs[1])
+            .split('\n').map(x => {
+                x = `    ` + x;
                 return x;
             }).join('\n');
         textarea.setRangeText(s, indexs[0], indexs[1], 'end');

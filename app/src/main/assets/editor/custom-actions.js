@@ -277,8 +277,8 @@ textarea {
             <div bind @click="onDeleteString" class="menu-item">
               删除
             </div>
-            <div bind @click="onFormatCodeBlock" class="menu-item">
-              格式化代码
+            <div bind @click="indentCodeBlock" class="menu-item">
+              缩进代码块
             </div>
             <div bind @click="onCopyLine" class="menu-item">
               复制行
@@ -325,15 +325,14 @@ textarea {
             if (this[attr.value])
               this[attr.value](evt);
             else {
-              [attr.value](evt)
+              window[attr.value](evt)
             }
           });
         });
       });
-      const patterns = this.getPatterns();
+      const patterns = getPatterns();
       if (patterns)
-        this.loadPatterns(patterns);
-      this.regex = "[a-zA-Z0-9_<>;:.+%'#*=()!?|^&\\[\\]{}\" -]";
+        loadPatterns(patterns);
     }
     
    

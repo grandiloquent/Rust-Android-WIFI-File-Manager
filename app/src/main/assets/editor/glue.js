@@ -1,3 +1,5 @@
+const codeRegex = "[a-zA-Z0-9_<>;:.+%'#*=()!?|^&\\[\\]{}\" -]";
+
 ///////////////////
 bind();
 
@@ -37,7 +39,7 @@ document.addEventListener('keydown', async evt => {
             }
             case 'd': {
                 evt.preventDefault();
-                actions.onInsertComment();
+                onInsertComment();
                 break;
             }
             case 'e': {
@@ -57,22 +59,22 @@ document.addEventListener('keydown', async evt => {
             }
             case 'h': {
                 evt.preventDefault();
-               actions.onFormatHead()
+                onFormatHead()
                 break;
             }
             case 'j': {
                 evt.preventDefault();
-                actions.openLink();
+                openLink();
                 break;
             }
             case 'k': {
                 evt.preventDefault();
-                actions.insertLink();
+                insertLink();
                 break;
             }
             case 'l': {
                 evt.preventDefault();
-                actions.pasteCode()
+                pasteCode()
                 break;
             }
             case 'o': {
@@ -87,7 +89,7 @@ document.addEventListener('keydown', async evt => {
             }
             case 'r': {
                 evt.preventDefault();
-                actions.onFormatCodeBlock();
+                formatCodeBlock();
                 break;
             }
             case 's': {
