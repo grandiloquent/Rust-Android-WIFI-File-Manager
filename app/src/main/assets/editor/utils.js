@@ -738,7 +738,7 @@ async function render() {
     const obj = await loadData();
     if (isObject(obj)) {
         try {
-            const obj = await loadData(id)
+            const obj = await loadData()
             document.title = obj.title;
             textarea.value = `# ${obj.title}|${JSON.stringify(obj.tags)}
 ${obj.content.trim()}`
