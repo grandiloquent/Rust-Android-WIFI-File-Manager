@@ -120,10 +120,9 @@ document.addEventListener('keydown', async evt => {
                 textarea.setRangeText(';~', data[1], data[1], 'end');
         } else {
             const string = getSelectedString(textarea);
-            console.log(string);
             textarea.setRangeText(string.split('\n')
                 // .filter(x => x.trim())
-                .map(x => '\t' + x.trim()).join('\n'), textarea.selectionStart, textarea.selectionEnd, 'end');
+                .map(x => '    ' + x.trim()).join('\n'), textarea.selectionStart, textarea.selectionEnd, 'end');
         }
     } else if (evt.key === 'F3') {
         evt.preventDefault();

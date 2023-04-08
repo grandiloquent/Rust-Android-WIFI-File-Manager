@@ -420,7 +420,7 @@ async function onSnippet() {
         'end'
     )
 }
-function onTranslateChinese() {
+async function onTranslateChinese() {
     let array1 = getLine();
     let strings = (typeof NativeAndroid !== 'undefined') ? NativeAndroid.translate(array1[0]) : (await translate(array1[0], 'zh'));
     if (this.patterns) {
@@ -537,8 +537,6 @@ async function submitServer() {
         content: substringAfter(textarea.value.trim(), "\n"),
         title: firstLine.replace(/^#+ +/, ''),
     };
-    const searchParams = new URL(window.location.href).searchParams;
-    const id = searchParams.get('id');
     let baseUri = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? '' : '';
     if (id) {
         obj.id = parseInt(id);
