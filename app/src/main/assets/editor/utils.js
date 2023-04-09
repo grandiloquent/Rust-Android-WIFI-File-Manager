@@ -655,7 +655,7 @@ async function onTranslateChinese() {
             ), element[1])
         }
     }
-    textarea.setRangeText(`\n\n${(strings)}`, array1[1], array1[2], 'end');
+    textarea.setRangeText(`${(strings)}`, array1[1], array1[2], 'end');
 }
 async function onTranslateEnglish() {
     let array1 = getLine();
@@ -750,16 +750,16 @@ ${obj.content.trim()}`
     }
 }
 function replaceText() {
-    const founded = textarea.value.indexOf("```") !== -1;
-    if (founded) {
-        const pv = findCodeBlockExtend(textarea);
-        let str = textarea.value.substring(pv[0] + 3, pv[1] - 3).trim();
-        const firstLine = substringBefore(str, "\n");
-        str = substringAfter(str, "\n");
-        const secondLine = substringBefore(str, "\n");
-        str = substringAfter(str, "\n").trim();
-        textarea.setRangeText(str.replaceAll(new RegExp(firstLine, 'g'), secondLine), pv[0], pv[1] + 1, "end");
-    } else {
+    // const founded = textarea.value.indexOf("```") !== -1;
+    // if (founded) {
+    //     const pv = findCodeBlockExtend(textarea);
+    //     let str = textarea.value.substring(pv[0] + 3, pv[1] - 3).trim();
+    //     const firstLine = substringBefore(str, "\n");
+    //     str = substringAfter(str, "\n");
+    //     const secondLine = substringBefore(str, "\n");
+    //     str = substringAfter(str, "\n").trim();
+    //     textarea.setRangeText(str.replaceAll(new RegExp(firstLine, 'g'), secondLine), pv[0], pv[1] + 1, "end");
+    // } else {
         let str = textarea.value;
         const firstLine = substringBefore(str, "\n");
         str = substringAfter(str, "\n");
@@ -767,7 +767,7 @@ function replaceText() {
         str = substringAfter(str, "\n").trim();
         textarea.value = firstLine + "\n" + secondLine + "\n" + str.replaceAll(new RegExp(firstLine, 'g'), secondLine)
             .replaceAll(new RegExp(upperCamel(firstLine), 'g'), upperCamel(secondLine));
-    }
+    //}
 }
 async function saveData() {
     const searchParams = new URL(window.location).searchParams;

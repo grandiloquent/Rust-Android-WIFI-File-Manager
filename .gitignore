@@ -16,3 +16,4 @@ local.properties
 libs
 jniLibs
 Secret.java
+target

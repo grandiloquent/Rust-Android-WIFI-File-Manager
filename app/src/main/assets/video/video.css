@@ -615,3 +615,8 @@ button.playback-play__stop::before {
     width: 24px;
     height: 24px;
 }
+
+video::cue {
+    font-size: 12px !important;
+    line-height: 1.25 !important;
+}

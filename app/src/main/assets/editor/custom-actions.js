@@ -308,7 +308,7 @@ textarea {
               粘贴后
             </div>   
             <div bind @click="replaceText" class="menu-item">
-              粘贴后
+              替换
             </div> 
             <div bind @click="close" class="menu-item">
               取消
