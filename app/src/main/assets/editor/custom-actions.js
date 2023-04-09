@@ -306,7 +306,10 @@ textarea {
             </div>  
             <div bind @click="pasteEnd" class="menu-item">
               粘贴后
-            </div>         
+            </div>   
+            <div bind @click="replaceText" class="menu-item">
+              粘贴后
+            </div> 
             <div bind @click="close" class="menu-item">
               取消
             </div>

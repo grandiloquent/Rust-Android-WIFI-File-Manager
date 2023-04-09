@@ -655,7 +655,7 @@ async function onTranslateChinese() {
             ), element[1])
         }
     }
-    textarea.setRangeText(`\n\n${(strings)}`, array1[2], array1[2], 'end');
+    textarea.setRangeText(`\n\n${(strings)}`, array1[1], array1[2], 'end');
 }
 async function onTranslateEnglish() {
     let array1 = getLine();
