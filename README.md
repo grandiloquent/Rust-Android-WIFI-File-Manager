@@ -52,3 +52,4 @@ rustup override set nightly
 - [Rust Rocket Web 框架上传文件](https://kpkpkp.cn/article?id=11)
 - [Rust 连接 PostgreSQL 数据库](https://kpkpkp.cn/article?id=9)
 - [Rust 并发基础](https://kpkpkp.cn/article?id=17)
+- https://rustwasm.github.io/wasm-bindgen/examples/fetch.html
