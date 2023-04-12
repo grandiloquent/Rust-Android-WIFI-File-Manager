@@ -27,11 +27,11 @@ async fn get_article_update(obj: Value, conn: &Object) -> Result<i32, postgres::
         .await?
         .try_get(0)
 }
-#[get("/api/articles?<id>")]
-pub async fn api_articles(id: Option<String>, pool: &State<Pool>) -> Result<String, Status> {
+#[get("/api/articles?<article>")]
+pub async fn api_articles(article: Option<String>, pool: &State<Pool>) -> Result<String, Status> {
     match pool.get().await {
         Ok(conn) => {
-            match get_articles(id.unwrap_or(String::default()).as_str(), &conn).await {
+            match get_articles(article.unwrap_or(String::default()).as_str(), &conn).await {
                 Ok(v) => {
                     return match String::from_utf8(v.0) {
                         Ok(v) => Ok(v),
@@ -50,11 +50,11 @@ pub async fn api_articles(id: Option<String>, pool: &State<Pool>) -> Result<Stri
         }
     }
 }
-#[get("/api/article?<id>")]
-pub async fn api_article(id: i32, pool: &State<Pool>) -> Result<String, Status> {
+#[get("/api/article?<article>")]
+pub async fn api_article(article: i32, pool: &State<Pool>) -> Result<String, Status> {
     match pool.get().await {
         Ok(conn) => {
-            match get_article(id, &conn).await {
+            match get_article(article, &conn).await {
                 Ok(v) => {
                     return match String::from_utf8(v.0) {
                         Ok(v) => Ok(v),
