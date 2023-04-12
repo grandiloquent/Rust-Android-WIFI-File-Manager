@@ -3,7 +3,7 @@ use std::fs;
 use std::io::Read;
 use std::ptr::NonNull;
 use jni::JNIEnv;
-use jni::objects::{ JObject, JString, JValue};
+use jni::objects::{JObject, JString, JValue};
 use ndk::asset::AssetManager;
 use rocket::serde::Deserialize;
 use rocket::serde::Serialize;
@@ -24,13 +24,13 @@ pub fn get_asset_manager(env: JNIEnv, asset_manager_object: JObject) -> AssetMan
 }
 
 
-pub fn read_resource_file(ass: &AssetManager, n: &str) -> Result<String, Box<dyn std::error::Error>> {
+pub fn read_resource_file(ass: &AssetManager, n: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
     let filename = &CString::new(n)?;
     match ass.open(filename) {
         Some(mut a) => {
-            let mut text = std::string::String::new();
-            a.read_to_string(&mut text)?;
-            Ok(text)
+            let mut bytes = vec![0; a.get_length()];
+            a.read_exact(&mut bytes)?;
+            Ok(bytes)
         }
         None => {
             Err("Error reading")?

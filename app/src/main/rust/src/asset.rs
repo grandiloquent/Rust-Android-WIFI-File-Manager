@@ -5,7 +5,7 @@ use crate::util::read_resource_file;
 
 pub struct Cache {
     ass: AssetManager,
-    data: Arc<RwLock<HashMap<String, String>>>,
+    data: Arc<RwLock<HashMap<String, Vec<u8>>>>,
 }
 
 impl Cache {
@@ -15,7 +15,8 @@ impl Cache {
             data: Arc::new(RwLock::new(HashMap::new())),
         }
     }
-    pub fn get(&self, key: &str) -> Option<String> {
+    pub fn get(&self, key: &str) -> Option<Vec<u8>> {
+        log::error!("{}",key);
         match self.data.write() {
             Ok(mut v) => {
                 match v.get(key) {
@@ -25,15 +26,18 @@ impl Cache {
                                 v.insert(key.to_string(), value.clone());
                                 Some(value)
                             }
-                            Err(_) => None
+                            Err(err) => {
+                                log::error!("{}",err.to_string());
+                                None
+                            }
                         }
                     }
                     Some(v) => {
-                        Some(v.to_string())
+                        Some((*v).clone())
                     }
                 }
             }
-            Err(_) => {
+            Err(err) => {
                 None
             }
         }

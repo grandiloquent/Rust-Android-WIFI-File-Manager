@@ -47,9 +47,9 @@ public class MainActivity extends Activity {
         Utils.loadStartPage(false);
         //Secret.populateSettings(this);
         Utils.launchServer();
-        String dir = mSharedPreferences.getString("video_directory", null);
-        if (dir != null)
-            Utils.generateVideoThumbnails(new File(dir)).start();
+//        String dir = mSharedPreferences.getString("video_directory", null);
+//        if (dir != null)
+//            Utils.generateVideoThumbnails(new File(dir)).start();
     }
 
     private void refresh() {

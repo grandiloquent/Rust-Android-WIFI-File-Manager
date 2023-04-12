@@ -5,7 +5,7 @@ use rocket::response::Responder;
 
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct Asset {
-    pub data: String,
+    pub data: Vec<u8>,
     pub content_type: &'static str,
 }
 
