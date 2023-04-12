@@ -80,7 +80,7 @@ public class WebAppInterface {
     @JavascriptInterface
     public void notes() {
         mContext.runOnUiThread(() -> {
-            mContext.getWebView().loadUrl(String.format("http://%s:3000/notes", Shared.getDeviceIP(mContext)));
+            mContext.getWebView().loadUrl(String.format("http://%s:3000/notes/notes?article=", Shared.getDeviceIP(mContext)));
         });
     }
 
