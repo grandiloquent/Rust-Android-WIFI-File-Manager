@@ -17,12 +17,15 @@ import android.webkit.WebView;
 import java.io.File;
 
 import psycho.euphoria.killer.tasks.DownloaderService;
+import psycho.euphoria.killer.video.Utils;
 
 import static psycho.euphoria.killer.utils.AroundFileUriExposedException.aroundFileUriExposedException;
 import static psycho.euphoria.killer.utils.InitializeWebView.initializeWebView;
+import static psycho.euphoria.killer.utils.LaunchServer.launchServer;
 import static psycho.euphoria.killer.utils.LoadStartPage.loadStartPage;
 import static psycho.euphoria.killer.utils.RequestPermission.requestPermission;
 import static psycho.euphoria.killer.utils.RequestStorageManagerPermission.requestStorageManagerPermission;
+import static psycho.euphoria.killer.utils.SaveRenderedWebPage.saveRenderedWebPage;
 
 public class MainActivity extends Activity {
 
@@ -65,7 +68,7 @@ public class MainActivity extends Activity {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mWebView = initializeWebView(this);
         //Secret.populateSettings(this);
-        Utils.launchServer();
+        launchServer(this);
 //        String dir = mSharedPreferences.getString("video_directory", null);
 //        if (dir != null)
 //            Utils.generateVideoThumbnails(new File(dir)).start();
@@ -85,7 +88,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Utils.setContext(this);
         if (!requestPermission(this))
             initialize();
     }
@@ -131,7 +133,7 @@ public class MainActivity extends Activity {
                 refresh();
                 break;
             case 3:
-                Utils.saveRenderedWebPage();
+                saveRenderedWebPage(this);
                 break;
             case 5:
                 restartService();
