@@ -23,8 +23,10 @@ import static psycho.euphoria.killer.utils.AroundFileUriExposedException.aroundF
 import static psycho.euphoria.killer.utils.InitializeWebView.initializeWebView;
 import static psycho.euphoria.killer.utils.LaunchServer.launchServer;
 import static psycho.euphoria.killer.utils.LoadStartPage.loadStartPage;
+import static psycho.euphoria.killer.utils.Refresh.refresh;
 import static psycho.euphoria.killer.utils.RequestPermission.requestPermission;
 import static psycho.euphoria.killer.utils.RequestStorageManagerPermission.requestStorageManagerPermission;
+import static psycho.euphoria.killer.utils.RestartService.restartService;
 import static psycho.euphoria.killer.utils.SaveRenderedWebPage.saveRenderedWebPage;
 
 public class MainActivity extends Activity {
@@ -74,17 +76,6 @@ public class MainActivity extends Activity {
 //            Utils.generateVideoThumbnails(new File(dir)).start();
     }
 
-    private void refresh() {
-        mWebView.clearCache(false);
-        mWebView.reload();
-    }
-
-    private void restartService() {
-        Intent service = new Intent(this, DownloaderService.class);
-        service.setAction("stop");
-        startService(service);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,13 +121,13 @@ public class MainActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case 1:
-                refresh();
+                refresh(this);
                 break;
             case 3:
                 saveRenderedWebPage(this);
                 break;
             case 5:
-                restartService();
+                restartService(this);
                 break;
             case 6:
                 loadStartPage(this, true);
