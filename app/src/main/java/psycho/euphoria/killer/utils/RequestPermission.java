@@ -1,7 +1,5 @@
 package psycho.euphoria.killer.utils;
 
-import android.content.Context;
-
 import java.util.List;
 
 import psycho.euphoria.killer.MainActivity;

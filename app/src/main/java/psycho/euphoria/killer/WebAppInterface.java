@@ -28,6 +28,7 @@ import java.net.URL;
 import java.util.zip.GZIPInputStream;
 
 import psycho.euphoria.killer.video.PlayerActivity;
+import psycho.euphoria.killer.video.Utils;
 import psycho.euphoria.killer.video.VideoListActivity;
 
 public class WebAppInterface {

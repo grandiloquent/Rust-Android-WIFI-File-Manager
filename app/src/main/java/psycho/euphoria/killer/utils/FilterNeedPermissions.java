@@ -1,7 +1,6 @@
 package psycho.euphoria.killer.utils;
 
 import android.Manifest.permission;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;

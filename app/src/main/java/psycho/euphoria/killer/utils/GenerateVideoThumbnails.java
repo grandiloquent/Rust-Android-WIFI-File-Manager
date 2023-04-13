@@ -1,13 +1,11 @@
 package psycho.euphoria.killer.utils;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 
 import java.io.File;
 import java.io.FileOutputStream;
 
-import psycho.euphoria.killer.MainActivity;
 import psycho.euphoria.killer.Shared;
 
 public class GenerateVideoThumbnails {

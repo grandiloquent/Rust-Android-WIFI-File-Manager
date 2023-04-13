@@ -12,6 +12,7 @@ import java.io.File;
 
 import psycho.euphoria.killer.service.Actions;
 import psycho.euphoria.killer.service.Calculations;
+import psycho.euphoria.killer.video.Utils;
 
 import static psycho.euphoria.killer.service.Data.ACTION_DISMISS;
 

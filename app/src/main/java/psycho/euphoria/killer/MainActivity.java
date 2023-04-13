@@ -9,15 +9,9 @@ import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
-
-import java.io.File;
-
-import psycho.euphoria.killer.tasks.DownloaderService;
-import psycho.euphoria.killer.video.Utils;
 
 import static psycho.euphoria.killer.utils.AroundFileUriExposedException.aroundFileUriExposedException;
 import static psycho.euphoria.killer.utils.InitializeWebView.initializeWebView;
