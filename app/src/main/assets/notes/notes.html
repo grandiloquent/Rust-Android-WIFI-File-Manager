@@ -355,6 +355,22 @@
             标题
         </div>
     </div>
+    <div id="format-cut-before" class="bar-item-renderer">
+        <svg viewBox="0 0 24 24">
+            <path d="M18.984 3h3v0.984l-6.984 7.031-2.016-2.016zM12 12.516q0.516 0 0.516-0.516t-0.516-0.516-0.516 0.516 0.516 0.516zM6 20.016q0.797 0 1.406-0.586t0.609-1.43-0.609-1.43-1.406-0.586-1.406 0.586-0.609 1.43 0.609 1.43 1.406 0.586zM6 8.016q0.797 0 1.406-0.586t0.609-1.43-0.609-1.43-1.406-0.586-1.406 0.586-0.609 1.43 0.609 1.43 1.406 0.586zM9.656 7.641l12.328 12.375v0.984h-3l-6.984-6.984-2.344 2.344q0.328 0.703 0.328 1.641 0 1.641-1.172 2.813t-2.813 1.172-2.813-1.172-1.172-2.813 1.172-2.813 2.813-1.172q0.938 0 1.641 0.328l2.344-2.344-2.344-2.344q-0.703 0.328-1.641 0.328-1.641 0-2.813-1.172t-1.172-2.813 1.172-2.813 2.813-1.172 2.813 1.172 1.172 2.813q0 0.938-0.328 1.641z"></path>
+        </svg>
+        <div class="bar-item-title">
+            剪切前
+        </div>
+    </div>
+    <div id="format-paste-end" class="bar-item-renderer">
+        <svg viewBox="0 0 24 24">
+            <path d="M18.984 20.016v-16.031h-1.969v3h-10.031v-3h-1.969v16.031h13.969zM12 2.016q-0.422 0-0.703 0.281t-0.281 0.703 0.281 0.703 0.703 0.281 0.703-0.281 0.281-0.703-0.281-0.703-0.703-0.281zM18.984 2.016q0.797 0 1.406 0.586t0.609 1.383v16.031q0 0.797-0.609 1.383t-1.406 0.586h-13.969q-0.797 0-1.406-0.586t-0.609-1.383v-16.031q0-0.797 0.609-1.383t1.406-0.586h4.172q0.328-0.891 1.078-1.453t1.734-0.563 1.734 0.563 1.078 1.453h4.172z"></path>
+        </svg>
+        <div class="bar-item-title">
+            粘贴后
+        </div>
+    </div>
     <div id="format-upload" class="bar-item-renderer">
         <svg viewBox="0 0 24 24">
             <path d="M8.484 13.5l-3.469 4.5h13.969l-4.5-6-3.469 4.5zM21 18.984q0 0.797-0.609 1.406t-1.406 0.609h-13.969q-0.797 0-1.406-0.609t-0.609-1.406v-13.969q0-0.797 0.609-1.406t1.406-0.609h13.969q0.797 0 1.406 0.609t0.609 1.406v13.969z"></path>
@@ -610,6 +626,17 @@
 
 </script>
 <script>
+    function cutBefore() {
+        const before = textarea.value.substring(0, textarea.selectionStart);
+        writeText(before);
+        textarea.value = textarea.value.substring(textarea.selectionStart);
+    }
+
+    async function pasteEnd() {
+        textarea.value = textarea.value.trim() +
+            (await readText())
+    }
+
     function tryUploadImageFromClipboard(success, error) {
         navigator.permissions.query({
             name: "clipboard-read"
@@ -779,6 +806,32 @@
                 return;
             }
             ev.preventDefault();
+            textarea.setRangeText(value, start, end, "end");
+        } else if (ev.key === "F8") {
+            let value = await readText();
+            let start = textarea.selectionStart;
+            let end = textarea.selectionEnd;
+            let cut = null;
+            value = value.split('\n').filter((x, index) => {
+                if (index === 0 && !x.trim()) return false;
+                if (cut === null) {
+                    cut = ' '.repeat((/^ +/.exec(x) && /^ +/.exec(x).value || '').length);
+                }
+                return true;
+            })
+                .map((x, i) => {
+                    if (x.startsWith(cut)) {
+                        x = x.slice(cut.length);
+                    }
+                    return "    " + x;
+                }).join('\n');
+            value = `
+1.
+
+    \`\`\`rs
+${value}
+    \`\`\`
+`
             textarea.setRangeText(value, start, end, "end");
         }
     });
@@ -1105,6 +1158,12 @@ left: 20px;">
 
     document.getElementById('show-patterns').addEventListener('click', evt => {
         onShowDialog()
+    })
+    document.getElementById('format-cut-before').addEventListener('click', evt => {
+        cutBefore();
+    })
+    document.getElementById('format-paste-end').addEventListener('click', evt => {
+        pasteEnd();
     })
 </script>
 <script>

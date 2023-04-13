@@ -5,7 +5,6 @@ use crate::asset::Cache;
 use crate::mimetypes::extension_to_mime;
 use crate::res::Asset;
 use crate::strings::StringExt;
-
 #[get("/<b..>")]
 pub fn file<'a>(b: PathBuf, cache: &State<Arc<Cache>>) -> Asset {
     match cache.get(b.to_str().unwrap_or("")) {

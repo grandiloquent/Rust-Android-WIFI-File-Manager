@@ -17,3 +17,4 @@ pub mod subtitle;
 pub mod markdown;
 pub mod title;
 pub mod db;
+pub mod translate;
