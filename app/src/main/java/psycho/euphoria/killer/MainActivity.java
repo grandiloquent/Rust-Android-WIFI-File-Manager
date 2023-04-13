@@ -19,6 +19,7 @@ import java.io.File;
 import psycho.euphoria.killer.tasks.DownloaderService;
 
 import static psycho.euphoria.killer.utils.AroundFileUriExposedException.aroundFileUriExposedException;
+import static psycho.euphoria.killer.utils.InitializeWebView.initializeWebView;
 import static psycho.euphoria.killer.utils.LoadStartPage.loadStartPage;
 import static psycho.euphoria.killer.utils.RequestPermission.requestPermission;
 import static psycho.euphoria.killer.utils.RequestStorageManagerPermission.requestStorageManagerPermission;
@@ -62,7 +63,7 @@ public class MainActivity extends Activity {
         aroundFileUriExposedException();
         requestStorageManagerPermission(this);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        mWebView = Utils.initializeWebView();
+        mWebView = initializeWebView(this);
         //Secret.populateSettings(this);
         Utils.launchServer();
 //        String dir = mSharedPreferences.getString("video_directory", null);

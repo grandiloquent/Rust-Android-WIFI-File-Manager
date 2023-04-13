@@ -27,7 +27,6 @@ public class Utils {
 
     public static final int DEFAULT_PORT = 3000;
     public static final String KEY_PORT = "port";
-    public static final String USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
     private static MainActivity sContext;
 
 
@@ -36,15 +35,7 @@ public class Utils {
 
 
 
-    public static WebView initializeWebView() {
-        WebView webView = new WebView(sContext);
-        setWebView(webView);
-        webView.addJavascriptInterface(new WebAppInterface(sContext), "NativeAndroid");
-        webView.setWebViewClient(new CustomWebViewClient(sContext));
-        webView.setWebChromeClient(new CustomWebChromeClient(sContext));
-        sContext.setContentView(webView);
-        return webView;
-    }
+
 
     public static void launchServer() {
         Intent intent = new Intent(sContext, ServerService.class);
@@ -66,12 +57,5 @@ public class Utils {
         sContext = context;
     }
 
-    public static void setWebView(WebView webView) {
-        WebSettings settings = webView.getSettings();
-        settings.setJavaScriptEnabled(true);
-        settings.setDomStorageEnabled(true);
-        settings.setAppCacheEnabled(true);
-        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-        settings.setUserAgentString(USER_AGENT);
-    }
+
 }
