@@ -31,6 +31,10 @@ import psycho.euphoria.killer.video.PlayerActivity;
 import psycho.euphoria.killer.video.Utils;
 import psycho.euphoria.killer.video.VideoListActivity;
 
+import static psycho.euphoria.killer.ServerService.DEFAULT_PORT;
+import static psycho.euphoria.killer.ServerService.KEY_PORT;
+import static psycho.euphoria.killer.utils.LaunchServer.launchServer;
+
 public class WebAppInterface {
 
     private MainActivity mContext;
@@ -84,6 +88,7 @@ public class WebAppInterface {
             mContext.getWebView().loadUrl(String.format("http://%s:3000/notes/notes?article=", Shared.getDeviceIP(mContext)));
         });
     }
+
     @JavascriptInterface
     public void documents() {
         mContext.runOnUiThread(() -> {
@@ -128,7 +133,7 @@ public class WebAppInterface {
         mContext.runOnUiThread(() -> {
             mContext.getWebView().loadUrl("http://" + Shared.getDeviceIP(mContext) + ":" +
                     mSharedPreferences.getInt(
-                            Utils.KEY_PORT, Utils.DEFAULT_PORT
+                            KEY_PORT, DEFAULT_PORT
                     ));
         });
     }
@@ -148,7 +153,7 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public void startServer() {
-        Utils.launchServer();
+        launchServer(mContext);
     }
 
     @JavascriptInterface

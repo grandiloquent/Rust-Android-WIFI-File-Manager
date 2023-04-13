@@ -10,11 +10,11 @@ import android.preference.PreferenceManager;
 
 import java.io.File;
 
-import psycho.euphoria.killer.service.Actions;
-import psycho.euphoria.killer.service.Calculations;
-import psycho.euphoria.killer.video.Utils;
 
-import static psycho.euphoria.killer.service.Data.ACTION_DISMISS;
+import static psycho.euphoria.killer.utils.CreateNotification.createNotification;
+import static psycho.euphoria.killer.utils.CreateNotificationChannel.createNotificationChannel;
+import static psycho.euphoria.killer.utils.GetPendingIntentDismiss.ACTION_DISMISS;
+import static psycho.euphoria.killer.utils.GetUsablePort.getUsablePort;
 
 public class ServerService extends Service {
 
@@ -30,11 +30,13 @@ public class ServerService extends Service {
         mSharedPreferences.edit().putString(key, value).apply();
     }
 
+    public static final int DEFAULT_PORT = 3000;
+    public static final String KEY_PORT = "port";
 
     private void startServer() {
         new Thread(() -> {
-            int port = Calculations.getUsablePort(Utils.DEFAULT_PORT);
-            mSharedPreferences.edit().putInt(Utils.KEY_PORT, port).apply();
+            int port = getUsablePort(DEFAULT_PORT);
+            mSharedPreferences.edit().putInt(KEY_PORT, port).apply();
             MainActivity.startServer(ServerService.this, ServerService.this.getAssets(), Shared.getDeviceIP(ServerService.this), port);
         }).start();
     }
@@ -48,12 +50,11 @@ public class ServerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Actions.setServerService(this);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mLogFileName = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
                 "service.txt").getAbsolutePath();
         Shared.log(mLogFileName, "onCreate");
-        Actions.createNotificationChannel();
+        createNotificationChannel(this);
     }
 
     @Override
@@ -75,7 +76,7 @@ public class ServerService extends Service {
             }
         }
         // https://developer.android.com/guide/components/foreground-services
-        Actions.createNotification();
+        createNotification(this);
         startServer();
         sendBroadcast(new Intent(getPackageName() + ".server_started"));
         return START_STICKY;
