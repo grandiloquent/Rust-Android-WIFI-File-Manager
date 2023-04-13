@@ -6,6 +6,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import psycho.euphoria.killer.utils.ShouldOverrideUrlLoading;
+
 
 public class CustomWebViewClient extends WebViewClient {
 
@@ -30,16 +32,6 @@ public class CustomWebViewClient extends WebViewClient {
     @Override
     @SuppressWarnings("deprecation")
     public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-        if ( !url.contains("ping.gif?")&&(url.contains(".m3u8") || url.contains(".m3u8?")
-        || url.contains("cdn.me") )) {
-            Shared.setText(mContext, url);
-            mContext.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(mContext, "解析到视频地址", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
         return super.shouldInterceptRequest(view, url);
 
     }
@@ -47,10 +39,7 @@ public class CustomWebViewClient extends WebViewClient {
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-        String url = request.getUrl().toString();
-        if ((url.startsWith("https://") || url.startsWith("http://")|| url.startsWith("file://") )) {
-            view.loadUrl(url);
-        }
+        ShouldOverrideUrlLoading.shouldOverrideUrlLoading(view, request);
         return true;
     }
 }
