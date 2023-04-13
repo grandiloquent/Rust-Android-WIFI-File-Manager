@@ -83,6 +83,12 @@ public class WebAppInterface {
             mContext.getWebView().loadUrl(String.format("http://%s:3000/notes/notes?article=", Shared.getDeviceIP(mContext)));
         });
     }
+    @JavascriptInterface
+    public void documents() {
+        mContext.runOnUiThread(() -> {
+            mContext.getWebView().loadUrl(String.format("http://%s:3000/notes/notes", Shared.getDeviceIP(mContext)));
+        });
+    }
 
     @JavascriptInterface
     public void openPage() {

@@ -24,6 +24,10 @@ function searchVideo() {
 function notes() {
     NativeAndroid.notes();
 }
+function documents() {
+    NativeAndroid.documents();
+}
+
 function setFavorite() {
     const dialog = document.createElement('custom-dialog');
     const div = document.createElement('div');

@@ -1050,7 +1050,7 @@ left: 20px;">
                     const res = await fetch(`/api/note?id=${id}`)
                     div.remove();
                     window.history.pushState({}, '', `?id=${id}`);
-                    textarea.value = `${element.querySelector('.dialog-item-title').textContent.trim()}\n\n${await res.text()}`;
+                    textarea.value = `${await res.text()}`;
                 })
             })
 
