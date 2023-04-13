@@ -4,9 +4,9 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 
-import psycho.euphoria.killer.MainActivity;
 
-import static psycho.euphoria.killer.service.Data.KP_NOTIFICATION_CHANNEL_ID;
+import static psycho.euphoria.killer.utils.CreateNotification.KP_NOTIFICATION_CHANNEL_ID;
+
 
 public class CreateNotificationChannel {
     public static void createNotificationChannel(Context context) {
