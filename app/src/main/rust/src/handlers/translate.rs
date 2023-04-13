@@ -1,5 +1,7 @@
 use reqwest::header::{HeaderMap, HeaderValue};
 use rocket::http::Status;
+use urlencoding::encode;
+
 #[get("/api/trans?<q>&<to>")]
 pub async fn trans(q: String, to: String) -> Result<String, Status> {
     let mut headers = HeaderMap::new();
@@ -23,7 +25,7 @@ pub async fn trans(q: String, to: String) -> Result<String, Status> {
         }
     };
     let r = match c
-        .get(format!("http://translate.google.com/translate_a/single?client=gtx&sl=auto&tl={}&dt=t&dt=bd&ie=UTF-8&oe=UTF-8&dj=1&source=icon&q={}", to, q))
+        .get(format!("http://translate.google.com/translate_a/single?client=gtx&sl=auto&tl={}&dt=t&dt=bd&ie=UTF-8&oe=UTF-8&dj=1&source=icon&q={}", to, encode(q.as_str())))
         .send()
         .await {
         Ok(v) => v,
