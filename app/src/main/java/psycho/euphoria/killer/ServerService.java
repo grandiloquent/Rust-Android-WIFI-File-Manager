@@ -34,7 +34,6 @@ public class ServerService extends Service {
         new Thread(() -> {
             int port = Calculations.getUsablePort(Utils.DEFAULT_PORT);
             mSharedPreferences.edit().putInt(Utils.KEY_PORT, port).apply();
-
             MainActivity.startServer(ServerService.this, ServerService.this.getAssets(), Shared.getDeviceIP(ServerService.this), port);
         }).start();
     }
@@ -77,6 +76,7 @@ public class ServerService extends Service {
         // https://developer.android.com/guide/components/foreground-services
         Actions.createNotification();
         startServer();
+        sendBroadcast(new Intent(getPackageName() + ".server_started"));
         return START_STICKY;
     }
 

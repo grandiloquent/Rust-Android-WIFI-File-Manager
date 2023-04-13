@@ -1,11 +1,15 @@
 package psycho.euphoria.killer;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
@@ -13,6 +17,11 @@ import android.webkit.WebView;
 import java.io.File;
 
 import psycho.euphoria.killer.tasks.DownloaderService;
+
+import static psycho.euphoria.killer.utils.AroundFileUriExposedException.aroundFileUriExposedException;
+import static psycho.euphoria.killer.utils.LoadStartPage.loadStartPage;
+import static psycho.euphoria.killer.utils.RequestPermission.requestPermission;
+import static psycho.euphoria.killer.utils.RequestStorageManagerPermission.requestStorageManagerPermission;
 
 public class MainActivity extends Activity {
 
@@ -25,6 +34,7 @@ public class MainActivity extends Activity {
 
     SharedPreferences mSharedPreferences;
     WebView mWebView;
+    BroadcastReceiver mBroadcastReceiver;
 
     public SharedPreferences getSharedPreferences() {
         return mSharedPreferences;
@@ -40,11 +50,19 @@ public class MainActivity extends Activity {
     public static native void startServer(ServerService service, AssetManager assetManager, String host, int port);
 
     private void initialize() {
-        Utils.aroundFileUriExposedException();
-        Utils.requestStorageManagerPermission();
+        mBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                loadStartPage(MainActivity.this, false);
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(getPackageName() + ".server_started");
+        registerReceiver(mBroadcastReceiver, intentFilter);
+        aroundFileUriExposedException();
+        requestStorageManagerPermission(this);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mWebView = Utils.initializeWebView();
-        Utils.loadStartPage(false);
         //Secret.populateSettings(this);
         Utils.launchServer();
 //        String dir = mSharedPreferences.getString("video_directory", null);
@@ -53,7 +71,7 @@ public class MainActivity extends Activity {
     }
 
     private void refresh() {
-        Utils.clearWebViewCachesCustom();
+        mWebView.clearCache(false);
         mWebView.reload();
     }
 
@@ -67,7 +85,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Utils.setContext(this);
-        if (!Utils.requestPermission())
+        if (!requestPermission(this))
             initialize();
     }
 
@@ -77,6 +95,12 @@ public class MainActivity extends Activity {
             mSharedPreferences.edit().putString("address", mWebView.getUrl()).apply();
         }
         super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(mBroadcastReceiver);
     }
 
     // 在用户单击返回按键时，先尝试返回上次打开的页面
@@ -112,7 +136,7 @@ public class MainActivity extends Activity {
                 restartService();
                 break;
             case 6:
-                Utils.loadStartPage(true);
+                loadStartPage(this, true);
                 break;
             case 7:
                 Shared.setText(this, mWebView.getUrl());
