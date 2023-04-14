@@ -322,7 +322,212 @@
             border: none;
             outline: none;
             padding-right: 0;
-        }</style>
+        }
+
+    </style>
+    <style>
+        .markdown-container {
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background-color: #fff;
+            padding: 16px;
+            font-size: 16px;
+            line-height: 24px;
+            overflow-y: auto;
+        }
+
+        .markdown-container h2 {
+            box-sizing: inherit;
+            font: 600 24px/32px Android Euclid, Noto Sans, Noto Sans JP, Noto Sans KR, Noto Naskh Arabic, Noto Sans Thai, Noto Sans Hebrew, Noto Sans Bengali, sans-serif;
+            letter-spacing: normal;
+            margin: 56px 0 16px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border-bottom: 0;
+            padding: 0;
+        }
+
+        .markdown-container p {
+            margin: 16px 0;
+            padding: 0;
+        }
+
+        .markdown-container h1 {
+            box-sizing: inherit;
+            color: #000;
+            font: 600 40px/48px Android Euclid, Noto Sans, Noto Sans JP, Noto Sans KR, Noto Naskh Arabic, Noto Sans Thai, Noto Sans Hebrew, Noto Sans Bengali, sans-serif;
+            letter-spacing: -0.5px;
+            margin: 40px 0 20px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline;
+            margin-top: 0;
+            vertical-align: middle;
+            margin-inline-end: 83px;
+        }
+
+        .markdown-container a {
+
+            box-sizing: inherit;
+            color: #1769e0;
+            outline: 0;
+            text-decoration: none;
+            word-break: break-word;
+        }
+
+        .markdown-container a:focus {
+            text-decoration: underline;
+        }
+
+        .markdown-container code {
+
+
+            box-sizing: inherit;
+            background: #f8f9fa;
+            color: #37474f;
+            direction: ltr !important;
+            padding: 1px 4px;
+            text-align: left !important;
+            border: 1px solid #e8eaed;
+            border-radius: 4px;
+            font: 500 90%/1 Roboto Mono, Consolas, monospace;
+            word-break: break-word;
+        }
+
+        .markdown-container code a {
+            color: #185abc;
+        }
+
+        .markdown-container pre {
+
+            box-sizing: inherit;
+            background: #f8f9fa;
+            color: #37474f;
+            direction: ltr !important;
+            text-align: left !important;
+            font: 14px/20px Roboto Mono, Consolas, monospace;
+            overflow-x: auto;
+            padding: 24px;
+            position: relative;
+            margin: 0;
+            padding-block: ;
+            padding-inline: ;
+        }
+
+        .markdown-container pre code {
+
+            box-sizing: inherit;
+            direction: ltr !important;
+            text-align: left !important;
+            border-radius: 4px;
+            font: 500 90%/1 Roboto Mono, Consolas, monospace;
+            font-weight: 400;
+            word-break: normal;
+            background: 0;
+            border: 0;
+            font-size: 14px;
+            padding: 0;
+        }
+
+        .markdown-container h {
+            box-sizing: inherit;
+            margin: 0;
+            padding-left: 40px;
+            list-style: disc outside;
+        }
+
+        .markdown-container li,
+        .markdown-container li p {
+            margin: 12px 0;
+            padding: 0;
+        }
+
+        .markdown-container img {
+
+            border: 0;
+            height: auto;
+            max-width: 100%;
+        }
+
+        .markdown-container .table-wrapper {
+            box-sizing: inherit;
+            padding: 0;
+            margin: 32px 0;
+            overflow: auto;
+        }
+
+        .markdown-container table {
+
+            box-sizing: inherit;
+            border: 0;
+            border-collapse: collapse;
+            border-spacing: 0;
+            font: 14px/20px Roboto, Noto Sans, Noto Sans JP, Noto Sans KR, Noto Naskh Arabic, Noto Sans Thai, Noto Sans Hebrew, Noto Sans Bengali, sans-serif;
+            width: 100%;
+            margin: 0;
+        }
+
+        .markdown-container tr {
+            border-collapse: collapse;
+            border-spacing: 0;
+            font: 14px/20px Roboto, Noto Sans, Noto Sans JP, Noto Sans KR, Noto Naskh Arabic, Noto Sans Thai, Noto Sans Hebrew, Noto Sans Bengali, sans-serif;
+            box-sizing: inherit;
+            border: 0;
+        }
+
+        .markdown-container tr:first-child {
+            border-top: 1px solid rgb(218, 220, 224);
+        }
+
+        .markdown-container td {
+
+            border: 0;
+            margin: 0;
+            text-align: left;
+            padding: 15px 16px 16px;
+            background: hsla(0, 0%, 100%, .95);
+            vertical-align: top;
+        }
+
+        .markdown-container h3 {
+
+            box-sizing: inherit;
+            font: 500 20px/28px Android Euclid, Noto Sans, Noto Sans JP, Noto Sans KR, Noto Naskh Arabic, Noto Sans Thai, Noto Sans Hebrew, Noto Sans Bengali, sans-serif;
+            letter-spacing: -0.25px;
+            margin: 32px 0 16px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .markdown-container h4 {
+
+            box-sizing: inherit;
+            margin: 32px 0 16px;
+            font: 500 18px/28px Android Euclid, Noto Sans, Noto Sans JP, Noto Sans KR, Noto Naskh Arabic, Noto Sans Thai, Noto Sans Hebrew, Noto Sans Bengali, sans-serif;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .markdown-container h5 {
+
+            box-sizing: inherit;
+            margin: 32px 0 16px;
+            font: 700 16px/24px Roboto, Noto Sans, Noto Sans JP, Noto Sans KR, Noto Naskh Arabic, Noto Sans Thai, Noto Sans Hebrew, Noto Sans Bengali, sans-serif;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .markdown-container ol {
+
+            box-sizing: inherit;
+            margin: 0;
+            padding-left: 40px;
+            list-style: decimal outside;
+        }
+    </style>
 </head>
 
 <body>
@@ -337,12 +542,12 @@
             翻译英文
         </div>
     </div>
-    <div id="format-code-block" class="bar-item-renderer">
+    <div id="format-bold" class="bar-item-renderer">
         <svg viewBox="0 0 24 24">
-            <path d="M14.578 16.594l4.641-4.594-4.641-4.594 1.406-1.406 6 6-6 6zM9.422 16.594l-1.406 1.406-6-6 6-6 1.406 1.406-4.641 4.594z"></path>
+            <path d="M13.5 15.516q0.656 0 1.078-0.445t0.422-1.055-0.422-1.055-1.078-0.445h-3.516v3h3.516zM9.984 6.516v3h3q0.609 0 1.055-0.445t0.445-1.055-0.445-1.055-1.055-0.445h-3zM15.609 10.781q2.156 0.984 2.156 3.422 0 1.594-1.055 2.695t-2.648 1.102h-7.078v-14.016h6.281q1.688 0 2.836 1.172t1.148 2.859-1.641 2.766z"></path>
         </svg>
         <div class="bar-item-title">
-            代码块
+            粗体
         </div>
     </div>
 
@@ -447,12 +652,13 @@
             代码
         </div>
     </div>
-    <div id="format-bold" class="bar-item-renderer">
+
+    <div id="format-code-block" class="bar-item-renderer">
         <svg viewBox="0 0 24 24">
-            <path d="M13.5 15.516q0.656 0 1.078-0.445t0.422-1.055-0.422-1.055-1.078-0.445h-3.516v3h3.516zM9.984 6.516v3h3q0.609 0 1.055-0.445t0.445-1.055-0.445-1.055-1.055-0.445h-3zM15.609 10.781q2.156 0.984 2.156 3.422 0 1.594-1.055 2.695t-2.648 1.102h-7.078v-14.016h6.281q1.688 0 2.836 1.172t1.148 2.859-1.641 2.766z"></path>
+            <path d="M14.578 16.594l4.641-4.594-4.641-4.594 1.406-1.406 6 6-6 6zM9.422 16.594l-1.406 1.406-6-6 6-6 1.406 1.406-4.641 4.594z"></path>
         </svg>
         <div class="bar-item-title">
-            粗体
+            代码块
         </div>
     </div>
     <div id="format-indent-increase" class="bar-item-renderer">
@@ -475,7 +681,15 @@
     </div>
     <div id="format-list" class="bar-item-renderer">
         <svg viewBox="0 0 24 24">
-            <path d="M13.5 15.516q0.656 0 1.078-0.445t0.422-1.055-0.422-1.055-1.078-0.445h-3.516v3h3.516zM9.984 6.516v3h3q0.609 0 1.055-0.445t0.445-1.055-0.445-1.055-1.055-0.445h-3zM15.609 10.781q2.156 0.984 2.156 3.422 0 1.594-1.055 2.695t-2.648 1.102h-7.078v-14.016h6.281q1.688 0 2.836 1.172t1.148 2.859-1.641 2.766z"></path>
+            <path d="M6.984 6.984h14.016v2.016h-14.016v-2.016zM6.984 17.016v-2.016h14.016v2.016h-14.016zM6.984 12.984v-1.969h14.016v1.969h-14.016zM3 9v-2.016h2.016v2.016h-2.016zM3 17.016v-2.016h2.016v2.016h-2.016zM3 12.984v-1.969h2.016v1.969h-2.016z"></path>
+        </svg>
+        <div class="bar-item-title">
+            列表
+        </div>
+    </div>
+    <div id="preview" class="bar-item-renderer">
+        <svg viewBox="0 0 24 24">
+            <path d="M6.984 6.984h14.016v2.016h-14.016v-2.016zM6.984 17.016v-2.016h14.016v2.016h-14.016zM6.984 12.984v-1.969h14.016v1.969h-14.016zM3 9v-2.016h2.016v2.016h-2.016zM3 17.016v-2.016h2.016v2.016h-2.016zM3 12.984v-1.969h2.016v1.969h-2.016z"></path>
         </svg>
         <div class="bar-item-title">
             列表
@@ -641,7 +855,7 @@
     }
 
     async function pasteEnd() {
-        textarea.value = textarea.value.trim() +"\n\n"+
+        textarea.value = textarea.value.trim() + "\n\n" +
             (await readText())
     }
 
@@ -1516,6 +1730,17 @@ textarea {
     })();
 </script>
 <custom-toast id="toast"></custom-toast>
+<script>
+    document.getElementById('preview')
+        .addEventListener('click', evt => {
+            requestAnimationFrame(() => {
+                document.querySelector('.markdown-container>div')
+                    .addEventListener('click', evt => {
+                        document.querySelector('.markdown-container').remove();
+                    })
+            })
+        })
+</script>
 </body>
 
 </html>
