@@ -2,8 +2,7 @@ use std::path::Path;
 use rocket::http::Status;
 use regex::Regex;
 use std::fs::File;
-use std::io::{Write, BufReader, BufRead};
-use rocket::fs;
+use std::io::{BufReader, BufRead};
 fn is_timecode(line: &str) -> bool {
     line.contains("-->")
 }

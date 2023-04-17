@@ -16,13 +16,12 @@ use diesel::{self, result::QueryResult, prelude::*};
 
 use crate::server::NotesConnection;
 use self::schema::snippet;
-use self::schema::snippet::dsl::{snippet as all_snippets};
 use rocket::serde::{Serialize, Deserialize};
 use crate::util::get_epoch_ms;
 
 #[derive(Serialize, Deserialize, Queryable, Insertable, Debug, Clone)]
 #[serde(crate = "rocket::serde")]
-#[table_name = "snippet"]
+#[diesel(table_name = snippet)]
 pub struct Snippet {
     pub id: Option<i32>,
     pub prefix: String,

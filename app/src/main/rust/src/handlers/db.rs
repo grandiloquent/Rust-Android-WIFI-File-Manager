@@ -1,15 +1,10 @@
-use std::path::Path;
 use crate::server::NotesConnection;
 use rocket::http::Status;
 use rocket::serde::json::serde_json;
-use rocket::serde::{Serialize, Deserialize};
 use std::sync::Arc;
 use crate::asset::Cache;
 use crate::res::Asset;
 
-use diesel::prelude::*;
-use rocket::data::FromData;
-use rocket::form::Form;
 use rocket::State;
 use crate::data::notes::{Note, Notes};
 use crate::data::snippet::Snippet;

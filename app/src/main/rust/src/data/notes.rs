@@ -13,13 +13,12 @@ mod schema {
 use diesel::{self, result::QueryResult, prelude::*};
 use crate::server::NotesConnection;
 use self::schema::notes;
-use self::schema::notes::dsl::{notes as all_notes};
 use rocket::serde::{Serialize, Deserialize};
 use crate::util::get_epoch_ms;
 
 #[derive(Serialize, Deserialize, Queryable, Insertable, Debug, Clone)]
 #[serde(crate = "rocket::serde")]
-#[table_name = "notes"]
+#[diesel(table_name = notes)]
 pub struct Notes {
     pub _id: Option<i32>,
     pub title: String,
