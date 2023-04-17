@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Environment;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import java.io.File;
 
@@ -19,6 +20,8 @@ import static psycho.euphoria.killer.utils.GetUsablePort.getUsablePort;
 public class ServerService extends Service {
 
 
+    public static final int DEFAULT_PORT = 3000;
+    public static final String KEY_PORT = "port";
     SharedPreferences mSharedPreferences;
     private String mLogFileName;
 
@@ -29,9 +32,6 @@ public class ServerService extends Service {
     public void setString(String key, String value) {
         mSharedPreferences.edit().putString(key, value).apply();
     }
-
-    public static final int DEFAULT_PORT = 3000;
-    public static final String KEY_PORT = "port";
 
     private void startServer() {
         new Thread(() -> {
@@ -77,6 +77,7 @@ public class ServerService extends Service {
         }
         // https://developer.android.com/guide/components/foreground-services
         createNotification(this);
+        Log.e("B5aOx2", String.format("onStartCommand, %s", "startServer"));
         startServer();
         sendBroadcast(new Intent(getPackageName() + ".server_started"));
         return START_STICKY;

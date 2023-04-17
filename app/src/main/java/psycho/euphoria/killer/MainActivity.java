@@ -88,7 +88,11 @@ public class MainActivity extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
-        unregisterReceiver(mBroadcastReceiver);
+        if (mBroadcastReceiver != null) {
+            unregisterReceiver(mBroadcastReceiver);
+            mBroadcastReceiver = null;
+        }
+
     }
 
     // 在用户单击返回按键时，先尝试返回上次打开的页面
