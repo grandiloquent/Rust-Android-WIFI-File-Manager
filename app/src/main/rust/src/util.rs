@@ -2,6 +2,7 @@ use std::ffi::CString;
 use std::fs;
 use std::io::Read;
 use std::ptr::NonNull;
+use std::time::{SystemTime, UNIX_EPOCH};
 use jni::JNIEnv;
 use jni::objects::{JObject, JString, JValue};
 use ndk::asset::AssetManager;
@@ -68,4 +69,12 @@ pub unsafe fn get_string(env: JNIEnv, context: JObject, key: &str) -> String {
     let v = env.call_method(context, "getString", "(Ljava/lang/String;)Ljava/lang/String;", &[jv(key).unwrap()]).unwrap().l().unwrap();
     let d = env.get_string(JString::from(v)).unwrap();
     d.into()
+}
+
+pub
+fn get_epoch_ms() -> u128 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_millis()
 }
