@@ -63,7 +63,7 @@ impl Notes {
             let s = v.content;
             let updated_notes = diesel::update(notes::table.filter(notes::_id.eq(&id)));
             updated_notes.set((
-                notes::content.eq(s + "\n\n" + &content),
+                notes::content.eq(s + "\n\n" + content.trim()),
                 notes::update_at.eq(&size))
             ).execute(c)
         }).await
