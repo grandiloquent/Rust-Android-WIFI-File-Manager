@@ -11,11 +11,10 @@ mod schema {
 }
 
 use diesel::{self, result::QueryResult, prelude::*};
-use crate::server::NotesConnection;
 use self::schema::notes;
 use rocket::serde::{Serialize, Deserialize};
+use crate::server::NotesConnection;
 use crate::util::get_epoch_ms;
-
 #[derive(Serialize, Deserialize, Queryable, Insertable, Debug, Clone)]
 #[serde(crate = "rocket::serde")]
 #[diesel(table_name = notes)]
@@ -56,6 +55,21 @@ impl Notes {
             diesel::insert_into(notes::table).values(&t).execute(c)
         }).await
     }
+    pub async fn append_content(id: i32, content: String, conn: &NotesConnection) -> QueryResult<usize> {
+        conn.run(move |c| {
+            let v = notes::table.filter(notes::_id.eq(&id))
+                .get_result::<Notes>(c).unwrap();
+            let size = (get_epoch_ms() / 1000) as i64;
+            let s = v.content;
+            let updated_notes = diesel::update(notes::table.filter(notes::_id.eq(&id)));
+            updated_notes.set((
+                notes::content.eq(s + "\n\n" + &content),
+                notes::update_at.eq(&size))
+            ).execute(c)
+        }).await
+    }
+
+
     pub async fn search(needle: String, conn: &NotesConnection) -> QueryResult<Vec<Note>> {
         conn.run(|c| {
             notes::table

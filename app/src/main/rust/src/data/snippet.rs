@@ -14,11 +14,10 @@ mod schema {
 use diesel::{self, result::QueryResult, prelude::*};
 
 
-use crate::server::NotesConnection;
 use self::schema::snippet;
 use rocket::serde::{Serialize, Deserialize};
+use crate::server::NotesConnection;
 use crate::util::get_epoch_ms;
-
 #[derive(Serialize, Deserialize, Queryable, Insertable, Debug, Clone)]
 #[serde(crate = "rocket::serde")]
 #[diesel(table_name = snippet)]

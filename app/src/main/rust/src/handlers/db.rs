@@ -1,13 +1,15 @@
-use crate::server::NotesConnection;
+use std::path::Path;
 use rocket::http::Status;
 use rocket::serde::json::serde_json;
-use std::sync::Arc;
-use crate::asset::Cache;
-use crate::res::Asset;
-use rocket::State;
+use rocket::serde::{Serialize, Deserialize};
+use diesel::{self, result::QueryResult, prelude::*};
+use diesel::prelude::*;
+use rocket::data::FromData;
+use rocket::form::Form;
 use crate::data::notes::{Note, Notes};
 use crate::data::snippet::Snippet;
 use crate::data::statistics::Statistics;
+use crate::server::NotesConnection;
 #[get("/api/note?<id..>")]
 pub async fn get_notes(id: Option<i32>, conn: NotesConnection) -> Result<String, Status> {
     match id {
@@ -87,6 +89,14 @@ pub async fn insert_note(id: Option<i32>, note_form: String, conn: NotesConnecti
     }
     Ok("Success".to_string())
 }
+#[post("/api/note/append?<id>", data = "<v>")]
+pub async fn append_note(id: i32, v: String, conn: NotesConnection) -> Result<String, Status> {
+    if let Err(e) = Notes::append_content(id, v, &conn).await {
+        println!("{}", e);
+        return Err(Status::InternalServerError);
+    }
+    Ok("Success".to_string())
+}
 #[get("/api/snippet?<prefix..>")]
 pub async fn get_snippet(prefix: Option<String>, conn: NotesConnection) -> Result<String, Status> {
     match prefix {
@@ -141,22 +151,8 @@ pub async fn delete_snippet(prefix: String, conn: NotesConnection) -> Result<Str
     }
     Ok("Success".to_string())
 }
-#[get("/notes/notes")]
-pub fn get_notes_page<'a>(cache: &State<Arc<Cache>>) -> Asset {
-    match cache.get("notes/notes.html") {
-        None => {
-            Asset::default()
-        }
-        Some(data) => {
-            Asset {
-                data,
-                content_type: "text/html; charset=utf8",
-            }
-        }
-    }
-}
 #[get("/api/statistics?<id..>")]
-pub async fn get_statistics(id:Option<i32>,conn: NotesConnection) -> Result<String, Status> {
+pub async fn get_statistics(id: Option<i32>, conn: NotesConnection) -> Result<String, Status> {
     match id {
         None => {
             match Statistics::all(&conn).await {
@@ -169,7 +165,7 @@ pub async fn get_statistics(id:Option<i32>,conn: NotesConnection) -> Result<Stri
             }
         }
         Some(v) => {
-            match Statistics::update(v,&conn).await {
+            match Statistics::update(v, &conn).await {
                 Ok(v) => {
                     Ok(serde_json::to_string(&v).unwrap())
                 }
@@ -177,6 +173,17 @@ pub async fn get_statistics(id:Option<i32>,conn: NotesConnection) -> Result<Stri
                     Err(Status::InternalServerError)
                 }
             }
+        }
+    }
+}
+#[get("/api/statistics/insert?<id>")]
+pub async fn insert_statistics(id: i32, conn: NotesConnection) -> Result<String, Status> {
+    match Statistics::insert(id, &conn).await {
+        Ok(v) => {
+            Ok(serde_json::to_string(&v).unwrap())
+        }
+        Err(e) => {
+            Err(Status::InternalServerError)
         }
     }
 }

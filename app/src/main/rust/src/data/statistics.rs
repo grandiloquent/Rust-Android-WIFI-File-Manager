@@ -11,12 +11,12 @@ mod schema {
 }
 
 use diesel::{self, result::QueryResult, prelude::*};
+use diesel::query_builder::QueryFragment;
 
-use crate::server::NotesConnection;
 use self::schema::statistics;
 use rocket::serde::{Serialize, Deserialize};
+use crate::server::NotesConnection;
 use crate::util::get_epoch_ms;
-
 #[derive(Serialize, Deserialize, Queryable, Insertable, Debug, Clone)]
 #[serde(crate = "rocket::serde")]
 #[diesel(table_name = statistics)]
@@ -46,6 +46,21 @@ impl Statistics {
                 statistics::count.eq(&(s.count + 1)),
                 statistics::update_at.eq(&size))
             ).execute(c)
+        }).await
+    }
+    pub async fn insert(action_id: i32, conn: &NotesConnection) -> QueryResult<usize> {
+
+        conn.run(move  |c| {
+
+            let t = Statistics {
+                id: None,
+                action_id,
+                count: 0,
+                create_at: Some((get_epoch_ms() / 1000) as i64),
+                update_at: Some((get_epoch_ms() / 1000) as i64),
+            };
+            //println!("{:?}", diesel::insert_into(statistics::table).values(&t));
+            diesel::insert_into(statistics::table).values(&t).execute(c)
         }).await
     }
 }

@@ -181,6 +181,14 @@ ${value}
                             })
                     })
                 })
+            document.getElementById('settings')
+                .addEventListener('click', evt => {
+                    const parent = evt.currentTarget.parentNode;
+                    if (!parent.classList.contains('bar-renderer')) {
+                        parent.style.display = 'none';
+                    }
+                    appendSettingsDialog();
+                });
             start("")
 
         });

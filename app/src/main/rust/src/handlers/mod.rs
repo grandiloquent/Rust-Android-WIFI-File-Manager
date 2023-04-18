@@ -18,3 +18,4 @@ pub mod markdown;
 pub mod title;
 pub mod db;
 pub mod translate;
+pub mod notes;
