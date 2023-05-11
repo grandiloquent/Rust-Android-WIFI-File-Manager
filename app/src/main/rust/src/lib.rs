@@ -1,6 +1,4 @@
 #![allow(unused_qualifications)]
-#![feature(decl_macro)]
-#![feature(addr_parse_ascii)]
 
 #[macro_use]
 extern crate rocket;

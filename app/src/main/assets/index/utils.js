@@ -172,7 +172,9 @@ function showContextMenu(detail) {
             showDeleteDialog(detail)
         } else if (evt.detail === "复制") {
             writeText(decodeURIComponent(detail.path))
-        }
+        }else if (evt.detail === "压缩") {
+                   window.open(`/compress_dir?path=${detail.path}`,'_blank');
+                 }
     })
 }
 function showDeleteDialog(detail) {

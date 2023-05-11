@@ -19,3 +19,4 @@ pub mod title;
 pub mod db;
 pub mod translate;
 pub mod notes;
+pub mod compress_zip;
