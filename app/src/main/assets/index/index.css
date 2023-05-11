@@ -12,7 +12,7 @@ html {
     color: #0f0f0f;
     background-color: #fff;
     font-size: 10px;
-    font-family: Roboto, Arial, sans-serif
+    font-family: Roboto, Arial, sans-serif;
 }
 
 body {
@@ -20,6 +20,11 @@ body {
     padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     font-size: 1.2rem;
     overflow-x: hidden
+}
+
+html,
+body {
+    height: 100%;
 }
 
 header {
@@ -131,6 +136,7 @@ p {
     margin: 8px 0;
     line-height: 1.25
 }
+
 input[type="text"] {
     background-color: transparent;
     outline: none;
@@ -144,6 +150,7 @@ input[type="text"] {
     padding: 6px;
     font-size: 14px;
 }
+
 .bar-renderer {
     display: flex;
     justify-content: space-around;
@@ -169,7 +176,7 @@ input[type="text"] {
     flex: 1 1 0;
 }
 
-.bar-item-renderer > svg {
+.bar-item-renderer>svg {
     width: 24px;
     height: 24px;
 }
