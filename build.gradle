@@ -2,5 +2,4 @@
 plugins {
     id 'com.android.application' version '7.3.1' apply false
     id 'com.android.library' version '7.3.1' apply false
-    id "com.github.willir.rust.cargo-ndk-android" version "0.3.4" apply false
 }

@@ -1,7 +1,3 @@
-#![allow(unused_qualifications)]
-#![feature(decl_macro)]
-#![feature(addr_parse_ascii)]
-
 #[macro_use]
 extern crate rocket;
 
@@ -48,13 +44,7 @@ pub extern "C" fn Java_psycho_euphoria_killer_MainActivity_startServer(
             host: _host,
             port,
             temp_dir: "/storage/emulated/0".to_string(),
-        }, Database {
-            host:get_string(env,context,"v_host"),
-            port:get_string(env,context,"v_port").parse::<u16>().unwrap_or(5432),
-            db_name:get_string(env,context,"v_db_name"),
-            user:get_string(env,context,"v_user"),
-            password:get_string(env,context,"v_password")
-        }, ass);
+        },ass);
     }
 }
 
