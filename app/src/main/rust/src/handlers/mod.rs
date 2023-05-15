@@ -1,9 +1,9 @@
 pub mod api_asset_file;
 pub mod api_file;
+pub mod api_files;
 pub mod api_file_delete;
 pub mod api_file_new;
 pub mod api_file_rename;
-pub mod api_files;
 pub mod api_zip;
 pub mod compress_zip;
 pub mod data;

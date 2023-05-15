@@ -27,6 +27,7 @@ import java.net.Proxy.Type;
 import java.net.URL;
 import java.util.zip.GZIPInputStream;
 
+import psycho.euphoria.killer.utils.GenerateVideoThumbnails;
 import psycho.euphoria.killer.video.PlayerActivity;
 import psycho.euphoria.killer.video.Utils;
 import psycho.euphoria.killer.video.VideoListActivity;
@@ -219,5 +220,10 @@ public class WebAppInterface {
             e.printStackTrace();
         }
         return sb.toString();
+    }
+
+    @JavascriptInterface
+    public void generateVideoThumbnails(String dir) {
+        GenerateVideoThumbnails.generateVideoThumbnails(new File(dir)).start();
     }
 }

@@ -280,17 +280,141 @@ input:focus {
 .dialog-input {
     width: 100%;
 }
+
 .video {
     position: absolute;
 }
+
 .delimiter {
     color: rgb(255, 255, 255);
     opacity: 0.7;
     margin: 0 4px;
 }
+
 .bottom-top-wrapper {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
+}
+
+.media-item {
+    display: block;
+    min-width: 0;
+    padding: 0;
+}
+
+.video-thumbnail-container-large {
+    position: relative;
+}
+
+.video-thumbnail-container-large:before {
+    display: block;
+    content: "";
+    width: 100%;
+    padding-top: 56.25%
+}
+
+.video-thumbnail-bg {
+
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    min-height: 100%;
+    margin: auto;
+    background-color: rgba(0, 0, 0, 0.1);
+
+}
+
+.core-image {
+    filter: none;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    display: inline-block;
+    min-height: 1px;
+    min-width: 1px;
+    visibility: inherit;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+
+}
+
+.details {
+    display: flex;
+    -webkit-box-flex: 1;
+    flex-grow: 1;
+    min-width: 0;
+    margin-bottom: 16px;
+    margin-left: 12px;
+    margin-top: 4px;
+
+}
+
+.media-channel {
+    margin-top: 8px;
+}
+
+.media-item-info {
+
+    display: flex;
+    -webkit-box-flex: 1;
+    flex-grow: 1;
+    min-width: 0;
+    -webkit-box-align: start;
+    align-items: flex-start;
+    margin-left: 12px;
+
+}
+
+.media-item-metadata {
+    display: flex;
+    -webkit-box-flex: 1;
+    flex-grow: 1;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+    min-width: 0;
+    margin-top: 8px;
+
+}
+
+.media-item-headline {
+
+    margin: 0 0 3px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    max-height: 2.5em;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    font-size: 1.4rem;
+    font-weight: 500;
+
+}
+
+.badge-and-byline-renderer {
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    max-height: 3em;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+}
+
+.badge-and-byline-item-byline {
+    font-size: 1.2rem;
+    margin-right: 4px;
+    display: inline;
+    opacity: .6;
+
 }
