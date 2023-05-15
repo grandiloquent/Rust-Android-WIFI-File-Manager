@@ -1,5 +1,6 @@
 use crate::asset::Cache;
 use crate::handlers;
+use crate::strings::StringExt;
 use crate::{error, Database, Server};
 use ndk::asset::AssetManager;
 use rocket::config::LogLevel;
@@ -33,14 +34,38 @@ impl Fairing for CORS {
         response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
     }
 }
+
+pub struct ContentDisposition;
+
+#[rocket::async_trait]
+impl Fairing for ContentDisposition {
+    fn info(&self) -> Info {
+        Info {
+            name: "Attaching ContentDisposition headers to responses",
+            kind: Kind::Response,
+        }
+    }
+
+    async fn on_response<'r>(&self, request: &'r Request<'_>, response: &mut Response<'r>) {
+        let p = request.uri().to_string();
+        if p.ends_with(".zip") || p.ends_with(".db") || p.ends_with(".7z") {
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
+            response.set_header(Header::new(
+                "Content-Disposition",
+                format!(
+                    "attachment; filename=\"{}\"",
+                    urlencoding::decode(request.uri().query().unwrap().as_str())
+                    .unwrap().to_string()
+                        .substring_after_last("/")
+                ),
+            ));
+        }
+    }
+}
+
 #[tokio::main]
 pub async fn run_server(srv: Server, ass: AssetManager) {
-    log::error!(
-        "host = {},port = {},tempDir = {}",
-        srv.host,
-        srv.port,
-        srv.temp_dir
-    );
+
     let limits = Limits::default()
         .limit("json", 3.mebibytes())
         .limit("string", 3.mebibytes())
@@ -55,33 +80,33 @@ pub async fn run_server(srv: Server, ass: AssetManager) {
         .merge((rocket::Config::LOG_LEVEL, LogLevel::Critical));
     let mut server = rocket::custom(figment)
         .attach(CORS)
+        .attach(ContentDisposition)
         .mount(
             "/",
-            routes![
-                handlers::api_asset_file::api_asset_file,
-                handlers::api_file::api_file,
-                handlers::api_file::api_file_post,
-                handlers::api_files::api_files,
-                handlers::api_files::api_files_clear,
-                handlers::api_files::api_files_rename,
-                handlers::api_file_delete::api_file_delete,
-                handlers::api_file_new::api_file_new_file,
-                handlers::api_file_new::api_file_new_dir,
-                handlers::api_file_rename::api_file_rename,
-                handlers::api_file_rename::api_file_move,
-                handlers::api_zip::api_zip,
-                handlers::file::file,
-                handlers::index::index,
-                handlers::index_file::index_file,
-                handlers::markdown::markdown,
-                handlers::markdown::markdown_file,
-                handlers::subtitle::subtitle,
-                handlers::upload::upload,
-                handlers::video::video
-            ],
+            routes![handlers::api_asset_file::api_asset_file,
+handlers::api_file::api_file,
+handlers::api_file::api_file_post,
+handlers::api_files::api_files,
+handlers::api_files::api_files_clear,
+handlers::api_files::api_files_rename,
+handlers::api_file_delete::api_file_delete,
+handlers::api_file_new::api_file_new_file,
+handlers::api_file_new::api_file_new_dir,
+handlers::api_file_rename::api_file_rename,
+handlers::api_file_rename::api_file_move,
+handlers::api_zip::api_zip,
+handlers::file::file,
+handlers::index::index,
+handlers::index_file::index_file,
+handlers::markdown::markdown,
+handlers::markdown::markdown_file,
+handlers::subtitle::subtitle,
+handlers::upload::upload,
+handlers::video::video],
         )
         .manage(Arc::new(Cache::new(ass)))
         .register("/", catchers![error::not_found]);
 
     server.launch().await;
 }
+// cargo ndk -t arm64-v8a --platform 31 -o C:\Users\Administrator\Desktop\file\Killer\app\src\main\jniLibs build --release

@@ -13,7 +13,7 @@ async function render(path) {
         return x.path.localeCompare(y.path)
     })
         .map(x => {
-            return `<custom-item bind @submit="submit" ${x.is_directory ? 'folder' : ''} title="${substringAfterLast(x.path, '/')}" path="${encodeURIComponent(x.path)}" isdirectory="${x.is_directory}"></custom-item>`
+            return `<custom-item bind @submit="onItemClick" ${x.is_directory ? 'folder' : ''} title="${substringAfterLast(x.path, '/')}" path="${encodeURIComponent(x.path)}" isdirectory="${x.is_directory}"></custom-item>`
         }).join('');
     bind(this.wrapper);
 }
@@ -22,7 +22,7 @@ function setDocumentTitle(path) {
     document.title = substringAfterLast(decodeURIComponent(path), "/")
 }
 
-function submit(evt) {
+function onItemClick(evt) {
     const encodedPath = evt.detail.path;
     if (evt.detail.id === '0') {
         if (evt.detail.isDirectory === "true") {
@@ -48,13 +48,20 @@ function submit(evt) {
                     NativeAndroid.openFile(encodedPath);
                     return
                 }
-                window.location = `/api/file?path=${encodedPath}`
+                window.location = `${baseUri}/api/file?path=${encodedPath}`
             }
         }
     } else {
         detail = evt.detail;
         showContextMenu(detail)
     }
+}
+function openVideoFile(path) {
+    if (/\.(?:mp4|m4a)$/.test(path) || substringAfterLast(decodeURIComponent(path), "/").indexOf(".") === -1) {
+        window.location = `/video/video?path=${path}`
+        return true;
+    }
+    return false;
 }
 ////////////////////////////////////////////////////////////////
 window.addEventListener("popstate", function (e) {

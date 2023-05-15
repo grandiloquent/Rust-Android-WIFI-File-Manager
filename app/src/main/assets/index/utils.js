@@ -54,13 +54,7 @@ function newFile() {
         await getString(`/api/file/new_file?path=${joinPath(filename)}`)
     })
 }
-function openVideoFile(path) {
-    if (/\.(?:mp4|m4a)$/.test(path) || substringAfterLast(decodeURIComponent(path), "/").indexOf(".") === -1) {
-        window.location = `/video/video?path=${path}`
-        return true;
-    }
-    return false;
-}
+
 
  async function requestDeleteFiles(paths) {
     const response = await fetch(`/api/file/delete`, {
