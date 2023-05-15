@@ -16,7 +16,6 @@ function durationchange(video, url) {
     return evt => {
         if (video.duration) {
             second.textContent = formatDuration(video.duration);
-            fetch(`${getBaseAddress()}/video/duration?url=${encodeURIComponent(url)}&duration=${video.duration | 0}`)
         }
         adjustSize(video);
     }
@@ -97,30 +96,19 @@ let timer;
 const middle = document.getElementById('middle');
 const bottom = document.getElementById('bottom');
 const toast = document.getElementById('toast');
+const baseUri = window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:3000" : "";
 
 async function initialize() {
     const searchParams = new URL(window.location).searchParams;
-    const url = searchParams.get("url");
-    let videoInformation;
-    try {
-        videoInformation = await getUrl(getBaseAddress(), url);
+    const path = searchParams.get("path");
 
-    } catch (error) {
-        toast.setAttribute('message', error.message);
-        return;
-    }
-    document.title = videoInformation.title;
-    toast.setAttribute('message', videoInformation.title);
+    toast.setAttribute('message', path);
     const video = document.querySelector('video');
 
     const loaded = document.querySelector('.progress_bar_loaded');
-    const download = document.querySelector('.download');
-    download.addEventListener('click', evt => {
-        writeText(videoInformation.file);
-        toast.setAttribute('message', "已成功复制视频地址");
-    });
-    setSrc(video, videoInformation.file);
-    video.addEventListener('durationchange', durationchange(video, url));
+    
+    video.src = `${baseUri}/api/file?path=${path}`
+    video.addEventListener('durationchange', durationchange(video, path));
     video.addEventListener('timeupdate', timeupdate(video));
     video.addEventListener('progress', progress(video, loaded));
     video.addEventListener('play', play());

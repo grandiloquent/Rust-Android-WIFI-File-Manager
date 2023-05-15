@@ -8,50 +8,6 @@
     <title>音乐播放器</title>
     <link rel="stylesheet" href="/music/music.css">
     <script src="/music/shared.js"></script>
-    <style>
-        .bar {
-            display: grid;
-            grid-template-columns: 0fr 1fr 0fr;
-            grid-template-areas: "start middle end";
-            background-color: rgb(33, 33, 33);
-            color: #909090;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            height: 64px;
-            transition-property: transform, height, background-color;
-            transition-duration: 300ms;
-            transition-timing-function: cubic-bezier(0.2, 0, 0.6, 1);
-            will-change: transform;
-            z-index: 3;
-            width: calc(100vw - 12px);
-            transform: translate3d(0, 0, 0);
-            visibility: visible;
-        }
-
-        .left-controls {
-            grid-area: start;
-            flex: none;
-            display: flex;
-            align-items: center;
-        }
-
-        .left-controls-buttons {
-
-            flex: none;
-            display: flex;
-            align-items: center;
-        }
-
-        .previous-button {
-            box-sizing: border-box !important;
-            flex: none;
-            padding: 4px;
-            width: 32px;
-            height: 32px;
-            margin: 0 0 0 8px;
-        }
-    </style>
 </head>
 
 <body>
@@ -64,14 +20,14 @@
                     <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false"
                         style="width: 24px;height: 24px;fill: #fff;">
                         <g>
-                            <path d="M19,6L9,12l10,6V6L19,6z M7,6H5v12h2V6z" class="style-scope tp-yt-iron-icon"></path>
+                            <path d="M19,6L9,12l10,6V6L19,6z M7,6H5v12h2V6z"></path>
                         </g>
                     </svg>
                 </div>
                 <div class="play-pause-button">
                     <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false">
                         <g>
-                            <path d="M6,4l12,8L6,20V4z" class="style-scope tp-yt-iron-icon"></path>
+                            <path d="M6,4l12,8L6,20V4z"></path>
                         </g>
                     </svg>
                 </div>
@@ -113,83 +69,7 @@
         </div>
     </div>
     <audio></audio>
-    <script>
-        const baseUri = window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:3000" : "";
-        const path = new URL(window.location).searchParams.get("path") || "%2Fstorage%2Femulated%2F0%2FMusics%2FMP3%2F%E9%98%BF%E6%82%A0%E6%82%A0-%E4%B8%80%E6%9B%B2%E7%9B%B8%E6%80%9D.mp3";
-        async function loadMusicFiles() {
-            let dir = substringBeforeLast(decodeURIComponent(path), "/");
-            const res = await fetch(`${baseUri}/api/files?path=${encodeURIComponent(dir)}`);
-            return res.json();
-        }
-        async function render() {
-            const files = (await loadMusicFiles())
-                .filter(x => !x.is_directory)
-                .sort((x, y) => x.path.localeCompare(y.path));
-            const buf = [];
-            for (const iterator of files) {
-                buf.push(`<div class="item-wrapper" data-path="${iterator.path}">
-        <div class="item-left">
-        </div>
-        <div class="item-main">
-            <div class="item-title">${substringBeforeLast(substringAfterLast(iterator.path, "/"), ".")}</div>
-            <div class="item-subtitle"></div>
-        </div>
-        <div class="item-right"></div>
-    </div>`);
-            }
-            wrapper.innerHTML = buf.join('');
-            bindPlayEvent();
-        }
-        async function bindPlayEvent() {
-            // https://developer.mozilla.org/en-US/docs/Web/Guide/Audio_and_video_delivery/buffering_seeking_time_ranges
-            const audio = document.querySelector('audio');
-            audio.addEventListener('timeupdate', evt => {
-                primaryProgress.style.transform = `scaleX(${audio.currentTime / audio.duration
-
-                    })`;
-            })
-            audio.addEventListener('progress', evt => {
-                const duration = audio.duration;
-                if (duration > 0) {
-                    for (let i = 0; i < audio.buffered.length; i++) {
-                        if (
-                            audio.buffered.start(audio.buffered.length - 1 - i) <
-                            audio.currentTime
-                        ) {
-                            secondaryProgress.style.transform = `scaleX(${(audio.buffered.end(audio.buffered.length - 1 - i)) / duration
-                                })`;
-                            break;
-                        }
-                    }
-                }
-
-            });
-            audio.src = `${baseUri}/api/file?path=${
-              path
-            }`
-            title.textContent =substringAfterLast(decodeURIComponent(path),"/");
-
-            document.querySelectorAll('.item-wrapper').forEach(itemWrapper => {
-                itemWrapper.addEventListener('click', evt => {
-                    audio.src = `${baseUri}/api/file?path=${
-                        evt.currentTarget.dataset.path
-                   }`
-                    title.textContent = evt.currentTarget.textContent;
-                    audio.play();
-                });
-            });
-        }
-        const wrapper = document.querySelector('.wrapper');
-        const title = document.querySelector('.title');
-        const primaryProgress = document.querySelector('.primary-progress');
-        const secondaryProgress = document.querySelector('.secondary-progress');
-
-
-
-
-
-        render();
-    </script>
+    <script src="/music/music.js"></script>
 </body>
 
 </html>

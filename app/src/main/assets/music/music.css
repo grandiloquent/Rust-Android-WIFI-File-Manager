@@ -208,4 +208,45 @@ audio {
     transform: scaleX(0.0100671);
 }
 
- 
+.bar {
+    display: grid;
+    grid-template-columns: 0fr 1fr 0fr;
+    grid-template-areas: "start middle end";
+    background-color: rgb(33, 33, 33);
+    color: #909090;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 64px;
+    transition-property: transform, height, background-color;
+    transition-duration: 300ms;
+    transition-timing-function: cubic-bezier(0.2, 0, 0.6, 1);
+    will-change: transform;
+    z-index: 3;
+    width: calc(100vw - 12px);
+    transform: translate3d(0, 0, 0);
+    visibility: visible;
+}
+
+.left-controls {
+    grid-area: start;
+    flex: none;
+    display: flex;
+    align-items: center;
+}
+
+.left-controls-buttons {
+
+    flex: none;
+    display: flex;
+    align-items: center;
+}
+
+.previous-button {
+    box-sizing: border-box !important;
+    flex: none;
+    padding: 4px;
+    width: 32px;
+    height: 32px;
+    margin: 0 0 0 8px;
+}
