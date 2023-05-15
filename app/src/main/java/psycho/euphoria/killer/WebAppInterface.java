@@ -7,6 +7,8 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -19,6 +21,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
@@ -27,9 +30,7 @@ import java.net.Proxy.Type;
 import java.net.URL;
 import java.util.zip.GZIPInputStream;
 
-import psycho.euphoria.killer.utils.GenerateVideoThumbnails;
 import psycho.euphoria.killer.video.PlayerActivity;
-import psycho.euphoria.killer.video.Utils;
 import psycho.euphoria.killer.video.VideoListActivity;
 
 import static psycho.euphoria.killer.ServerService.DEFAULT_PORT;
@@ -224,6 +225,34 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public void generateVideoThumbnails(String dir) {
-        GenerateVideoThumbnails.generateVideoThumbnails(new File(dir)).start();
+        generateVideoThumbnails(new File(dir)).start();
+    }
+
+    public static Thread generateVideoThumbnails(File dir) {
+        return new Thread(() -> {
+            File parent = new File(dir, ".images");
+            if (!parent.exists()) {
+                parent.mkdirs();
+            }
+            File[] files = dir.listFiles(file -> file.isFile() && !file.getName().endsWith(".srt"));
+            if (files != null) {
+                for (File file : files) {
+                    File output = new File(parent, file.getName());
+                    if (output.exists()) continue;
+                    try {
+                        Bitmap bitmap = Shared.createVideoThumbnail(file.getAbsolutePath());
+                        if (bitmap != null) {
+                            FileOutputStream fileOutputStream = new FileOutputStream(output);
+                            bitmap.compress(CompressFormat.JPEG, 75, fileOutputStream);
+                            bitmap.recycle();
+                            fileOutputStream.close();
+                        }
+
+                    } catch (Exception ignored) {
+                    }
+
+                }
+            }
+        });
     }
 }
