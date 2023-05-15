@@ -13,57 +13,6 @@ use rocket::routes;
 use rocket::{Request, Response};
 use std::sync::Arc;
 
-pub struct CORS;
-
-#[rocket::async_trait]
-impl Fairing for CORS {
-    fn info(&self) -> Info {
-        Info {
-            name: "Attaching CORS headers to responses",
-            kind: Kind::Response,
-        }
-    }
-
-    async fn on_response<'r>(&self, _request: &'r Request<'_>, response: &mut Response<'r>) {
-        response.set_header(Header::new("Access-Control-Allow-Origin", "*"));
-        response.set_header(Header::new(
-            "Access-Control-Allow-Methods",
-            "POST, GET, PATCH, OPTIONS",
-        ));
-        response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
-        response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
-    }
-}
-
-pub struct ContentDisposition;
-
-#[rocket::async_trait]
-impl Fairing for ContentDisposition {
-    fn info(&self) -> Info {
-        Info {
-            name: "Attaching ContentDisposition headers to responses",
-            kind: Kind::Response,
-        }
-    }
-
-    async fn on_response<'r>(&self, request: &'r Request<'_>, response: &mut Response<'r>) {
-        let p = request.uri().to_string();
-        if p.ends_with(".zip") || p.ends_with(".db") || p.ends_with(".7z") {
-            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
-            response.set_header(Header::new(
-                "Content-Disposition",
-                format!(
-                    "attachment; filename=\"{}\"",
-                    urlencoding::decode(request.uri().query().unwrap().as_str())
-                        .unwrap()
-                        .to_string()
-                        .substring_after_last("/")
-                ),
-            ));
-        }
-    }
-}
-
 #[tokio::main]
 pub async fn run_server(srv: Server, ass: AssetManager) {
     let limits = Limits::default()
@@ -79,8 +28,8 @@ pub async fn run_server(srv: Server, ass: AssetManager) {
         .merge((rocket::Config::LIMITS, limits))
         .merge((rocket::Config::LOG_LEVEL, LogLevel::Critical));
     let mut server = rocket::custom(figment)
-        .attach(CORS)
-        .attach(ContentDisposition)
+        .attach(handlers::cors::CORS)
+        .attach(handlers::content_disposition::ContentDisposition)
         .mount(
             "/",
             routes![
