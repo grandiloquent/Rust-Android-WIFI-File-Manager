@@ -14,7 +14,7 @@ pub async fn api_file_rename(path: String, dst: String) -> Value {
         if let Some(value) = p.parent() {
             let d = value.join(dst);
             if !d.exists() {
-                fs::rename(p, d);
+                let _ = fs::rename(p, d);
             }
         } else {
         }
@@ -32,7 +32,7 @@ pub async fn api_file_move(dst: String, list: Json<Vec<String>>) -> Value {
         let p = Path::new(path.as_str());
         let f = d.join(p.file_name().unwrap().to_str().unwrap());
         if !f.exists() {
-            fs::rename(p, f);
+            let _ = fs::rename(p, f);
         }
     }
     // https://doc.rust-lang.org/stable/std/fs/fn.remove_dir_all.html

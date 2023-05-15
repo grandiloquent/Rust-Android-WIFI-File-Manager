@@ -8,9 +8,9 @@ pub async fn api_file_delete(list: Json<Vec<String>>) -> Value {
     for path in list.into_inner() {
         let p = Path::new(path.as_str());
         if p.is_dir() {
-            fs::remove_dir_all(p);
+            let _ = fs::remove_dir_all(p);
         } else {
-            fs::remove_file(p);
+            let _ = fs::remove_file(p);
         }
     }
     // https://doc.rust-lang.org/stable/std/fs/fn.remove_dir_all.html

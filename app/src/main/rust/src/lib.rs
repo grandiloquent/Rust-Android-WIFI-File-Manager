@@ -12,9 +12,9 @@ mod server;
 mod strings;
 mod util;
 
-use crate::data::config::{Database, Server};
+use crate::data::config::{ Server};
 use crate::server::run_server;
-use crate::util::{get_asset_manager, get_string};
+use crate::util::{get_asset_manager};
 use jni::objects::{JObject, JString};
 use jni::JNIEnv;
 

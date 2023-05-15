@@ -1,16 +1,11 @@
 use crate::asset::Cache;
 use crate::handlers;
-use crate::strings::StringExt;
-use crate::{error, Database, Server};
+use crate::{error, Server};
 use ndk::asset::AssetManager;
 use rocket::config::LogLevel;
 use rocket::data::{Limits, ToByteUnit};
-use rocket::fairing::{Fairing, Info, Kind};
-use rocket::figment::providers::{Format, Toml};
 use rocket::figment::Figment;
-use rocket::http::Header;
 use rocket::routes;
-use rocket::{Request, Response};
 use std::sync::Arc;
 
 #[tokio::main]
@@ -59,6 +54,6 @@ pub async fn run_server(srv: Server, ass: AssetManager) {
         .manage(Arc::new(Cache::new(ass)))
         .register("/", catchers![error::not_found]);
 
-    server.launch().await;
+    let _ = server.launch().await;
 }
 // cargo ndk -t arm64-v8a --platform 31 -o C:\Users\Administrator\Desktop\file\Killer\app\src\main\jniLibs build --release

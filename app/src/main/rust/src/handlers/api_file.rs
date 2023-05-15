@@ -13,6 +13,6 @@ pub fn api_file_post<'a>(path: String, data: String) -> Result<(), Status> {
     if !p.exists() {
         return Err(Status::NotFound);
     }
-    fs::write(p, data);
+    let _ = fs::write(p, data);
     Ok(())
 }
