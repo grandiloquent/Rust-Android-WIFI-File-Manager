@@ -1,252 +1,203 @@
-function appendSubtitle(video) {
-    //document.querySelectorAll('track').forEach(x => x.remove())
-    const track = document.createElement('track');
-    var tracks = video.textTracks;
-    var numTracks = tracks.length;
-    for (var i = numTracks - 1; i >= 0; i--)
-        video.textTracks[i].mode = "disabled";
-    track.src = substringBeforeLast(video.src, ".") + ".srt";
-    track.default = true;
-    video.appendChild(track);
+function adjustSize(video) {
+    if (video.videoWidth > 0) {
+        const w = Math.min(window.outerWidth, window.innerWidth);
+        const h = Math.min(window.outerHeight, window.innerHeight);
+        let ratio = Math.min(w / video.videoWidth, h / video.videoHeight);
+        let height = video.videoHeight * ratio
+        let width = video.videoWidth * ratio;
+        video.style.width = `${width}px`;
+        video.style.height = `${height}px`;
+        video.style.left = `${(w - width) / 2}px`;
+        video.style.top = `${(h - height) / 2}px`
+    }
+}
+function durationchange(video, url) {
+    const second = document.getElementById('second');
+    return evt => {
+        if (video.duration) {
+            second.textContent = formatDuration(video.duration);
+            fetch(`${getBaseAddress()}/video/duration?url=${encodeURIComponent(url)}&duration=${video.duration | 0}`)
+        }
+        adjustSize(video);
+    }
 }
 
-function bind(elememnt) {
-    (elememnt || document).querySelectorAll('[bind]').forEach(element => {
-        if (element.getAttribute('bind')) {
-            window[element.getAttribute('bind')] = element;
-        }
-        [...element.attributes].filter(attr => attr.nodeName.startsWith('@')).forEach(attr => {
-            if (!attr.value) return;
-            element.addEventListener(attr.nodeName.slice(1), evt => {
-                window[attr.value](evt);
-            });
-        });
+async function getUrl(baseUri, url) {
+    const res = await fetch(`${baseUri}/video/fetch?url=${encodeURIComponent(url)}`);
+    if (res.status === 204) {
+        throw new Error(`无法获取视频地址`);
+    }
+    return res.json();
+}
+function initializeSeek(video, first) {
+    // const width = video.getBoundingClientRect().width;
+    // let right, start, dif = 0, timer;
+    // video.addEventListener('touchstart', evt => {
+    //     video.pause();
+    //     start = video.currentTime;
+    //     right = (evt.touches[0].clientX >= width / 2);
+    //     clearInterval(timer);
+    //     timer = setInterval(() => {
+    //         dif += 1 * (right ? 1 : -1);
+    //         first.textContent = formatDuration(dif + start);
+    //         startTimer();
+    //     }, 100);
+    // })
+    // video.addEventListener('touchend', evt => {
+    //     clearInterval(timer);
+    //     console.log(dif + start)
+    //     video.currentTime = dif + start;
+    //     video.play();
+    // })
+
+    document.getElementById('back').addEventListener('click', evt => {
+        startTimer();
+        if (video.currentTime - 30 > 0)
+            video.currentTime = video.currentTime - 30;
+    })
+    document.getElementById('forward').addEventListener('click', evt => {
+        startTimer();
+        if (video.currentTime + 30 <= video.duration)
+            video.currentTime = video.currentTime + 30;
     })
 }
-
-function calculateLoadedPercent(video) {
-    if (!video.buffered.length) {
-        return '0';
-    }
-    return (video.buffered.end(0) / video.duration) * 100 + '%';
-}
-
-
-
-
-function getCurrentVideoFileName() {
-    let s = substringAfterLast(decodeURIComponent(video.src), '/');
-    s = substringAfterLast(s, '\\')
-    return substringBefore(s, "&");
-}
-
-function getIndexOfCurrentPlayback() {
-    const name = getCurrentVideoFileName();
-    return items.indexOf(items.filter(x => x.path.endsWith(`\\${name}`))[0]);
-}
-
-function getPath() {
-    return new URL(document.URL).searchParams.get('path');
-}
-
-async function loadData() {
-    if (!items) {
-        const path = substringBeforeLast(decodeURIComponent(new URL(document.URL).searchParams.get('path')), '\\');
-       console.log(path)
-        const res = await fetch(`/api/files?path=${encodeURIComponent(path)}`);
-        items = await res.json();
-        items = items.filter(x => {
-            return !x.isDirectory && x.path.endsWith('.mp4');
-        })
+function progress(video, loaded) {
+    return evt => {
+        if (video.buffered.length) {
+            loaded.style.width = `${video.buffered.end(0) / video.duration * 100}%`;
+        }
     }
 }
 
-function onBottom(evt) {
-    evt.stopPropagation();
-    if (evt.clientX > left || evt.clientX <= width + left) {
-        let precent = (evt.clientX - left) / width;
-        precent = Math.max(precent, 0);
-        precent = Math.min(precent, 1);
-        video.currentTime = video.duration * precent;
-    }
-}
-
-function onDownload(evt) {
-    evt.stopPropagation();
-    renderData();
-}
-
-function onDurationChange() {
-    customTimePicker.min = video.currentTime;
-    customTimePicker.max = video.duration;
-    if (window.innerWidth < window.innerHeight) {
-        const ratio = video.videoWidth / window.innerWidth;
-        layout.style.height = `${video.videoHeight / ratio}px`;
+function setSrc(video, src) {
+    if (src.indexOf(".m3u8") !== -1 && !video.canPlayType('application/vnd.apple.mpegurl') && Hls.isSupported()) {
+        var hls = new Hls();
+        hls.loadSource(src);
+        hls.attachMedia(
+            video
+        );
     } else {
-        const ratio = video.videoHeight / window.innerHeight;
-        layout.style.height = `${video.videoHeight / ratio}px`;
-    }
-    progressBarPlayed.style.width = calculateProgressPercent(video);
-    timeSecond.textContent = formatDuration(video.duration);
-}
-
-function onEnded() {
-    playIndexedVideo(true)
-}
-
-function onFullscreen(evt) {
-    evt.stopPropagation();
-    toggleFullScreen();
-}
-
-function onLayout(evt) {
-    middle.style.display = 'flex';
-    bottom.style.display = 'flex';
-    timer && clearTimeout(timer);
-    timer = setTimeout(() => {
-        middle.style.display = 'none';
-        bottom.style.display = 'none';
-    }, 5000)
-}
-
-function onNext(evt) {
-    evt.stopPropagation();
-    playIndexedVideo(true)
-    
-}
-
-function onPause() {
-    buttonPlay.querySelector('path').setAttribute('d', 'M6,4l12,8L6,20V4z');
-}
-
-function onPlay(evt) {
-    evt.stopPropagation();
-    scheduleHide();
-    buttonPlay.querySelector('path').setAttribute('d', 'M9,19H7V5H9ZM17,5H15V19h2Z');
-}
-
-function onPlayButton(evt) {
-    evt.stopPropagation();
-    if (video.paused) {
-        video.play();
-
-    } else {
-        video.pause();
+        video.src = src;
     }
 }
-
-function scheduleHide() {
-    timer && clearTimeout(timer);
-    timer = setTimeout(() => {
-        middle.style.display = 'none';
-        bottom.style.display = 'none';
-    }, 3000)
-}
-
-function onPrevious(evt) {
-    evt.stopPropagation();
-    playIndexedVideo(false)
-}
-
-function onProgress() {
-    progressBarLoaded.style.width = calculateLoadedPercent(video);
-}
-
-
-
-async function playIndexedVideo(next) {
-    await loadData();
-    let index = getIndexOfCurrentPlayback();
-    console.log(index)
-    if (next && index + 1 < items.length) {
-        index++;
-        playVideoAtSpecifiedIndex(index)
-    }
-    if (!next && index > 0) {
-        index--
-        playVideoAtSpecifiedIndex(index)
+function timeupdate(video) {
+    const first = document.getElementById('first');
+    const progressBarPlayed = document.querySelector('.progress_bar_played');
+    const progressBarPlayheadWrapper = document.querySelector('.progress_bar_playhead_wrapper');
+    return evt => {
+        if (video.currentTime) {
+            first.textContent = formatDuration(video.currentTime);
+            const ratio = video.currentTime / video.duration;
+            progressBarPlayed.style.width = `${ratio * 100}%`;
+            progressBarPlayheadWrapper.style.marginLeft = `${ratio * 100}%`;
+        }
     }
 }
+let timer;
+const middle = document.getElementById('middle');
+const bottom = document.getElementById('bottom');
+const toast = document.getElementById('toast');
 
-async function playVideoAtSpecifiedIndex(index) {
-    const v = items[index];
-    video.src = `/api/file?path=${encodeURIComponent(v.path)}`;
-    appendSubtitle(video);
-    await video.play();
-    document.title = substringAfterLast(v.path, "\\");
-    title.textContent = substringAfterLast(v.path, "\\");
-    toast.setAttribute('message', title.textContent);
-}
+async function initialize() {
+    const searchParams = new URL(window.location).searchParams;
+    const url = searchParams.get("url");
+    let videoInformation;
+    try {
+        videoInformation = await getUrl(getBaseAddress(), url);
 
-async function renderData() {
-    await loadData();
+    } catch (error) {
+        toast.setAttribute('message', error.message);
+        return;
+    }
+    document.title = videoInformation.title;
+    toast.setAttribute('message', videoInformation.title);
+    const video = document.querySelector('video');
 
-    customBottomSheet.data = items.map((x, i) => {
-        return {
-            id: i,
-            title: substringAfterLast(x.path, "\\")
+    const loaded = document.querySelector('.progress_bar_loaded');
+    const download = document.querySelector('.download');
+    download.addEventListener('click', evt => {
+        writeText(videoInformation.file);
+        toast.setAttribute('message', "已成功复制视频地址");
+    });
+    setSrc(video, videoInformation.file);
+    video.addEventListener('durationchange', durationchange(video, url));
+    video.addEventListener('timeupdate', timeupdate(video));
+    video.addEventListener('progress', progress(video, loaded));
+    video.addEventListener('play', play());
+    video.addEventListener('pause', pause());
+
+    initializeSeek(video, first);
+    initializeSeekDialog(video);
+    document.getElementById('play').addEventListener('click', evt => {
+        if (video.paused) {
+            video.play();
+            startTimer();
+        } else {
+            video.pause();
         }
     });
-    customBottomSheet.style.display = 'block';
+    video.addEventListener('click', evt => {
+        middle.style.display = "flex";
+        bottom.style.display = "flex";
+        startTimer();
+    });
 }
-
-function substringAfterLast(string, delimiter, missingDelimiterValue) {
-    const index = string.lastIndexOf(delimiter);
-    if (index === -1) {
-        return missingDelimiterValue || string;
-    } else {
-        return string.substring(index + delimiter.length);
+function play() {
+    return evt => {
+        document.querySelector('#play path').setAttribute('d', 'M9,19H7V5H9ZM17,5H15V19h2Z');
     }
 }
-
-function substringBefore(string, delimiter, missingDelimiterValue) {
-    const index = string.indexOf(delimiter);
-    if (index === -1) {
-        return missingDelimiterValue || string;
-    } else {
-        return string.substring(0, index);
+function pause() {
+    return evt => {
+        document.querySelector('#play path').setAttribute('d', ' M6,4l12,8L6,20V4z');
     }
 }
+initialize();
 
-function substringBeforeLast(string, delimiter, missingDelimiterValue) {
-    const index = string.lastIndexOf(delimiter);
-    if (index === -1) {
-        return missingDelimiterValue || string;
-    } else {
-        return string.substring(0, index);
-    }
+function startTimer() {
+    if (timer)
+        clearTimeout(timer);
+    timer = setTimeout(() => {
+        middle.style.display = "none";
+        bottom.style.display = "none";
+    }, 10000);
+    return timer;
 }
 
-function toggleFullScreen() {
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-        layout.style.position = "fixed";
-        layout.style.left = '0';
-        layout.style.top = '0';
-        layout.style.bottom = '0';
-        layout.style.right = '0';
-        layout.style.height = 'auto'
-    } else {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-            layout.style.position = "relative";
-            const ratio = video.videoWidth / window.innerWidth;
-            layout.style.height = `${video.videoHeight / ratio}px`;
-        }
-    }
+function initializeSeekDialog(video) {
+    const dialogContainer = document.querySelector('.dialog-container');
+    dialogContainer.querySelector('.dialog-overlay')
+        .addEventListener('click', evt => {
+            dialogContainer.style.display = 'none';
+        });
+    dialogContainer.querySelector('.dialog-buttons>div')
+        .addEventListener('click', evt => {
+            const values = /((\d+)h)?((\d+)m)?(\d+)s/.exec(dialogContainer.querySelector('input').value);
+            let currentTime = 0;
+            if (values[2]) {
+                currentTime += parseInt(values[2]) * 3600;
+            }
+            if (values[4]) {
+                currentTime += parseInt(values[4]) * 60;
+            }
+            if (values[5]) {
+                currentTime += parseInt(values[5]);
+            }
+            video.currentTime = currentTime;
+            dialogContainer.style.display = 'none';
+        });
+
+    document.querySelector('.playback_speed')
+        .addEventListener('click', evt => {
+            const step = (video.duration / 10) | 0;
+            let seekTo = video.currentTime + step < video.duration;
+            seekTo = Math.min(seekTo, video.duration);
+            dialogContainer.querySelector('input').value = formatSeconds(seekTo);
+            dialogContainer.style.display = 'flex';
+        })
 }
-
-function onCustomBottomSheetSubmit(evt) {
-    customBottomSheet.style.display = 'none';
-    playVideoAtSpecifiedIndex(parseInt(evt.detail.id))
+function formatSeconds(value) {
+    const seconds = value % 60;
+    const minutes = value / 60 | 10;
+    return `${minutes}m${seconds}s`;
 }
-
-function onCustomTimePickerSubmit(evt) {
-    video.currentTime = evt.detail;
-}
-
-
-/*
-https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement
-https://developer.mozilla.org/zh-CN/docs/Web/API/Fullscreen_API
-*/

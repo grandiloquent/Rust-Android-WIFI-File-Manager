@@ -77,7 +77,6 @@ public class ServerService extends Service {
         }
         // https://developer.android.com/guide/components/foreground-services
         createNotification(this);
-        Log.e("B5aOx2", String.format("onStartCommand, %s", "startServer"));
         startServer();
         sendBroadcast(new Intent(getPackageName() + ".server_started"));
         return START_STICKY;

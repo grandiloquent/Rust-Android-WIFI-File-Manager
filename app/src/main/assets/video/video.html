@@ -7,122 +7,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>视频</title>
     <link rel="stylesheet" href="video.css">
-    <!-- <script src="video.js"></script> -->
-    <script src="../custom-bottom-sheet.js"></script>
-    <script src="../toast.js"></script>
-    <script src="../shared.js"></script>
-    <script src="calculations.js"></script>
-    <style>
-
-    </style>
-    <script src="title.js"></script>
-    <script src="strings.js"></script>
+    <script src="https://fastly.jsdelivr.net/npm/hls.js@1"></script>
+    <script src="shared.js"></script>
+    <script src="custom_toast.js"></script>
 </head>
 
 <body>
-    <custom-toast bind="toast"></custom-toast>
-    <div class="video-player__content">
-        <div bind="videoContainer" class="video-container">
-            <video class="video" bind="video" @timeupdate="onTimeupdate" @durationChange="onDurationChange"
-                @progress="onProgress" @pause="onPause" @ended="onEnded" @play="onPlay" class="video">
-            </video>
+    <div id="middle">
+        <div id="back">
+            <svg style="width:36px;height: 36px;" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24"
+                width="24">
+                <path d="M19,6L9,12l10,6V6L19,6z M7,6H5v12h2V6z"></path>
+            </svg>
         </div>
-        <div bind="gradient" class="gradient">
+        <div id="play">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M6,4l12,8L6,20V4z"></path>
+            </svg>
         </div>
-        <div bind="scrim" class="scrim">
-            <div class="scrim__header" style="visibility: hidden;">
-                <button class="button">
-                    <svg class="svg" xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 64 64"
-                        aria-hidden="true">
-                        <path
-                            d="M3.67 55.784c-1.26 1.26-1.298 3.412 0 4.673 1.298 1.26 3.45 1.26 4.71 0l23.734-23.735 23.734 23.735c1.261 1.26 3.45 1.298 4.71 0 1.261-1.298 1.261-3.412 0-4.673L36.824 32.013 60.558 8.278c1.261-1.26 1.298-3.411 0-4.672-1.298-1.298-3.449-1.298-4.71 0L32.114 27.34 8.38 3.606c-1.26-1.298-3.449-1.335-4.71 0-1.26 1.298-1.26 3.412 0 4.672l23.734 23.735L3.67 55.783z">
-                        </path>
-                    </svg>
-                </button>
+        <div id="forward">
+            <svg style="width:36px;height: 36px;" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24"
+                width="24">
+                <path d="M5,18l10-6L5,6V18L5,18z M19,6h-2v12h2V6z"></path>
+            </svg>
+        </div>
+    </div>
+
+    <div id="bottom">
+        <div class="bottom-top-wrapper">
+            <div class="video-times">
+                <div id="first">00:00</div>
+                <div class="delimiter">/</div>
+                <div id="second">00:00</div>
             </div>
-            <div class="scrim__body">
-                <div class="unified-controls">
-                    <div class="playback-controls-skip">
-                        <button bind @click="onBack" class="button--back">
-                            <div class="icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="84.21 19.76 99.61 109.08">
-                                    <path
-                                        d="M84.205 79.035c0 27.246 22.608 49.804 49.805 49.804 27.246 0 49.805-22.558 49.805-49.804 0-24.024-17.53-44.385-40.381-48.877v-6.934c0-3.467-2.393-4.395-5.03-2.49l-15.576 10.888c-2.246 1.563-2.295 3.907 0 5.518l15.528 10.938c2.685 1.953 5.078 1.025 5.078-2.49v-6.934c18.457 4.199 32.031 20.605 32.031 40.38 0 23.047-18.408 41.504-41.455 41.504-23.047 0-41.553-18.457-41.504-41.503.049-13.868 6.787-26.124 17.188-33.545 2.002-1.514 2.636-3.809 1.416-5.86-1.221-2.002-3.907-2.539-6.055-.879-12.549 9.131-20.85 23.877-20.85 40.284Zm61.866 20.556c8.105 0 13.427-7.666 13.427-19.385 0-11.816-5.322-19.58-13.427-19.58-8.106 0-13.428 7.764-13.428 19.58 0 11.72 5.322 19.385 13.428 19.385Zm-25.44-.586c1.904 0 3.125-1.318 3.125-3.369V64.923c0-2.392-1.27-3.906-3.467-3.906-1.318 0-2.246.44-4.052 1.611l-6.739 4.541c-1.074.782-1.611 1.66-1.611 2.832 0 1.612 1.27 2.979 2.832 2.979.928 0 1.367-.195 2.344-.879l4.54-3.32v26.855c0 2.002 1.173 3.37 3.028 3.37Zm25.44-5.322c-4.297 0-7.08-5.127-7.08-13.477 0-8.496 2.734-13.671 7.08-13.671 4.345 0 7.03 5.126 7.03 13.671 0 8.35-2.734 13.477-7.03 13.477Z">
-                                    </path>
-                                </svg>
-                            </div>
-                        </button>
-                    </div>
-
-                    <div class="playback-controls-play">
-                        <button class="playback-play__play" bind="play">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="102.69 30.35 87.5 97.51">
-                                <path
-                                    d="M113.428 127.863c2.588 0 5.03-.733 8.448-2.686l60.302-35.01c4.883-2.88 8.008-6.103 8.008-11.084 0-4.98-3.125-8.203-8.008-11.035l-60.302-35.01c-3.418-2.002-5.86-2.685-8.448-2.685-5.566 0-10.742 4.248-10.742 11.67v74.17c0 7.422 5.176 11.67 10.742 11.67Z">
-                                </path>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div class="playback-controls-skip">
-                        <button bind @click="onForward" class="button--back">
-                            <div class="icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="84.21 19.76 99.61 109.08">
-                                    <path
-                                        d="M84.205 79.035c0 27.246 22.608 49.804 49.805 49.804 27.246 0 49.805-22.558 49.805-49.804 0-16.407-8.301-31.153-20.85-40.284-2.148-1.66-4.834-1.123-6.055.88-1.22 2.05-.586 4.345 1.416 5.859 10.4 7.421 17.139 19.677 17.188 33.545.049 23.046-18.457 41.503-41.504 41.503-23.047 0-41.455-18.457-41.455-41.503 0-19.776 13.574-36.182 32.031-40.381v6.982c0 3.467 2.393 4.395 5.078 2.49L145.24 37.19c2.198-1.514 2.247-3.858 0-5.469l-15.527-10.937c-2.734-1.954-5.127-1.026-5.127 2.49v6.885c-22.851 4.492-40.38 24.853-40.38 48.877Zm61.621 20.556c8.106 0 13.428-7.666 13.428-19.385 0-11.816-5.322-19.58-13.428-19.58-8.105 0-13.427 7.764-13.427 19.58 0 11.72 5.322 19.385 13.427 19.385Zm-25.44-.586c1.905 0 3.126-1.318 3.126-3.369V64.923c0-2.392-1.27-3.906-3.467-3.906-1.318 0-2.246.44-4.053 1.611l-6.738 4.541c-1.074.782-1.611 1.66-1.611 2.832 0 1.612 1.27 2.979 2.832 2.979.928 0 1.367-.195 2.344-.879l4.54-3.32v26.855c0 2.002 1.172 3.37 3.028 3.37Zm25.44-5.322c-4.296 0-7.08-5.127-7.08-13.477 0-8.496 2.735-13.671 7.08-13.671 4.346 0 7.032 5.126 7.032 13.671 0 8.35-2.735 13.477-7.032 13.477Z">
-                                    </path>
-                                </svg>
-                            </div>
-                        </button>
-                    </div>
-
-                </div>
+            <div style="flex-grow: 1;"></div>
+            <div class="playback_speed button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M10.6,9.2v5.6l4.2-2.8L10.6,9.2L10.6,9.2z M8,7.1L7.6,6.5c1-0.8,2.3-1.4,3.7-1.5l0.1,0.7C10.1,5.8,9,6.3,8,7.1z M7.1,8
+        L6.5,7.6c-0.8,1-1.4,2.3-1.5,3.7l0.7,0.1C5.8,10.1,6.3,9,7.1,8z M7.1,16c-0.8-1-1.3-2.2-1.4-3.4L5,12.7c0.1,1.4,0.7,2.7,1.5,3.8
+        L7.1,16z M11.4,18.3C10.1,18.2,9,17.7,8,16.9l-0.4,0.6c1,0.8,2.3,1.4,3.7,1.5L11.4,18.3z M19,12c0-3.6-2.7-6.6-6.3-7l-0.1,0.7
+        c3.2,0.4,5.7,3,5.7,6.3s-2.4,6-5.7,6.3l0.1,0.7C16.3,18.6,19,15.6,19,12z"></path>
+                </svg>
             </div>
-            <div class="scrim__footer">
-                <div class="scrim-footer__info">
-                    <div bind="title" class="video-player-title">
-
-                    </div>
-                </div>
-                <div class="scrim-footer__progress">
-                    <div class="playback-controls-progress">
-                        <div class="elapsed" bind="elapsed"></div>
-                        <div class="scrubber">
-                            <div class="progress-range__shadow">
-                            </div>
-                            <input bind="range" @change="onSeek" value="0" type="range" class="playback-progress" min="0"
-                                class="max=" 100">
-                        </div>
-                        <div class="remaining" bind="remaining"></div>
-                    </div>
-                </div>
-                <div class="scrim-footer__controls">
-                    <div bind @click="onSeekTo" class="scrim-footer__button">
-                        <svg style="fill: #fff;" viewBox="0 0 24 24">
-                            <path
-                                d="M18.984 18.984v-13.969h-13.969v13.969h13.969zM18.984 3q0.797 0 1.406 0.609t0.609 1.406v13.969q0 0.797-0.609 1.406t-1.406 0.609h-13.969q-0.797 0-1.406-0.609t-0.609-1.406v-13.969q0-0.797 0.609-1.406t1.406-0.609h13.969zM9.984 8.016l5.016 3.984-5.016 3.984v-7.969z">
-                            </path>
-                        </svg>
-                    </div>
-                    <div bind @click="onPlayVideo" class="scrim-footer__button">
-                        <svg style="fill: #fff;" viewBox="0 0 24 24">
-                            <path
-                                d="M3 6h18v5.016h2.016v-5.016q0-0.844-0.586-1.43t-1.43-0.586h-18q-0.844 0-1.43 0.586t-0.586 1.43v12q0 0.844 0.586 1.43t1.43 0.586h9v-2.016h-9v-12zM15 12l-6-3.984v7.969zM22.688 18.422q0.094-0.469 0.047-0.844l1.078-0.844q0.141-0.141 0.047-0.328l-1.031-1.781q-0.094-0.188-0.328-0.141l-1.266 0.516q-0.328-0.234-0.75-0.422l-0.188-1.359q-0.047-0.234-0.281-0.234h-2.063q-0.188 0-0.234 0.234l-0.188 1.359q-0.234 0.094-0.422 0.188t-0.328 0.234l-1.313-0.516q-0.188-0.094-0.281 0.094l-1.031 1.828q-0.094 0.188 0.047 0.281l1.078 0.891q-0.047 0.469 0 0.844l-1.078 0.844q-0.188 0.141-0.047 0.328l1.031 1.781q0.094 0.188 0.281 0.141l1.266-0.516q0.375 0.234 0.75 0.422l0.234 1.359q0 0.188 0.234 0.188h2.063q0.234 0 0.234-0.188l0.234-1.359 0.375-0.188t0.328-0.234l1.313 0.516q0.188 0.047 0.281-0.141l1.031-1.781q0.141-0.188-0.047-0.328zM18.984 19.5q-0.609 0-1.055-0.445t-0.445-1.055 0.445-1.055 1.055-0.445q0.656 0 1.078 0.445t0.422 1.055-0.422 1.055-1.078 0.445z">
-                            </path>
-                        </svg>
-                    </div>
-                    <div bind @click="onFullscreen" class="scrim-footer__button">
-                        <svg style="fill: #fff;" viewBox="0 0 24 24">
-                            <path
-                                d="M14.016 5.016h4.969v4.969h-1.969v-3h-3v-1.969zM17.016 17.016v-3h1.969v4.969h-4.969v-1.969h3zM5.016 9.984v-4.969h4.969v1.969h-3v3h-1.969zM6.984 14.016v3h3v1.969h-4.969v-4.969h1.969z">
-                            </path>
-                        </svg>
-                    </div>
+            <div class="download button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path
+                        d="M5.016 18h13.969v2.016h-13.969v-2.016zM18.984 9l-6.984 6.984-6.984-6.984h3.984v-6h6v6h3.984z">
+                    </path>
+                </svg>
+            </div>
+            <div class="fullscreen button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M7,11H6V6h5v1H7V11z M18,6h-5v1h4v4h1V6z M18,13h-1v4h-4v1h5V13z M11,17H7v-4H6v5h5V17z">
+                    </path>
+                </svg>
+            </div>
+        </div>
+        <div class="progress_bar_line">
+            <div class="progress_bar_background">
+            </div>
+            <div class="progress_bar_loaded">
+            </div>
+            <div class="progress_bar_played">
+            </div>
+            <div class="progress_bar_playhead_wrapper">
+                <div class="progress_bar_playhead_dot">
                 </div>
             </div>
         </div>
     </div>
-    <script src="actions.js"></script>
+    <video class="video"></video>
+
+    <div class="dialog-container">
+        <div class="dialog">
+            <div class="dialog-header">
+                <h2 class="dialog-title">跳转</h2>
+            </div>
+            <div class="dialog-body">
+                <input class="dialog-input" placeholder="0m0s">
+            </div>
+            <div class="dialog-buttons">
+                <div class="dialog-button">
+                    确认
+                </div>
+            </div>
+        </div>
+        <div class="dialog-overlay"></div>
+    </div>
+    <custom-toast id="toast"></custom-toast>
+    <script src="video.js"></script>
 </body>
 
 </html>

@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
@@ -16,7 +17,6 @@ import android.webkit.WebView;
 import static psycho.euphoria.killer.utils.AroundFileUriExposedException.aroundFileUriExposedException;
 import static psycho.euphoria.killer.utils.InitializeWebView.initializeWebView;
 import static psycho.euphoria.killer.utils.LaunchServer.launchServer;
-import static psycho.euphoria.killer.utils.LoadStartPage.loadStartPage;
 import static psycho.euphoria.killer.utils.Refresh.refresh;
 import static psycho.euphoria.killer.utils.RequestPermission.requestPermission;
 import static psycho.euphoria.killer.utils.RequestStorageManagerPermission.requestStorageManagerPermission;
@@ -49,10 +49,23 @@ public class MainActivity extends Activity {
       */
     public static native void startServer(ServerService service, AssetManager assetManager, String host, int port);
 
+    private String mAddress;
+    private void loadStartPage(MainActivity context, boolean isHomePage) {
+        if (isHomePage) {
+            Log.e("B5aOx2", String.format("loadStartPage, %s", mAddress));
+            context.getWebView().loadUrl(mAddress);
+        } else {
+            String lastedAddress = context.getSharedPreferences().getString("address", mAddress);
+            if (lastedAddress != null) {
+                context.getWebView().loadUrl(lastedAddress);
+            }
+        }
+    }
     private void initialize() {
         mBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                mAddress = String.format("http://%s:%d", Shared.getDeviceIP(MainActivity.this), mSharedPreferences.getInt("port", 0));
                 loadStartPage(MainActivity.this, false);
             }
         };
