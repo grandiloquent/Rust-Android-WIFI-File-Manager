@@ -1,8 +1,8 @@
-use std::path::Path;
-use rocket::http::Status;
 use regex::Regex;
+use rocket::http::Status;
 use std::fs::File;
-use std::io::{BufReader, BufRead};
+use std::io::{BufRead, BufReader};
+use std::path::Path;
 fn is_timecode(line: &str) -> bool {
     line.contains("-->")
 }
@@ -18,16 +18,14 @@ fn delete_cue_settings(line: &str) -> String {
     }
     output.trim().to_string()
 }
-pub fn transform(input_path: &Path)
-                 -> String
-{
+pub fn transform(input_path: &Path) -> String {
     let f = File::open(input_path).unwrap();
     let reader = BufReader::new(f);
-    let timing = match Regex::new(
-        r"(\d{2}:\d{2}:\d{2}[,.]\d{3}) --> (\d{2}:\d{2}:\d{2}[,.]\d{3})$") {
+    let timing = match Regex::new(r"(\d{2}:\d{2}:\d{2}[,.]\d{3}) --> (\d{2}:\d{2}:\d{2}[,.]\d{3})$")
+    {
         Ok(v) => v,
         Err(error) => {
-            log::error!("{}",error.to_string());
+            log::error!("{}", error.to_string());
             Regex::new("").unwrap()
         }
     };
@@ -57,8 +55,7 @@ pub fn transform(input_path: &Path)
     }
     return s;
 }
-fn process_line(time_line: String) -> String
-{
+fn process_line(time_line: String) -> String {
     let (line_start, line_end): (f64, f64);
     // Create block so &time_line borrow ends before return:
     {
@@ -80,7 +77,8 @@ fn process_line(time_line: String) -> String
 /// Processes a &str of the form 'hh:mm:ss.sss'
 /// into the total number of seconds as f64.
 pub fn get_secs(time_string: &str) -> f64 {
-    time_string.rsplit(":")
+    time_string
+        .rsplit(":")
         // can't panic since time_string is validated by regex:
         .map(|t| t.parse::<f64>().unwrap())
         .zip(&[1.0, 60.0, 3600.0])

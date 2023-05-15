@@ -1,7 +1,7 @@
-use std::io::Cursor;
-use rocket::{Request, Response, response};
-use rocket::http::{Status};
+use rocket::http::Status;
 use rocket::response::Responder;
+use rocket::{response, Request, Response};
+use std::io::Cursor;
 
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct Asset {
@@ -12,9 +12,7 @@ pub struct Asset {
 impl<'r> Responder<'r, 'static> for Asset {
     fn respond_to(self, _: &'r Request<'_>) -> response::Result<'static> {
         if self.data.len() == 0 {
-            Response::build()
-                .status(Status::NotFound)
-                .ok()
+            Response::build().status(Status::NotFound).ok()
         } else {
             Response::build()
                 .raw_header("Content-Type", self.content_type)

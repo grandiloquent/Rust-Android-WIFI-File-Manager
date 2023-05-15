@@ -1,5 +1,5 @@
-use rocket::Request;
 use rocket::request::{FromRequest, Outcome};
+use rocket::Request;
 
 #[derive(Debug)]
 pub enum RangeFromHeader {

@@ -55,7 +55,8 @@ impl Fairing for ContentDisposition {
                 format!(
                     "attachment; filename=\"{}\"",
                     urlencoding::decode(request.uri().query().unwrap().as_str())
-                    .unwrap().to_string()
+                        .unwrap()
+                        .to_string()
                         .substring_after_last("/")
                 ),
             ));
@@ -65,7 +66,6 @@ impl Fairing for ContentDisposition {
 
 #[tokio::main]
 pub async fn run_server(srv: Server, ass: AssetManager) {
-
     let limits = Limits::default()
         .limit("json", 3.mebibytes())
         .limit("string", 3.mebibytes())
@@ -83,26 +83,29 @@ pub async fn run_server(srv: Server, ass: AssetManager) {
         .attach(ContentDisposition)
         .mount(
             "/",
-            routes![handlers::api_asset_file::api_asset_file,
-handlers::api_file::api_file,
-handlers::api_file::api_file_post,
-handlers::api_files::api_files,
-handlers::api_files::api_files_clear,
-handlers::api_files::api_files_rename,
-handlers::api_file_delete::api_file_delete,
-handlers::api_file_new::api_file_new_file,
-handlers::api_file_new::api_file_new_dir,
-handlers::api_file_rename::api_file_rename,
-handlers::api_file_rename::api_file_move,
-handlers::api_zip::api_zip,
-handlers::file::file,
-handlers::index::index,
-handlers::index_file::index_file,
-handlers::markdown::markdown,
-handlers::markdown::markdown_file,
-handlers::subtitle::subtitle,
-handlers::upload::upload,
-handlers::video::video],
+            routes![
+                handlers::api_asset_file::api_asset_file,
+                handlers::api_file::api_file,
+                handlers::api_file::api_file_post,
+                handlers::api_files::api_files,
+                handlers::api_files::api_files_clear,
+                handlers::api_files::api_files_rename,
+                handlers::api_file_delete::api_file_delete,
+                handlers::api_file_new::api_file_new_file,
+                handlers::api_file_new::api_file_new_dir,
+                handlers::api_file_rename::api_file_rename,
+                handlers::api_file_rename::api_file_move,
+                handlers::api_zip::api_zip,
+                handlers::compress_zip::compress_zip,
+                handlers::file::file,
+                handlers::index::index,
+                handlers::index_file::index_file,
+                handlers::markdown::markdown,
+                handlers::markdown::markdown_file,
+                handlers::subtitle::subtitle,
+                handlers::upload::upload,
+                handlers::video::video
+            ],
         )
         .manage(Arc::new(Cache::new(ass)))
         .register("/", catchers![error::not_found]);

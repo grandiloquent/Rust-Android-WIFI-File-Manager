@@ -19,7 +19,7 @@ impl StringExt for String {
         let i_pos = self.find(search);
         let answer = match i_pos {
             None => String::from(self),
-            Some(val) => self[..val].to_string()
+            Some(val) => self[..val].to_string(),
         };
         answer
     }
@@ -28,7 +28,7 @@ impl StringExt for String {
         let i_pos = self.rfind(search);
         let answer = match i_pos {
             None => String::from(self),
-            Some(val) => self[..val].to_string()
+            Some(val) => self[..val].to_string(),
         };
         answer
     }
@@ -37,7 +37,7 @@ impl StringExt for String {
         let i_pos = self.find(search);
         let answer = match i_pos {
             None => String::new(),
-            Some(val) => self[(val + search.len())..].to_string()
+            Some(val) => self[(val + search.len())..].to_string(),
         };
         answer
     }
@@ -46,7 +46,7 @@ impl StringExt for String {
         let i_pos = self.rfind(search);
         let answer = match i_pos {
             None => String::new(),
-            Some(val) => self[(val + search.len())..].to_string()
+            Some(val) => self[(val + search.len())..].to_string(),
         };
         answer
     }
@@ -60,7 +60,7 @@ impl StringExt for String {
                 let i_end_pos = rest.find(end);
                 match i_end_pos {
                     None => String::new(),
-                    Some(val2) => rest[0..val2].to_string()
+                    Some(val2) => rest[0..val2].to_string(),
                 }
             }
         };

@@ -1,7 +1,7 @@
-use ndk::asset::AssetManager;
-use std::sync::{Arc, RwLock};
-use std::collections::HashMap;
 use crate::util::read_resource_file;
+use ndk::asset::AssetManager;
+use std::collections::HashMap;
+use std::sync::{Arc, RwLock};
 
 pub struct Cache {
     ass: AssetManager,
@@ -16,30 +16,22 @@ impl Cache {
         }
     }
     pub fn get(&self, key: &str) -> Option<Vec<u8>> {
-        log::error!("{}",key);
+        log::error!("{}", key);
         match self.data.write() {
-            Ok(mut v) => {
-                match v.get(key) {
-                    None => {
-                        match read_resource_file(&self.ass, key) {
-                            Ok(value) => {
-                                v.insert(key.to_string(), value.clone());
-                                Some(value)
-                            }
-                            Err(err) => {
-                                log::error!("{}",err.to_string());
-                                None
-                            }
-                        }
+            Ok(mut v) => match v.get(key) {
+                None => match read_resource_file(&self.ass, key) {
+                    Ok(value) => {
+                        v.insert(key.to_string(), value.clone());
+                        Some(value)
                     }
-                    Some(v) => {
-                        Some((*v).clone())
+                    Err(err) => {
+                        log::error!("{}", err.to_string());
+                        None
                     }
-                }
-            }
-            Err(err) => {
-                None
-            }
+                },
+                Some(v) => Some((*v).clone()),
+            },
+            Err(err) => None,
         }
     }
 }

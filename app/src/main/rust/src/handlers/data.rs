@@ -8,10 +8,7 @@ pub struct Message<'a> {
 }
 impl<'a> Message<'a> {
     pub fn new(error: u32, message: &'a str) -> Self {
-        Message {
-            error,
-            message,
-        }
+        Message { error, message }
     }
     pub fn success(message: &'a str) -> Self {
         Message {

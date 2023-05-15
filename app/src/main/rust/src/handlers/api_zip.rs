@@ -1,14 +1,14 @@
-use std::error::Error;
-use std::path::{Path};
 use rocket::serde::json::{json, Value};
+use std::error::Error;
+use std::path::Path;
 use std::{fs, io};
 fn read_file(p: &Path) -> Result<(), Box<dyn Error>> {
     let mut d = match p.parent() {
         Some(v) => v,
         None => Err("Bad request")?,
     };
-// https://doc.rust-lang.org/std/path/struct.Path.html#method.file_stem
-// https://doc.rust-lang.org/std/ffi/struct.OsStr.html#method.to_str
+    // https://doc.rust-lang.org/std/path/struct.Path.html#method.file_stem
+    // https://doc.rust-lang.org/std/ffi/struct.OsStr.html#method.to_str
     let file_stem = match p.file_stem() {
         Some(v) => v,
         None => Err("Bad request")?,
@@ -44,7 +44,7 @@ fn read_file(p: &Path) -> Result<(), Box<dyn Error>> {
 // https://github.com/zip-rs/zip
 #[get("/api/zip?<path>")]
 pub async fn api_zip(path: String) -> Value {
-// https://doc.rust-lang.org/std/path/struct.Path.html
+    // https://doc.rust-lang.org/std/path/struct.Path.html
     let p = Path::new(path.as_str());
     if !p.is_file() {
         json!({
@@ -52,9 +52,9 @@ pub async fn api_zip(path: String) -> Value {
         })
     } else {
         if let Err(value) = read_file(p) {
-            log::error!("{}",value.to_string());
+            log::error!("{}", value.to_string());
         }
-// https://doc.rust-lang.org/std/fs/fn.rename.html
+        // https://doc.rust-lang.org/std/fs/fn.rename.html
         json!({
             "error":0
         })

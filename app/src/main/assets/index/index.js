@@ -12,6 +12,11 @@ function onItemClick(evt) {
             window.history.pushState({}, '', `?path=${encodedPath}`);
             render(evt.detail.path);
         } else {
+             
+            if (evt.detail.path.endsWith(".mp3")) {
+                window.location=`/music/music.html?path=${encodeURIComponent(evt.detail.path)}`
+                return;
+            }
             if (openVideoFile(evt.detail.path)) {
                 return
             }

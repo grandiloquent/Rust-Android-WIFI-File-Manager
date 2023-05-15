@@ -6,7 +6,6 @@ body {
     margin: 0;
     background-color: #030303;
     -webkit-font-smoothing: antialiased;
-    overflow: hidden;
 }
 
 .item-wrapper {
@@ -80,3 +79,133 @@ audio {
     position: fixed;
     left: -100%;
 }
+
+.play-pause-button {
+    padding: 4px;
+    width: 40px;
+    height: 40px;
+    color: #fff;
+    fill: currentColor;
+    box-sizing: border-box;
+}
+
+.next-button {
+    padding: 4px;
+    width: 32px;
+    height: 32px;
+    color: #fff;
+    fill: currentColor;
+    box-sizing: border-box;
+}
+
+.middle-controls {
+    grid-area: middle;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+}
+
+.content-info-wrapper {
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin: 0;
+
+}
+
+.title {
+    display: block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    font-family: Roboto, Noto Naskh Arabic UI, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: 500;
+    color: #fff;
+
+}
+
+.byline-wrapper {
+
+    display: flex;
+    align-items: center;
+
+}
+
+.right-controls {
+    grid-area: end;
+    justify-self: end;
+    position: relative;
+    justify-content: flex-end;
+    margin: 0 4px 0 0;
+    flex: none;
+    display: flex;
+    align-items: center;
+
+}
+
+.progress-bar {
+    position: absolute;
+    cursor: pointer;
+    display: block;
+    top: 1px;
+    left: -16px;
+    width: 100%;
+    transform: translateY(-50%);
+}
+
+.slider-container {
+    position: relative;
+    width: 100%;
+    height: 32px;
+    margin: 0 16px;
+}
+
+.slider-bar {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    padding: 15px 0;
+    width: 100%;
+    background-color: transparent;
+    touch-action: none;
+}
+
+.progress-container {
+    position: relative;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+
+}
+
+.secondary-progress {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform-origin: left center;
+    will-change: transform;
+    background: rgba(255, 255, 255, 0.1);
+    transform: scaleX(0.436242);
+
+}
+
+.primary-progress {
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform-origin: left center;
+    will-change: transform;
+    background: #f00;
+    transform: scaleX(0.0100671);
+}
+
+ 

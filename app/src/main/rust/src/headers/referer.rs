@@ -1,5 +1,5 @@
-use rocket::Request;
 use rocket::request::{FromRequest, Outcome};
+use rocket::Request;
 
 pub struct Referer(pub String);
 
@@ -9,12 +9,8 @@ impl<'r> FromRequest<'r> for Referer {
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, ()> {
         let referer = request.headers().get_one("referer");
         match referer {
-            Some(v) => {
-                Outcome::Success(Referer(v.to_string()))
-            }
-            None => {
-                Outcome::Forward(())
-            }
+            Some(v) => Outcome::Success(Referer(v.to_string())),
+            None => Outcome::Forward(()),
         }
     }
 }
