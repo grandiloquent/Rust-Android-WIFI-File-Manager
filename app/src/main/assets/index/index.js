@@ -63,6 +63,36 @@ function openVideoFile(path) {
     }
     return false;
 }
+function showContextMenu(detail) {
+    const bottomSheet = document.createElement('custom-bottom-sheet');
+    addContextMenuItem(bottomSheet, '删除', () => {
+        bottomSheet.remove();
+        deleteFile(detail);
+    });
+    document.body.appendChild(bottomSheet);
+}
+function deleteFile(detail) {
+    const dialog = document.createElement('custom-dialog');
+    const div = document.createElement('div');
+    div.textContent = `您确定要删除 ${substringAfterLast(decodeURIComponent(detail.path), "/")} 吗？`;
+    dialog.appendChild(div);
+    dialog.addEventListener('submit', async () => {
+        const res = await fetch(`${baseUri}/api/file/delete`, {
+            method: 'POST',
+            body: JSON.stringify([decodeURIComponent(detail.path)])
+        });
+        document.querySelector(`[path="${detail.path}"]`).remove();
+    });
+    document.body.appendChild(dialog);
+
+}
+function addContextMenuItem(bottomSheet, title, handler) {
+    const item = document.createElement('div');
+    item.className = 'menu-item';
+    item.textContent = title;
+    bottomSheet.appendChild(item);
+    item.addEventListener('click', handler);
+}
 ////////////////////////////////////////////////////////////////
 window.addEventListener("popstate", function (e) {
     window.location = location;

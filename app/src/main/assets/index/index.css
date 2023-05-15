@@ -193,3 +193,10 @@ input[type="text"] {
     color: #0f0f0f;
 
 }
+
+.menu-item {
+    padding: 0;
+    height: 48px;
+    display: flex;
+    align-items: center;
+}
