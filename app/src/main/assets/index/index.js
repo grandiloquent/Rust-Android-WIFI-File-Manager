@@ -14,7 +14,7 @@ function onItemClick(evt) {
         return;
     }
 
-    if (audioRe.test(path) {
+    if (audioRe.test(path)) {
         window.location = `/music/music.html?path=${encodeURIComponent(path)}`
         return;
     }

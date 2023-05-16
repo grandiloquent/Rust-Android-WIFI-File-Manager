@@ -16,12 +16,17 @@ fn remove_files_extension(path: &str) -> Result<(), Box<dyn Error>> {
             continue;
         }
         match d.path().extension() {
-            None => {}
+            None => {
+            }
             Some(v) => {
-                if v.to_str().unwrap() != "srt" {
+                
+                if v.to_str().unwrap().to_lowercase() == "mp4" {
                     let s = d.path().parent().unwrap().to_str().unwrap().to_string();
                     let n = Path::new(s.as_str());
-                    let nn = n.join(d.path().file_stem().unwrap());
+                    let nn = n.join(format!(
+                        "{}.v",
+                        d.path().file_stem().unwrap().to_str().unwrap()
+                    ));
                     let _ = fs::rename(d.path(), nn);
                 }
             }
@@ -65,8 +70,15 @@ pub fn api_files_clear(path: String) -> Result<String, Status> {
         });
     Ok("Success".to_string())
 }
+// http://192.168.8.55:3000/api/files/rename?path=/storage/emulated/0/Download/Telegram
 #[get("/api/files/rename?<path>")]
 pub fn api_files_rename(path: String) -> Result<String, Status> {
-    let _ = remove_files_extension(&path);
+    match remove_files_extension(&path) {
+        Ok(()) => {}
+        Err(err) => {
+            log::error!("{}", err);
+            return Err(Status::InternalServerError);
+        }
+    };
     Ok("Success".to_string())
 }
