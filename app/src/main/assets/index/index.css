@@ -269,9 +269,7 @@ input[type="text"] {
 .list-item-text {
     display: flex;
     align-items: center;
-    letter-spacing: .07272727em;
-    font-family: Roboto, Arial, sans-serif;
-    font-size: .6875rem;
+    font-size: 12px;
     font-weight: 500;
     color: #5f6368;
     margin-right: 8px;
@@ -281,11 +279,9 @@ input[type="text"] {
 }
 
 .list-item-action {
-    letter-spacing: .01785714em;
-    font-family: "Google Sans", Roboto, Arial, sans-serif;
-    font-size: .875rem;
+    font-size: 14px;
     font-weight: 500;
-    line-height: 1.25rem;
+    line-height: 20px;
     color: #202124;
     text-overflow: ellipsis;
     text-align: right;
