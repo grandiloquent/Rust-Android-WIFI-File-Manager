@@ -153,9 +153,7 @@ h2 {
   }
 
   attributeChangedCallback(attrName, oldVal, newVal) {
-    if (attrName === 'title') {
-      this.header.textContent = newVal;
-    }
+    
   }
 }
 

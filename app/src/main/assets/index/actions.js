@@ -1,4 +1,3 @@
-
 function addContextMenuItem(bottomSheet, title, handler) {
     const item = document.createElement('div');
     item.className = 'menu-item';
@@ -6,7 +5,6 @@ function addContextMenuItem(bottomSheet, title, handler) {
     bottomSheet.appendChild(item);
     item.addEventListener('click', handler);
 }
-
 function deleteFile(path) {
     const dialog = document.createElement('custom-dialog');
     const div = document.createElement('div');
@@ -17,11 +15,16 @@ function deleteFile(path) {
             method: 'POST',
             body: JSON.stringify([path])
         });
-        document.querySelector(`[data-path="${path}"]`).remove();
+        queryElementByPath(path).remove();
     });
     document.body.appendChild(dialog);
 }
-
+function queryElementByPath(path) {
+    return document.querySelector(`[data-path="${path}"]`);
+}
+async function downloadDirectory(path) {
+    window.open(`${baseUri}/compress_dir?path=${encodeURIComponent(path)}`, '_blank');
+}
 function initializeDropZone() {
     document.addEventListener("DOMContentLoaded", evt => {
         var dropZone = document.querySelector('body');
@@ -63,11 +66,24 @@ async function loadData(path) {
     const res = await fetch(`${baseUri}/api/files?path=${path || ''}`);
     return res.json();
 }
+function renameFile(path) {
+    const dialog = document.createElement('custom-dialog');
+    dialog.setAttribute('title', "重命名")
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = substringAfterLast(path, "/");
+    dialog.appendChild(input);
+    dialog.addEventListener('submit', async () => {
+        const res = await fetch(`${baseUri}/api/file/rename?path=${encodeURIComponent(path)}&dst=${encodeURIComponent(substringBeforeLast(path, "/") + "/" + input.value.trim())}`);
+        window.location.reload();
+    });
+    document.body.appendChild(dialog);
+}
 async function render(path) {
     setDocumentTitle(path);
     path = path || new URL(window.location).searchParams.get("path");
     const res = await loadData(path);
-    
+
     this.wrapper.innerHTML = res.sort((x, y) => {
         if (x.is_directory !== y.is_directory) if (x.is_directory) return -1; else return 1;
         return x.path.localeCompare(y.path)
@@ -104,10 +120,19 @@ function showContextMenu(evt) {
     const isDirectory = dataset.isdirectory === 'true';
 
     const bottomSheet = document.createElement('custom-bottom-sheet');
+    addContextMenuItem(bottomSheet, '选择相同类型', () => {
+        bottomSheet.remove();
+        selectSameType(path, isDirectory);
+    });
+    addContextMenuItem(bottomSheet, '重命名', () => {
+        bottomSheet.remove();
+        renameFile(path);
+    });
     addContextMenuItem(bottomSheet, '删除', () => {
         bottomSheet.remove();
         deleteFile(path);
     });
+
     if (isDirectory) {
         addContextMenuItem(bottomSheet, '下载', () => {
             bottomSheet.remove();
@@ -116,6 +141,66 @@ function showContextMenu(evt) {
     }
     document.body.appendChild(bottomSheet);
 }
-async function downloadDirectory(path) {
-    window.open(`${baseUri}/compress_dir?path=${encodeURIComponent(path)}`, '_blank');
+
+function getExtension(path) {
+    const index = path.lastIndexOf('.');
+    if (index !== -1) {
+        return path.substr(index + 1);
+    }
+    return null;
+}
+function selectSameType(path, isDirectory) {
+    const extension = getExtension(path);
+    const buf = [];
+    document.querySelectorAll('.item').forEach(item => {
+        const isdirectory = item.dataset.isdirectory === 'true';
+        if (isDirectory) {
+            if (isdirectory) {
+                buf.push(item.dataset.path);
+            }
+        } else {
+            if (!isdirectory) {
+                if (extension === getExtension(item.dataset.path)) {
+                    buf.push(item.dataset.path);
+                }
+            }
+        }
+    });
+    localStorage.setItem("paths", JSON.stringify(buf));
+    toast.setAttribute('message', '成功');
+}
+function onDelete() {
+
+    const dialog = document.createElement('custom-dialog');
+    dialog.setAttribute('title', '删除文件');
+    const div = document.createElement('div');
+    div.className = "list-wrapper";
+    const obj = JSON.parse(localStorage.getItem('paths') || "[]");
+    const buf = [];
+    for (let index = 0; index < obj.length; index++) {
+        const element = obj[index];
+        buf.push(`<div class="list-item" data-path="${element}"><div class="list-item-text">${element}</div>
+        <div class="list-item-action">删除</div>
+        </div>`);
+    }
+    div.innerHTML = buf.join('');
+    dialog.appendChild(div);
+    div.querySelectorAll('.list-item').forEach(listItem => {
+        listItem.addEventListener('click', evt => {
+            let index = obj.indexOf(listItem.dataset.path);
+            if (index !== -1) {
+                obj.splice(index, 1);
+            }
+            listItem.remove();
+        });
+    });
+    dialog.addEventListener('submit', async () => {
+        const res = await fetch(`${baseUri}/api/file/delete`, {
+            method: 'POST',
+            body: JSON.stringify(obj)
+        });
+        localStorage.setItem('paths', '');
+        location.reload();
+    });
+    document.body.appendChild(dialog);
 }
