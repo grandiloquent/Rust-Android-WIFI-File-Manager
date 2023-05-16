@@ -7,17 +7,17 @@ function addContextMenuItem(bottomSheet, title, handler) {
     item.addEventListener('click', handler);
 }
 
-function deleteFile(detail) {
+function deleteFile(path) {
     const dialog = document.createElement('custom-dialog');
     const div = document.createElement('div');
-    div.textContent = `您确定要删除 ${substringAfterLast(decodeURIComponent(detail.path), "/")} 吗？`;
+    div.textContent = `您确定要删除 ${substringAfterLast(path, "/")} 吗？`;
     dialog.appendChild(div);
     dialog.addEventListener('submit', async () => {
         const res = await fetch(`${baseUri}/api/file/delete`, {
             method: 'POST',
-            body: JSON.stringify([decodeURIComponent(detail.path)])
+            body: JSON.stringify([path])
         });
-        document.querySelector(`[path="${detail.path}"]`).remove();
+        document.querySelector(`[data-path="${path}"]`).remove();
     });
     document.body.appendChild(dialog);
 
@@ -68,16 +68,43 @@ async function render(path) {
     setDocumentTitle(path);
     path = path || new URL(window.location).searchParams.get("path");
     const res = await loadData(path);
+    const imageRe = new RegExp(/\.(?:jpeg|jpg|webp|gif|png|bmp)$/);
     this.wrapper.innerHTML = res.sort((x, y) => {
         if (x.is_directory !== y.is_directory) if (x.is_directory) return -1; else return 1;
         return x.path.localeCompare(y.path)
     })
         .map(x => {
-            return `<custom-item bind @submit="onItemClick" ${x.is_directory ? 'folder' : ''} title="${substringAfterLast(x.path, '/')}" path="${encodeURIComponent(x.path)}" isdirectory="${x.is_directory}"></custom-item>`
+            return `<div class="item" data-path="${x.path}" data-isdirectory=${x.is_directory}>
+            <div class="item-icon ${x.is_directory ? 'item-directory' : 'item-file'}" 
+            ${imageRe.test(x.path) ? `style="background-size:contain;background-image:url(${baseUri}/api/file?path=${x.path})"` : ''}
+            ></div>
+          <div class="item-title" data-path="${x.path}">${substringAfterLast(x.path, "/")}</div>
+          <div class="item-more" data-path="${x.path}">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 15.984q0.797 0 1.406 0.609t0.609 1.406-0.609 1.406-1.406 0.609-1.406-0.609-0.609-1.406 0.609-1.406 1.406-0.609zM12 9.984q0.797 0 1.406 0.609t0.609 1.406-0.609 1.406-1.406 0.609-1.406-0.609-0.609-1.406 0.609-1.406 1.406-0.609zM12 8.016q-0.797 0-1.406-0.609t-0.609-1.406 0.609-1.406 1.406-0.609 1.406 0.609 0.609 1.406-0.609 1.406-1.406 0.609z"></path>
+            </svg>
+          </div>
+          </div>`
         }).join('');
-    bind(this.wrapper);
+    document.querySelectorAll('.item').forEach(item => {
+        item.addEventListener('click', onItemClick);
+    })
+    document.querySelectorAll('.item-more').forEach(item => {
+        item.addEventListener('click', showContextMenu);
+    })
+
 }
 function setDocumentTitle(path) {
     if (!path) return;
     document.title = substringAfterLast(decodeURIComponent(path), "/")
+}
+function showContextMenu(evt) {
+    evt.stopPropagation();
+    const path = evt.currentTarget.dataset.path;
+    const bottomSheet = document.createElement('custom-bottom-sheet');
+    addContextMenuItem(bottomSheet, '删除', () => {
+        bottomSheet.remove();
+        deleteFile(path);
+    });
+    document.body.appendChild(bottomSheet);
 }
