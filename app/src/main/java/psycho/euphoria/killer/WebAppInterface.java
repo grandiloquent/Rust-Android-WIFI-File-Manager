@@ -225,6 +225,7 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public void generateVideoThumbnails(String dir) {
+        Log.e("B5aOx2", String.format("generateVideoThumbnails, %s", dir));
         generateVideoThumbnails(new File(dir)).start();
     }
 

@@ -20,7 +20,6 @@ function durationchange(video, url) {
         adjustSize(video);
     }
 }
-
 async function getUrl(baseUri, url) {
     const res = await fetch(`${baseUri}/video/fetch?url=${encodeURIComponent(url)}`);
     if (res.status === 204) {
@@ -67,18 +66,6 @@ function progress(video, loaded) {
         }
     }
 }
-
-function setSrc(video, src) {
-    if (src.indexOf(".m3u8") !== -1 && !video.canPlayType('application/vnd.apple.mpegurl') && Hls.isSupported()) {
-        var hls = new Hls();
-        hls.loadSource(src);
-        hls.attachMedia(
-            video
-        );
-    } else {
-        video.src = src;
-    }
-}
 function timeupdate(video) {
     const first = document.getElementById('first');
     const progressBarPlayed = document.querySelector('.progress_bar_played');
@@ -92,44 +79,6 @@ function timeupdate(video) {
         }
     }
 }
-let timer;
-const middle = document.getElementById('middle');
-const bottom = document.getElementById('bottom');
-const toast = document.getElementById('toast');
-const baseUri = window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:3000" : "";
-
-async function initialize() {
-    const searchParams = new URL(window.location).searchParams;
-    const path = searchParams.get("path");
-
-    toast.setAttribute('message', path);
-    const video = document.querySelector('video');
-
-    const loaded = document.querySelector('.progress_bar_loaded');
-    
-    video.src = `${baseUri}/api/file?path=${path}`
-    video.addEventListener('durationchange', durationchange(video, path));
-    video.addEventListener('timeupdate', timeupdate(video));
-    video.addEventListener('progress', progress(video, loaded));
-    video.addEventListener('play', play());
-    video.addEventListener('pause', pause());
-
-    initializeSeek(video, first);
-    initializeSeekDialog(video);
-    document.getElementById('play').addEventListener('click', evt => {
-        if (video.paused) {
-            video.play();
-            startTimer();
-        } else {
-            video.pause();
-        }
-    });
-    video.addEventListener('click', evt => {
-        middle.style.display = "flex";
-        bottom.style.display = "flex";
-        startTimer();
-    });
-}
 function play() {
     return evt => {
         document.querySelector('#play path').setAttribute('d', 'M9,19H7V5H9ZM17,5H15V19h2Z');
@@ -140,8 +89,6 @@ function pause() {
         document.querySelector('#play path').setAttribute('d', ' M6,4l12,8L6,20V4z');
     }
 }
-initialize();
-
 function startTimer() {
     if (timer)
         clearTimeout(timer);
@@ -151,7 +98,6 @@ function startTimer() {
     }, 10000);
     return timer;
 }
-
 function initializeSeekDialog(video) {
     const dialogContainer = document.querySelector('.dialog-container');
     dialogContainer.querySelector('.dialog-overlay')
@@ -188,4 +134,104 @@ function formatSeconds(value) {
     const seconds = value % 60;
     const minutes = value / 60 | 10;
     return `${minutes}m${seconds}s`;
+}
+async function loadVideoList() {
+    const res = await fetch(`${baseUri}/api/files?path=${encodeURIComponent(substringBeforeLast(path, '/'))}`);
+    const videos = await res.json();
+    return videos.filter(x => !x.is_directory &&
+        re.test(x.path))
+        .sort((x1, x2) => {
+            return x1.path.localeCompare(x2.path);
+        })
+}
+
+async function renderVideoList() {
+    if (videoList.dataset.loaded !== 'trure') {
+        const videos = await loadVideoList();
+
+        const buf = [];
+        for (let index = 0; index < videos.length; index++) {
+            const element = videos[index];
+            buf.push(`<div class="media-item" data-path="${element.path}">
+        <div class="video-thumbnail-container-large">
+            <div class="video-thumbnail-bg"></div>
+            <img class="core-image" src="${baseUri}/api/file?path=${encodeURIComponent(substringBeforeLast(element.path, "/") + "/.images/" + substringAfterLast(element.path, "/"))}">
+        </div>
+        <div class="details">
+            <div class="media-channel"></div>
+            <div class="media-item-info">
+                <div class="media-item-metadata">
+                    <div class="media-item-headline">
+                        ${substringAfterLast(element.path, "/")}
+                    </div>
+                    <div class="badge-and-byline-renderer">
+                        <div class="badge-and-byline-item-byline"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>`)
+        }
+
+        videoList.innerHTML = buf.join('');
+        videoList.dataset.loaded = 'true';
+    }
+    videoList.style.display = 'block';
+
+    document.querySelectorAll('.media-item').forEach(mediaItem => {
+        mediaItem.addEventListener('click', evt => {
+            videoList.style.display = 'none';
+            video.src = `${baseUri}/api/file?path=${encodeURIComponent(evt.currentTarget.dataset.path)}`;
+            video.play();
+        });
+    })
+}
+//////////////////////////////////////////////////////////////////
+let timer;
+const middle = document.getElementById('middle');
+const bottom = document.getElementById('bottom');
+const toast = document.getElementById('toast');
+const baseUri = window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:3000" : "";
+const searchParams = new URL(window.location).searchParams;
+const path = searchParams.get("path");
+const re = new RegExp(/\.(?:v|mp4|m4a)$/);
+const videoList = document.querySelector('.video-list');
+const video = document.querySelector('video');
+
+async function initialize() {
+    toast.setAttribute('message', path);
+    const loaded = document.querySelector('.progress_bar_loaded');
+    video.src = `${baseUri}/api/file?path=${path}`
+    video.addEventListener('durationchange', durationchange(video, path));
+    video.addEventListener('timeupdate', timeupdate(video));
+    video.addEventListener('progress', progress(video, loaded));
+    video.addEventListener('play', play());
+    video.addEventListener('pause', pause());
+
+    initializeSeek(video, first);
+    initializeSeekDialog(video);
+    document.getElementById('play').addEventListener('click', evt => {
+        if (video.paused) {
+            video.play();
+            startTimer();
+        } else {
+            video.pause();
+        }
+    });
+    video.addEventListener('click', evt => {
+        middle.style.display = "flex";
+        bottom.style.display = "flex";
+        startTimer();
+    });
+}
+initialize();
+
+
+const fullscreen = document.querySelector('.fullscreen');
+fullscreen.addEventListener('click', evt => {
+    renderVideoList();
+});
+
+if (typeof NativeAndroid !== 'undefined') {
+    NativeAndroid.generateVideoThumbnails(substringBeforeLast(path, "/"));
 }
