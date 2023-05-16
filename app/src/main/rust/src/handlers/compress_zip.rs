@@ -159,7 +159,7 @@ impl<'r> Responder<'r, 'static> for FileResponse {
                 // TODO: escape?
                 format!(
                     "attachment; filename=\"{}.zip\"",
-                    self.dir.substring_after_last("\\")
+                    self.dir.substring_after_last("/")
                 ),
             )
             .sized_body(bytes_written as usize, buf)
