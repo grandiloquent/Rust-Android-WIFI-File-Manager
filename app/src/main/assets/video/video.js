@@ -27,38 +27,7 @@ async function getUrl(baseUri, url) {
     }
     return res.json();
 }
-function initializeSeek(video, first) {
-    // const width = video.getBoundingClientRect().width;
-    // let right, start, dif = 0, timer;
-    // video.addEventListener('touchstart', evt => {
-    //     video.pause();
-    //     start = video.currentTime;
-    //     right = (evt.touches[0].clientX >= width / 2);
-    //     clearInterval(timer);
-    //     timer = setInterval(() => {
-    //         dif += 1 * (right ? 1 : -1);
-    //         first.textContent = formatDuration(dif + start);
-    //         startTimer();
-    //     }, 100);
-    // })
-    // video.addEventListener('touchend', evt => {
-    //     clearInterval(timer);
-    //     console.log(dif + start)
-    //     video.currentTime = dif + start;
-    //     video.play();
-    // })
 
-    document.getElementById('back').addEventListener('click', evt => {
-        startTimer();
-        if (video.currentTime - 30 > 0)
-            video.currentTime = video.currentTime - 30;
-    })
-    document.getElementById('forward').addEventListener('click', evt => {
-        startTimer();
-        if (video.currentTime + 30 <= video.duration)
-            video.currentTime = video.currentTime + 30;
-    })
-}
 function progress(video, loaded) {
     return evt => {
         if (video.buffered.length) {
@@ -146,8 +115,7 @@ async function loadVideoList() {
 }
 
 async function renderVideoList() {
-    if (videoList.dataset.loaded !== 'trure') {
-        const videos = await loadVideoList();
+    if (videoList.dataset.loaded !== 'true') {
 
         const buf = [];
         for (let index = 0; index < videos.length; index++) {
@@ -186,6 +154,21 @@ async function renderVideoList() {
         });
     })
 }
+async function formatFilenames(path) {
+    const res = await fetch(`${baseUri}/api/files/rename?path=${path}`)
+}
+async function playWithIndex() {
+    const src = videos[index].path;
+    document.title = substringAfterLast(src, "/");
+    video.load();
+    video.src = `${baseUri}/api/file?path=${encodeURIComponent(src)}`;
+    video.play();
+}
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+}
 //////////////////////////////////////////////////////////////////
 let timer;
 const middle = document.getElementById('middle');
@@ -197,8 +180,11 @@ const path = searchParams.get("path");
 const re = new RegExp(/\.(?:v|mp4|m4a)$/);
 const videoList = document.querySelector('.video-list');
 const video = document.querySelector('video');
+let videos;
+let index;
 
 async function initialize() {
+
     toast.setAttribute('message', path);
     const loaded = document.querySelector('.progress_bar_loaded');
     video.src = `${baseUri}/api/file?path=${path}`
@@ -208,7 +194,7 @@ async function initialize() {
     video.addEventListener('play', play());
     video.addEventListener('pause', pause());
 
-    initializeSeek(video, first);
+
     initializeSeekDialog(video);
     document.getElementById('play').addEventListener('click', evt => {
         if (video.paused) {
@@ -223,15 +209,79 @@ async function initialize() {
         bottom.style.display = "flex";
         startTimer();
     });
+    await formatFilenames(substringBeforeLast(path, "/"));
+    videos = await loadVideoList();
+    for (let v = 0; v < videos.length; v++) {
+        const element = videos[v];
+        if (element.path == path) {
+            index = v;
+
+            break;
+        }
+    }
 }
 initialize();
 
 
 const fullscreen = document.querySelector('.fullscreen');
 fullscreen.addEventListener('click', evt => {
-    renderVideoList();
+
 });
 
 if (typeof NativeAndroid !== 'undefined') {
     NativeAndroid.generateVideoThumbnails(substringBeforeLast(path, "/"));
 }
+const forward_10 = document.querySelector('.forward_10');
+forward_10.addEventListener('click', evt => {
+    startTimer();
+    if (video.currentTime + 10 <= video.duration)
+        video.currentTime = video.currentTime + 10;
+});
+const replay_10 = document.querySelector('.replay_10');
+replay_10.addEventListener('click', evt => {
+    startTimer();
+    if (video.currentTime - 10 > 0)
+        video.currentTime = video.currentTime - 10;
+});
+const moveGroup = document.querySelector('.move_group');
+moveGroup.addEventListener('click', async evt => {
+    video.pause();
+    const dir = substringBeforeLast(path, "/") + "/Recycled";
+    await fetch(`${baseUri}/api/file/new_dir?path=${encodeURIComponent(dir)}`);
+    const src = videos[index].path;
+    await fetch(`${baseUri}/api/file/rename?path=${encodeURIComponent(src)}&dst=${encodeURIComponent(dir + "/" + substringAfterLast(src, "/"))}`)
+    if (videos.length === 1) {
+        return;
+    }
+    videos.splice(index, 1);
+    if (index === videos.length) {
+        if (index === 0) {
+            return;
+        }
+        index--;
+    }
+    playWithIndex();
+});
+const playlistPlay = document.querySelector('.playlist_play');
+playlistPlay.addEventListener('click', evt => {
+    renderVideoList();
+});
+
+
+document.getElementById('back').addEventListener('click', evt => {
+    if (index > 0) {
+        index--;
+    }
+    playWithIndex();
+})
+document.getElementById('forward').addEventListener('click', evt => {
+    if (index + 1 < videos.length) {
+        index++;
+    }
+    playWithIndex();
+})
+const shuffle = document.querySelector('.shuffle');
+shuffle.addEventListener('click', evt => {
+    index = getRandomInt(0, videos.length);
+    playWithIndex();
+});
