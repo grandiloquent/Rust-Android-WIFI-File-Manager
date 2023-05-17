@@ -20,7 +20,8 @@ fn remove_files_extension(path: &str) -> Result<(), Box<dyn Error>> {
             }
             Some(v) => {
                 
-                if v.to_str().unwrap().to_lowercase() == "mp4" {
+                if v.to_str().unwrap().to_lowercase() == "mp4" 
+                || v.to_str().unwrap().to_lowercase() == "mov" {
                     let s = d.path().parent().unwrap().to_str().unwrap().to_string();
                     let n = Path::new(s.as_str());
                     let nn = n.join(format!(
