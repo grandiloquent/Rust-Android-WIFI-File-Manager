@@ -12,9 +12,10 @@ mod server;
 mod strings;
 mod util;
 
-use crate::data::config::{ Server};
+use crate::data::config::Server;
 use crate::server::run_server;
-use crate::util::{get_asset_manager};
+use crate::util::get_asset_manager;
+use crate::util::get_string;
 use jni::objects::{JObject, JString};
 use jni::JNIEnv;
 
@@ -43,12 +44,15 @@ pub extern "C" fn Java_psycho_euphoria_killer_MainActivity_startServer(
     //     log::error!("{}",get_string(env, context, "port").parse::<u16>().unwrap_or(5432));
     // }
     let ass = get_asset_manager(env, asset_manager);
+
     unsafe {
+        let db = get_string(env, context, "db");
         run_server(
             Server {
                 host: _host,
                 port,
                 temp_dir: "/storage/emulated/0".to_string(),
+                db,
             },
             ass,
         );

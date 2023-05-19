@@ -292,3 +292,8 @@ function onMenu(evt) {
     });
     document.body.appendChild(bottomSheet);
 }
+function onShowFavorites(){
+    const bottomSheet = document.createElement('custom-bottom-sheet');
+    
+    document.body.appendChild(bottomSheet);
+}

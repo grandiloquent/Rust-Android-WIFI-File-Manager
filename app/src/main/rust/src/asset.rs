@@ -16,7 +16,7 @@ impl Cache {
         }
     }
     pub fn get(&self, key: &str) -> Option<Vec<u8>> {
-        log::error!("{}", key);
+        
         match self.data.write() {
             Ok(mut v) => match v.get(key) {
                 None => match read_resource_file(&self.ass, key) {

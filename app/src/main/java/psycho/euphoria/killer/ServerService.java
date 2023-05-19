@@ -36,7 +36,9 @@ public class ServerService extends Service {
     private void startServer() {
         new Thread(() -> {
             int port = getUsablePort(DEFAULT_PORT);
-            mSharedPreferences.edit().putInt(KEY_PORT, port).apply();
+            mSharedPreferences.edit().putInt(KEY_PORT, port)
+                    .putString("db", new File(Environment.getExternalStorageDirectory(), "favorites.db").getAbsolutePath())
+                    .commit();
             MainActivity.startServer(ServerService.this, ServerService.this.getAssets(), Shared.getDeviceIP(ServerService.this), port);
         }).start();
     }

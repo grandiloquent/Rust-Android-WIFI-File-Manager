@@ -7,9 +7,28 @@ use rocket::data::{Limits, ToByteUnit};
 use rocket::figment::Figment;
 use rocket::routes;
 use std::sync::Arc;
+use rusqlite::{Connection};
+use std::sync::Mutex;
+pub struct Database(pub Arc<Mutex<Connection>>);
 
 #[tokio::main]
 pub async fn run_server(srv: Server, ass: AssetManager) {
+    let conn = Connection::open(srv.db.as_str()).expect("");
+    match conn.execute(
+        r#"CREATE TABLE IF NOT EXISTS "favorite" (
+	"id"	INTEGER NOT NULL UNIQUE,
+	"path"	TEXT NOT NULL UNIQUE,
+	"create_at"	INTEGER,
+	"update_at"	INTEGER,
+	PRIMARY KEY("id" AUTOINCREMENT)
+)"#,
+        [],
+    ) {
+        Ok(_) => {}
+        Err(err) => {
+            log::error!("Error {}", err);
+        }
+    }
     let limits = Limits::default()
         .limit("json", 3.mebibytes())
         .limit("string", 3.mebibytes())
@@ -25,6 +44,7 @@ pub async fn run_server(srv: Server, ass: AssetManager) {
     let mut server = rocket::custom(figment)
         .attach(handlers::cors::CORS)
         .attach(handlers::content_disposition::ContentDisposition)
+        .manage(Arc::new(Database(Arc::new(Mutex::new(conn)))))
         .mount(
             "/",
             routes![handlers::api_asset_file::api_asset_file,
@@ -41,6 +61,7 @@ handlers::api_file_rename::api_file_rename,
 handlers::api_file_rename::api_file_move,
 handlers::api_zip::api_zip,
 handlers::compress_zip::compress_zip,
+handlers::db::fav_insert,
 handlers::file::file,
 handlers::index::index,
 handlers::index_file::index_file,

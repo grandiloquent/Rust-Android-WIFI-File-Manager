@@ -9,6 +9,7 @@ pub mod compress_zip;
 pub mod content_disposition;
 pub mod cors;
 pub mod data;
+pub mod db;
 pub mod file;
 pub mod index;
 pub mod index_file;

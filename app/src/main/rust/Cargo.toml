@@ -23,6 +23,7 @@ android_logger = "*"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 urlencoding = "2.1.2"
+rusqlite = { version = "0.27.0", features = ["bundled"] }
 rocket = { version = "=0.5.0-rc.3", features = ["json"] }
 zip = "0.6.4"
 walkdir = "2.3.3"
