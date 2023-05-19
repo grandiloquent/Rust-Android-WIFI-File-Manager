@@ -3,7 +3,6 @@ use rocket::http::Header;
 use rocket::{Request, Response};
 use crate::strings::StringExt;
 pub struct ContentDisposition;
-
 #[rocket::async_trait]
 impl Fairing for ContentDisposition {
     fn info(&self) -> Info {
@@ -12,7 +11,6 @@ impl Fairing for ContentDisposition {
             kind: Kind::Response,
         }
     }
-
     async fn on_response<'r>(&self, request: &'r Request<'_>, response: &mut Response<'r>) {
         let p = request.uri().to_string();
         if p.ends_with(".zip") || p.ends_with(".db") || p.ends_with(".7z") {

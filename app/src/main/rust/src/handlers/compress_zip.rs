@@ -17,7 +17,6 @@ use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 use zip::result::ZipError;
 use zip::write::FileOptions;
-
 fn zip_dir<T>(
     it: &mut dyn Iterator<Item = walkdir::DirEntry>,
     prefix: &str,

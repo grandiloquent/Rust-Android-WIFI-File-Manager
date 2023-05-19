@@ -4,6 +4,7 @@ use rocket::response::content::RawJson;
 use std::error::Error;
 use std::fs;
 use std::path::Path;
+use walkdir::WalkDir;
 fn remove_files_extension(path: &str) -> Result<(), Box<dyn Error>> {
     let p = Path::new(&path);
     if !p.is_dir() {
@@ -16,12 +17,11 @@ fn remove_files_extension(path: &str) -> Result<(), Box<dyn Error>> {
             continue;
         }
         match d.path().extension() {
-            None => {
-            }
+            None => {}
             Some(v) => {
-                
-                if v.to_str().unwrap().to_lowercase() == "mp4" 
-                || v.to_str().unwrap().to_lowercase() == "mov" {
+                if v.to_str().unwrap().to_lowercase() == "mp4"
+                    || v.to_str().unwrap().to_lowercase() == "mov"
+                {
                     let s = d.path().parent().unwrap().to_str().unwrap().to_string();
                     let n = Path::new(s.as_str());
                     let nn = n.join(format!(
@@ -82,4 +82,24 @@ pub fn api_files_rename(path: String) -> Result<String, Status> {
         }
     };
     Ok("Success".to_string())
+}
+#[get("/api/files/size?<path>")]
+pub fn get_size(path: String) -> Result<String, Status> {
+    let path = Path::new(&path);
+    if path.is_dir() {
+        let mut total: u64 = 0;
+        for entry in WalkDir::new(path) {
+            match entry {
+                Ok(entry) => {
+                    total += entry.metadata().map(|m| m.len()).unwrap_or(0);
+                }
+                Err(_) => {}
+            };
+        }
+        return Ok(total.to_string());
+    } else if path.is_file() {
+        Ok(path.metadata().map(|m| m.len()).unwrap_or(0).to_string())
+    } else {
+        Err(Status::NotFound)
+    }
 }
