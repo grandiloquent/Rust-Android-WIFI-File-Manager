@@ -65,8 +65,8 @@ function initializeDropZone() {
         }
     });
 }
-async function loadData(path) {
-    const res = await fetch(`${baseUri}/api/files?path=${path || ''}`);
+async function loadData(path, size) {
+    const res = await fetch(`${baseUri}/api/files?path=${path || ''}&size=${size || 'false'}`);
     return res.json();
 }
 function newFile() {
@@ -150,8 +150,9 @@ function renameFile(path) {
 }
 async function render(path) {
     setDocumentTitle(path);
-    path = path || new URL(window.location).searchParams.get("path");
-    const res = await loadData(path);
+    const searchParams = new URL(window.location).searchParams;
+    path = path || searchParams.get("path") || '/storage/emulated/0';
+    const res = await loadData(path, searchParams.get("size"));
     this.wrapper.innerHTML = res.sort((x, y) => {
         if (x.is_directory !== y.is_directory) if (x.is_directory) return -1; else return 1;
         return x.path.localeCompare(y.path)
@@ -161,7 +162,11 @@ async function render(path) {
             <div class="item-icon ${x.is_directory ? 'item-directory' : 'item-file'}" 
             ${imageRe.test(x.path) ? `style="background-repeat:no-repeat;background-size:contain;background-position:50% 50%;background-image:url(${baseUri}/api/file?path=${x.path})"` : ''}
             ></div>
-          <div class="item-title">${substringAfterLast(x.path, "/")}</div>
+          <div class="item-title">
+          <div>${substringAfterLast(x.path, "/")}</div>
+          <div class="item-subtitle">${humanFileSize(x.size)}</div>
+          </div>
+          
           <div class="item-more">
             <svg viewBox="0 0 24 24">
               <path d="M12 15.984q0.797 0 1.406 0.609t0.609 1.406-0.609 1.406-1.406 0.609-1.406-0.609-0.609-1.406 0.609-1.406 1.406-0.609zM12 9.984q0.797 0 1.406 0.609t0.609 1.406-0.609 1.406-1.406 0.609-1.406-0.609-0.609-1.406 0.609-1.406 1.406-0.609zM12 8.016q-0.797 0-1.406-0.609t-0.609-1.406 0.609-1.406 1.406-0.609 1.406 0.609 0.609 1.406-0.609 1.406-1.406 0.609z"></path>
@@ -255,7 +260,7 @@ function onMove() {
         });
     });
     let path = new URL(window.location).searchParams.get("path")
-    || '/storage/emulated/0';
+        || '/storage/emulated/0';
     dialog.addEventListener('submit', async () => {
         const res = await fetch(`${baseUri}/api/file/move?dst=${encodeURIComponent(path)}`, {
             method: 'POST',

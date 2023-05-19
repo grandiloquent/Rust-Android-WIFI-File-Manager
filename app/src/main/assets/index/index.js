@@ -5,7 +5,7 @@ const audioRe = new RegExp(/\.(?:mp3|wav|m4a)$/);
 const videoRe = new RegExp(/\.(?:mp4|v)$/);
 const toast = document.querySelector('.toast');
 
-            
+
 function onItemClick(evt) {
     const path = evt.currentTarget.dataset.path;
 
@@ -54,3 +54,8 @@ window.addEventListener("popstate", function (e) {
 bind();
 initializeDropZone();
 render();
+
+// fetch(`http://192.168.8.55:3000/api/files/size?path=/storage/emulated/0/Download`).then(res => res.text())
+//     .then(res => {
+//         console.log(humanFileSize(parseInt(res)));
+//     })

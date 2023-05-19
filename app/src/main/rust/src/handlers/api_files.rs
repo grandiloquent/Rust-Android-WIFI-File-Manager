@@ -35,12 +35,9 @@ fn remove_files_extension(path: &str) -> Result<(), Box<dyn Error>> {
     }
     Ok(())
 }
-#[get("/api/files?<path>")]
-pub fn api_files(path: String) -> RawJson<String> {
-    RawJson(
-        serde_json::to_string(&get_file_list(path, "/storage/emulated/0"))
-            .unwrap_or("".to_string()),
-    )
+#[get("/api/files?<path>&<size>")]
+pub fn api_files(path: String, size: bool) -> RawJson<String> {
+    RawJson(serde_json::to_string(&get_file_list(path, size)).unwrap_or("".to_string()))
 }
 #[get("/api/files/clear?<path>")]
 pub fn api_files_clear(path: String) -> Result<String, Status> {
