@@ -155,6 +155,16 @@ async function render(path) {
     const res = await loadData(path, searchParams.get("size"));
     this.wrapper.innerHTML = res.sort((x, y) => {
         if (x.is_directory !== y.is_directory) if (x.is_directory) return -1; else return 1;
+        if (y.size && x.size) {
+            const dif = y.size - x.size;
+            if (dif > 0) {
+                return 1;
+            } else if (dif < 0) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
         return x.path.localeCompare(y.path)
     })
         .map(x => {
@@ -164,7 +174,7 @@ async function render(path) {
             ></div>
           <div class="item-title">
           <div>${substringAfterLast(x.path, "/")}</div>
-          <div class="item-subtitle">${humanFileSize(x.size)}</div>
+          <div class="item-subtitle" style="${x.size === 0 ? 'display:none' : ''}">${humanFileSize(x.size)}</div>
           </div>
           
           <div class="item-more">
