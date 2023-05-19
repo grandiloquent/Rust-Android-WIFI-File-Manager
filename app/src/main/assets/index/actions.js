@@ -238,6 +238,10 @@ function showContextMenu(evt) {
         deleteFile(path);
     });
     if (isDirectory) {
+        addContextMenuItem(bottomSheet, '加入收藏夹', () => {
+            bottomSheet.remove();
+            addFavorite(path);
+        });
         addContextMenuItem(bottomSheet, '下载', () => {
             bottomSheet.remove();
             downloadDirectory(path);
@@ -292,8 +296,20 @@ function onMenu(evt) {
     });
     document.body.appendChild(bottomSheet);
 }
-function onShowFavorites(){
+async function onShowFavorites() {
     const bottomSheet = document.createElement('custom-bottom-sheet');
-    
+    const res = await fetch(`${baseUri}/fav/list`);
+    (await res.json()).forEach(p=> {
+        addContextMenuItem(bottomSheet, p, () => {
+            bottomSheet.remove();
+            const url = new URL(window.location);
+            url.searchParams.set('path', p);
+            window.location = url;
+        });
+    })
     document.body.appendChild(bottomSheet);
+}
+async function addFavorite(path) {
+    const res = await fetch(`${baseUri}/fav/insert?path=${path}`);
+    toast.setAttribute('message', '成功');
 }
