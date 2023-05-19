@@ -281,3 +281,14 @@ function onMove() {
     });
     document.body.appendChild(dialog);
 }
+function onMenu(evt) {
+    evt.stopPropagation();
+    const bottomSheet = document.createElement('custom-bottom-sheet');
+    addContextMenuItem(bottomSheet, '大小', () => {
+        bottomSheet.remove();
+        const url = new URL(window.location);
+        url.searchParams.set('size', true);
+        window.location = url;
+    });
+    document.body.appendChild(bottomSheet);
+}
