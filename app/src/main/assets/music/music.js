@@ -5,6 +5,11 @@ async function loadMusicFiles() {
     const res = await fetch(`${baseUri}/api/files?path=${encodeURIComponent(dir)}`);
     return res.json();
 }
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+}
 async function render() {
     const files = (await loadMusicFiles())
         .filter(x => !x.is_directory && x.path.endsWith(".mp3"))
@@ -53,6 +58,15 @@ async function bindPlayEvent() {
             }
         }
     });
+    audio.addEventListener('ended', evt => {
+        audio.load();
+        const file = files[
+            getRandomInt(0, files.length)
+        ];
+        audio.src = `${baseUri}/api/file?path=${file.path}`;
+        audio.play();
+        title.textContent = substringAfterLast(file.path, "/");
+    })
 
     searchIndex(path);
     audio.src = `${baseUri}/api/file?path=${path}`;

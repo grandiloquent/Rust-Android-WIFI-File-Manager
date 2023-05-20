@@ -3,6 +3,8 @@ const imageRe = new RegExp(/\.(?:jpeg|jpg|webp|gif|png|bmp)$/);
 const binaryRe = new RegExp(/\.(?:pdf|epub|apk)$/);
 const audioRe = new RegExp(/\.(?:mp3|wav|m4a)$/);
 const videoRe = new RegExp(/\.(?:mp4|v)$/);
+const zipRe = new RegExp(/\.(?:zip|gzip)$/);
+
 const toast = document.querySelector('.toast');
 
 

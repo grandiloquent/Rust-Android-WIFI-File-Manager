@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "..\\..\\rust"
+		},
+		{
+			"path": ".."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "assets"
+	}
+}

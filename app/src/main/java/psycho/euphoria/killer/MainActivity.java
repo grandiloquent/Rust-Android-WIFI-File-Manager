@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 
 import static psycho.euphoria.killer.utils.AroundFileUriExposedException.aroundFileUriExposedException;
@@ -50,6 +51,7 @@ public class MainActivity extends Activity {
     public static native void startServer(ServerService service, AssetManager assetManager, String host, int port);
 
     private String mAddress;
+
     private void loadStartPage(MainActivity context, boolean isHomePage) {
         if (isHomePage) {
             Log.e("B5aOx2", String.format("loadStartPage, %s", mAddress));
@@ -61,6 +63,7 @@ public class MainActivity extends Activity {
             }
         }
     }
+
     private void initialize() {
         mBroadcastReceiver = new BroadcastReceiver() {
             @Override
@@ -124,6 +127,7 @@ public class MainActivity extends Activity {
         menu.add(0, 3, 0, "保存页面");
         menu.add(0, 6, 0, "首页");
         menu.add(0, 7, 0, "复制");
+        menu.add(0, 2, 0, "切换输入法");
         menu.add(0, 5, 0, "退出");
         return super.onCreateOptionsMenu(menu);
     }
@@ -136,6 +140,10 @@ public class MainActivity extends Activity {
                 break;
             case 3:
                 saveRenderedWebPage(this);
+                break;
+            case 2:
+                ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
+                        .showInputMethodPicker();
                 break;
             case 5:
                 restartService(this);

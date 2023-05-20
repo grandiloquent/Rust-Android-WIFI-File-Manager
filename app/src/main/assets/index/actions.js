@@ -246,6 +246,13 @@ function showContextMenu(evt) {
             bottomSheet.remove();
             downloadDirectory(path);
         });
+    } else {
+        if (zipRe.test(path)) {
+            addContextMenuItem(bottomSheet, '解压', () => {
+                bottomSheet.remove();
+                unCompressFile(path);
+            });
+        }
     }
     document.body.appendChild(bottomSheet);
 }
@@ -299,7 +306,7 @@ function onMenu(evt) {
 async function onShowFavorites() {
     const bottomSheet = document.createElement('custom-bottom-sheet');
     const res = await fetch(`${baseUri}/fav/list`);
-    (await res.json()).forEach(p=> {
+    (await res.json()).forEach(p => {
         addContextMenuItem(bottomSheet, p, () => {
             bottomSheet.remove();
             const url = new URL(window.location);
@@ -312,4 +319,13 @@ async function onShowFavorites() {
 async function addFavorite(path) {
     const res = await fetch(`${baseUri}/fav/insert?path=${path}`);
     toast.setAttribute('message', '成功');
+}
+async function unCompressFile(path) {
+    let res;
+    try {
+        res = await fetch(`${baseUri}/api/zip?path=${path}`);
+        toast.setAttribute('message', '成功');
+    } catch (error) {
+        toast.setAttribute('message', '错误');
+    }
 }
