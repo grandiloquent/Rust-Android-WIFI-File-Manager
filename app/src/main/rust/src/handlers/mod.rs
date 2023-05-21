@@ -5,6 +5,7 @@ pub mod api_file_delete;
 pub mod api_file_new;
 pub mod api_file_rename;
 pub mod api_zip;
+pub mod cmd;
 pub mod compress_zip;
 pub mod content_disposition;
 pub mod cors;
