@@ -16,6 +16,15 @@ import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
 
+import com.arthenica.ffmpegkit.FFmpegKit;
+import com.arthenica.ffmpegkit.FFmpegSession;
+import com.arthenica.ffmpegkit.FFmpegSessionCompleteCallback;
+import com.arthenica.ffmpegkit.LogCallback;
+import com.arthenica.ffmpegkit.ReturnCode;
+import com.arthenica.ffmpegkit.SessionState;
+import com.arthenica.ffmpegkit.Statistics;
+import com.arthenica.ffmpegkit.StatisticsCallback;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -227,6 +236,26 @@ public class WebAppInterface {
     public void generateVideoThumbnails(String dir) {
         Log.e("B5aOx2", String.format("generateVideoThumbnails, %s", dir));
         generateVideoThumbnails(new File(dir)).start();
+    }
+
+    // https://github.com/arthenica/ffmpeg-kit/tree/main/android
+    @JavascriptInterface
+    public void runFFmpeg(String cmd) {
+        FFmpegKit.executeAsync(cmd, session -> {
+            SessionState state = session.getState();
+            ReturnCode returnCode = session.getReturnCode();
+
+            // CALLED WHEN SESSION IS EXECUTED
+
+        }, log -> {
+
+            // CALLED WHEN SESSION PRINTS LOGS
+
+        }, statistics -> {
+
+            // CALLED WHEN SESSION GENERATES STATISTICS
+
+        });
     }
 
     public static Thread generateVideoThumbnails(File dir) {

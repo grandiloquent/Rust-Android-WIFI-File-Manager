@@ -303,16 +303,48 @@ function onMenu(evt) {
     });
     document.body.appendChild(bottomSheet);
 }
+function addFavoriteItem(bottomSheet, path) {
+    const item = document.createElement('div');
+    item.className = 'menu-item';
+
+    const div = document.createElement('div');
+    div.style = `height: 48px;display: flex;align-items: center;justify-content: center`
+    div.innerHTML = `<span class="material-symbols-outlined">
+close
+</span>`;
+    div.addEventListener('click', async evt => {
+        evt.stopPropagation();
+        bottomSheet.remove();
+        let res;
+        try {
+            res = await fetch(`${baseUri}/fav/delete?path=${encodeURIComponent(path)}`);
+            if (res.statusCode !== 200) {
+                throw new Error();
+            }
+            toast.setAttribute('message', '成功');
+        } catch (error) {
+            toast.setAttribute('message', '错误');
+        }
+    });
+    item.appendChild(div);
+
+    const textElement = document.createElement('div');
+    textElement.textContent = path;
+    item.appendChild(textElement);
+
+    bottomSheet.appendChild(item);
+    item.addEventListener('click', () => {
+        bottomSheet.remove();
+        const url = new URL(window.location);
+        url.searchParams.set('path', p);
+        window.location = url;
+    });
+}
 async function onShowFavorites() {
     const bottomSheet = document.createElement('custom-bottom-sheet');
     const res = await fetch(`${baseUri}/fav/list`);
     (await res.json()).forEach(p => {
-        addContextMenuItem(bottomSheet, p, () => {
-            bottomSheet.remove();
-            const url = new URL(window.location);
-            url.searchParams.set('path', p);
-            window.location = url;
-        });
+        addFavoriteItem(bottomSheet, p);
     })
     document.body.appendChild(bottomSheet);
 }
