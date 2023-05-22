@@ -329,7 +329,7 @@ close
         let res;
         try {
             res = await fetch(`${baseUri}/fav/delete?path=${encodeURIComponent(path)}`);
-            if (res.statusCode !== 200) {
+            if (res.status !== 200) {
                 throw new Error();
             }
             toast.setAttribute('message', '成功');
@@ -347,7 +347,7 @@ close
     item.addEventListener('click', () => {
         bottomSheet.remove();
         const url = new URL(window.location);
-        url.searchParams.set('path', p);
+        url.searchParams.set('path', path);
         window.location = url;
     });
 }

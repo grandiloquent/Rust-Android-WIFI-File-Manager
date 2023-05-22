@@ -1,10 +1,18 @@
 use crate::server::Database;
 use rocket::http::Status;
+use rocket::State;
 use rusqlite::{params, Connection};
+use std::sync::Arc;
 use std::time::SystemTime;
 use std::time::UNIX_EPOCH;
-use rocket::State;
-use std::sync::Arc;
+#[get("/fav/delete?<path>")]
+pub fn fav_delete(path: String,db: &State<Arc<Database>>) -> Result<String, Status> {
+    db.0.lock().unwrap().execute(
+        "delete from favorite where path = ?",
+        params![&path],
+    );
+    return Ok(String::new());
+}
 #[get("/fav/insert?<path>")]
 pub fn fav_insert(path: String, db: &State<Arc<Database>>) -> Result<String, Status> {
     let id: u32 = match db.0.lock().unwrap().query_row(
@@ -28,7 +36,9 @@ pub fn fav_insert(path: String, db: &State<Arc<Database>>) -> Result<String, Sta
 #[get("/fav/list")]
 pub fn fav_list(db: &State<Arc<Database>>) -> Result<String, Status> {
     let binding = db.0.lock().unwrap();
-    let mut query = binding.prepare("SELECT path FROM favorite ORDER BY path").unwrap();
+    let mut query = binding
+        .prepare("SELECT path FROM favorite ORDER BY path")
+        .unwrap();
     let mut rows = query.query([]).unwrap();
     let mut v = Vec::<String>::new();
     while let Some(row) = rows.next().unwrap() {
