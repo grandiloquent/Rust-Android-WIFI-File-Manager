@@ -17,7 +17,10 @@ function onItemClick(evt) {
         render(path);
         return;
     }
-
+    if (imageRe.test(path)) {
+        showImage(path);
+        return;
+    }
     if (audioRe.test(path)) {
         window.location = `/music/music.html?path=${encodeURIComponent(path)}`
         return;

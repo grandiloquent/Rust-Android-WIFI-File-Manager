@@ -257,6 +257,11 @@ function showContextMenu(evt) {
                 bottomSheet.remove();
                 showVideoInformation(path);
             });
+            addContextMenuItem(bottomSheet, '预览', () => {
+                bottomSheet.remove();
+                let imgPath = `${substringBeforeLast(path, "/")}/.images/${substringAfterLast(path, "/")}`;
+                showImage(imgPath)
+            });
         }
         addContextMenuItem(bottomSheet, '分享', () => {
             bottomSheet.remove();
@@ -386,4 +391,18 @@ function showVideoInformation(path) {
 
     });
     document.body.appendChild(dialog);
+}
+function showImage(path) {
+    const div = document.createElement('div');
+    div.className = 'photo-viewer';
+    const img = document.createElement('img');
+    img.src = `${baseUri}/api/file?path=${encodeURIComponent(path)}`
+    div.appendChild(img);
+    document.body.appendChild(div);
+    img.addEventListener('click', () => {
+        div.remove();
+    })
+    div.addEventListener('click', () => {
+        div.remove();
+    })
 }
