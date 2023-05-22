@@ -285,10 +285,7 @@ shuffle.addEventListener('click', evt => {
     index = getRandomInt(0, videos.length);
     playWithIndex();
 });
-const contentCopy = document.querySelector('#content_copy');
-contentCopy.addEventListener('click', evt => {
-    writeText(video.currentTime.toFixed(3));
-});
+
 const fps = (localStorage.getItem('fps') && parseFloat(localStorage.getItem('fps'))) || 29.97;
 document.getElementById('forward_10')
     .addEventListener('click', evt => {
@@ -314,11 +311,7 @@ document.getElementById('30fps_select')
         });
         document.body.appendChild(dialog);
     });
-document.getElementById('video_file')
-    .addEventListener('click', evt => {
-        const url = new URL(video.src);
-        writeText(url.searchParams.get('path'));
-    });
+
 document.getElementById('code')
     .addEventListener('click', async evt => {
         if (typeof NativeAndroid !== 'undefined') {
@@ -362,4 +355,18 @@ document.getElementById('content_cut')
         const s = `-ss ${inPoint} -i "${path}" -t ${outPoint - inPoint} -c:v libx264 "${outPath}"`;
         NativeAndroid.runFFmpeg(s);
         toast.setAttribute('message', "成功");
+    });
+const progressBarLine = document.querySelector('.progress_bar_line');
+let progressBarLineWidth = progressBarLine.getBoundingClientRect().width;
+progressBarLine.addEventListener('click', evt => {
+    let ratio = evt.offsetX / progressBarLineWidth;
+    video.currentTime = ratio * video.duration;
+});
+document.getElementById('replay')
+    .addEventListener('click', evt => {
+        video.currentTime -= 1;
+    });
+document.getElementById('forward_media')
+    .addEventListener('click', evt => {
+        video.currentTime += 1;
     });
