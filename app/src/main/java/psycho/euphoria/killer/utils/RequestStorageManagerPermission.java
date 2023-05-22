@@ -7,7 +7,6 @@ import android.os.Build.VERSION_CODES;
 import android.os.Environment;
 import android.provider.Settings;
 
-import psycho.euphoria.killer.BuildConfig;
 import psycho.euphoria.killer.MainActivity;
 
 public class RequestStorageManagerPermission {
@@ -19,7 +18,7 @@ public class RequestStorageManagerPermission {
             // 但不包括 Android/data 目录下程序的私有数据目录
             if (!Environment.isExternalStorageManager()) {
                 try {
-                    Uri uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID);
+                    Uri uri = Uri.parse("package:psycho.euphoria.killer" );
                     Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri);
                     context.startActivity(intent);
                 } catch (Exception ex) {

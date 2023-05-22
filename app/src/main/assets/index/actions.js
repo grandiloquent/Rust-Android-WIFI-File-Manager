@@ -252,6 +252,12 @@ function showContextMenu(evt) {
                 bottomSheet.remove();
                 unCompressFile(path);
             });
+        } else if (videoRe.test(path)) {
+            addContextMenuItem(bottomSheet, '显示视频信息', () => {
+                bottomSheet.remove();
+                showVideoInformation(path);
+
+            });
         }
     }
     document.body.appendChild(bottomSheet);
@@ -360,4 +366,19 @@ async function unCompressFile(path) {
     } catch (error) {
         toast.setAttribute('message', '错误');
     }
+}
+function showVideoInformation(path) {
+    const dialog = document.createElement('custom-dialog');
+    const div = document.createElement('div');
+    dialog.title = "视频信息";
+    if (typeof NativeAndroid !== 'undefined') {
+        const lines = NativeAndroid.probe(path);
+        writeText(lines);
+        div.innerHTML = lines.split('\n').map(x => `<div style="white-space:pre">${x}</div>`).join('');
+    }
+    dialog.appendChild(div);
+    dialog.addEventListener('submit', async () => {
+
+    });
+    document.body.appendChild(dialog);
 }

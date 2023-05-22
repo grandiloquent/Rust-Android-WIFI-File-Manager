@@ -19,6 +19,8 @@ import android.webkit.JavascriptInterface;
 import com.arthenica.ffmpegkit.FFmpegKit;
 import com.arthenica.ffmpegkit.FFmpegSession;
 import com.arthenica.ffmpegkit.FFmpegSessionCompleteCallback;
+import com.arthenica.ffmpegkit.FFprobeKit;
+import com.arthenica.ffmpegkit.FFprobeSession;
 import com.arthenica.ffmpegkit.LogCallback;
 import com.arthenica.ffmpegkit.ReturnCode;
 import com.arthenica.ffmpegkit.SessionState;
@@ -244,18 +246,21 @@ public class WebAppInterface {
         FFmpegKit.executeAsync(cmd, session -> {
             SessionState state = session.getState();
             ReturnCode returnCode = session.getReturnCode();
-
             // CALLED WHEN SESSION IS EXECUTED
-
         }, log -> {
-
             // CALLED WHEN SESSION PRINTS LOGS
-
         }, statistics -> {
-
             // CALLED WHEN SESSION GENERATES STATISTICS
-
         });
+    }
+
+    @JavascriptInterface
+    public String probe(String path) {
+        FFprobeSession session = FFprobeKit.execute(String.format("-hide_banner -i \"%s\"", path));
+        if (!ReturnCode.isSuccess(session.getReturnCode())) {
+            return null;
+        }
+        return session.getOutput();
     }
 
     public static Thread generateVideoThumbnails(File dir) {

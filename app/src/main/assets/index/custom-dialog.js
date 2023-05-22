@@ -33,7 +33,7 @@ class CustomDialog extends HTMLElement {
 
 .dialog-body {
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: auto;
   max-height: 100vh;
   /*white-space: pre-wrap*/
 }
