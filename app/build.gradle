@@ -29,6 +29,6 @@ android {
 
 dependencies {
     // https://github.com/arthenica/ffmpeg-kit
-    implementation 'com.arthenica:ffmpeg-kit-full:5.1'
+    implementation 'com.arthenica:ffmpeg-kit-full-gpl:5.1'
 }
 

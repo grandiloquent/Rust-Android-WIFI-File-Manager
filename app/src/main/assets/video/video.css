@@ -437,9 +437,9 @@ input:focus {
     left: 0;
     right: 0;
     color: #fff;
-    display: flex;
-    align-items: center;
     user-select: none;
+    display: grid;
+    grid-template-columns: repeat(6,1fr);
 }
 
 #top>span {

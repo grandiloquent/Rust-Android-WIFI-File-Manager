@@ -185,7 +185,7 @@ let index;
 
 async function initialize() {
 
-    toast.setAttribute('message', path);
+    //toast.setAttribute('message', path);
     const loaded = document.querySelector('.progress_bar_loaded');
     video.src = `${baseUri}/api/file?path=${path}`
     video.addEventListener('durationchange', durationchange(video, path));
@@ -209,7 +209,7 @@ async function initialize() {
         bottom.style.display = "flex";
         startTimer();
     });
-    await formatFilenames(substringBeforeLast(path, "/"));
+    //await formatFilenames(substringBeforeLast(path, "/"));
     videos = await loadVideoList();
     for (let v = 0; v < videos.length; v++) {
         const element = videos[v];
@@ -317,5 +317,49 @@ document.getElementById('30fps_select')
 document.getElementById('video_file')
     .addEventListener('click', evt => {
         const url = new URL(video.src);
-        writeText(url.searchParams('path'));
+        writeText(url.searchParams.get('path'));
+    });
+document.getElementById('code')
+    .addEventListener('click', async evt => {
+        if (typeof NativeAndroid !== 'undefined') {
+            NativeAndroid.runFFmpeg(await readText());
+            toast.setAttribute('message', "成功");
+        }
+    });
+let inPoint = (
+    parseFloat(localStorage.getItem('inPoint') || '0')
+), outPoint = (
+    parseFloat(localStorage.getItem('outPoint') || '0')
+);
+document.getElementById('first_page')
+    .addEventListener('click', evt => {
+        if (inPoint) {
+            video.currentTime = inPoint;
+        }
+    });
+document.getElementById('last_page')
+    .addEventListener('click', evt => {
+        if (inPoint) {
+            video.currentTime = outPoint;
+        }
+    });
+document.getElementById('arrow_forward')
+    .addEventListener('click', evt => {
+
+        inPoint = video.currentTime;
+        localStorage.setItem('inPoint', inPoint);
+    });
+document.getElementById('start')
+    .addEventListener('click', evt => {
+        outPoint = video.currentTime;
+        localStorage.setItem('outPoint', outPoint);
+    });
+document.getElementById('content_cut')
+    .addEventListener('click', evt => {
+        const url = new URL(video.src);
+        const path = url.searchParams.get('path');
+        const outPath = substringBeforeLast(path, "/") + "/out/" + substringAfterLast(path, "/") + ".mp4";
+        const s = `-ss ${inPoint} -i "${path}" -t ${outPoint - inPoint} -c:v libx264 "${outPath}"`;
+        NativeAndroid.runFFmpeg(s);
+        toast.setAttribute('message', "成功");
     });

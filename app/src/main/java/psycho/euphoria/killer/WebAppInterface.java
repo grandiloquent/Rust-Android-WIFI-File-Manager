@@ -195,16 +195,13 @@ public class WebAppInterface {
 
     // https://github.com/arthenica/ffmpeg-kit/tree/main/android
     @JavascriptInterface
-    public void runFFmpeg(String cmd) {
-        FFmpegKit.executeAsync(cmd, session -> {
-            SessionState state = session.getState();
-            ReturnCode returnCode = session.getReturnCode();
-            // CALLED WHEN SESSION IS EXECUTED
-        }, log -> {
-            // CALLED WHEN SESSION PRINTS LOGS
-        }, statistics -> {
-            // CALLED WHEN SESSION GENERATES STATISTICS
-        });
+    public String runFFmpeg(String cmd) {
+        Log.e("B5aOx2", String.format("runFFmpeg, %s", cmd));
+        FFmpegSession session = FFmpegKit.execute(String.format("-hide_banner %s", cmd));
+        if (ReturnCode.isSuccess(session.getReturnCode())) {
+            return session.getOutput();
+        }
+        return null;
     }
 
     @JavascriptInterface
@@ -227,7 +224,6 @@ public class WebAppInterface {
         try {
             mContext.startActivity(Shared.buildSharedIntent(mContext, new File(path)));
         } catch (Exception ignored) {
-            Log.e("B5aOx2", String.format("share, %s", ignored));
         }
     }
 
