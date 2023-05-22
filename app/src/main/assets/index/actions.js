@@ -256,9 +256,14 @@ function showContextMenu(evt) {
             addContextMenuItem(bottomSheet, '显示视频信息', () => {
                 bottomSheet.remove();
                 showVideoInformation(path);
-
             });
         }
+        addContextMenuItem(bottomSheet, '分享', () => {
+            bottomSheet.remove();
+            if (typeof NativeAndroid !== 'undefined') {
+                NativeAndroid.share(path);
+            }
+        });
     }
     document.body.appendChild(bottomSheet);
 }

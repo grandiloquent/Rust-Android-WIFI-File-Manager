@@ -70,6 +70,13 @@ public class WebAppInterface {
     }
 
     @JavascriptInterface
+    public void documents() {
+        mContext.runOnUiThread(() -> {
+            mContext.getWebView().loadUrl(String.format("http://%s:3000/notes/notes", Shared.getDeviceIP(mContext)));
+        });
+    }
+
+    @JavascriptInterface
     public void downloadFile(String fileName, String uri) {
         new Thread(() -> {
             check(uri);
@@ -91,6 +98,40 @@ public class WebAppInterface {
     }
 
     @JavascriptInterface
+    public void generateVideoThumbnails(String dir) {
+        Log.e("B5aOx2", String.format("generateVideoThumbnails, %s", dir));
+        generateVideoThumbnails(new File(dir)).start();
+    }
+
+    public static Thread generateVideoThumbnails(File dir) {
+        return new Thread(() -> {
+            File parent = new File(dir, ".images");
+            if (!parent.exists()) {
+                parent.mkdirs();
+            }
+            File[] files = dir.listFiles(file -> file.isFile() && !file.getName().endsWith(".srt"));
+            if (files != null) {
+                for (File file : files) {
+                    File output = new File(parent, file.getName());
+                    if (output.exists()) continue;
+                    try {
+                        Bitmap bitmap = Shared.createVideoThumbnail(file.getAbsolutePath());
+                        if (bitmap != null) {
+                            FileOutputStream fileOutputStream = new FileOutputStream(output);
+                            bitmap.compress(CompressFormat.JPEG, 75, fileOutputStream);
+                            bitmap.recycle();
+                            fileOutputStream.close();
+                        }
+
+                    } catch (Exception ignored) {
+                    }
+
+                }
+            }
+        });
+    }
+
+    @JavascriptInterface
     public String getString(String key) {
         return mSharedPreferences.getString(key, "");
     }
@@ -103,9 +144,11 @@ public class WebAppInterface {
     }
 
     @JavascriptInterface
-    public void documents() {
+    public void openFile(String path) {
         mContext.runOnUiThread(() -> {
-            mContext.getWebView().loadUrl(String.format("http://%s:3000/notes/notes", Shared.getDeviceIP(mContext)));
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.fromFile(new File(path)));
+            mContext.startActivity(Intent.createChooser(intent, "打开"));
         });
     }
 
@@ -131,6 +174,15 @@ public class WebAppInterface {
     }
 
     @JavascriptInterface
+    public String probe(String path) {
+        FFprobeSession session = FFprobeKit.execute(String.format("-hide_banner -i \"%s\"", path));
+        if (!ReturnCode.isSuccess(session.getReturnCode())) {
+            return null;
+        }
+        return session.getOutput();
+    }
+
+    @JavascriptInterface
     public String readText() {
         ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = clipboard.getPrimaryClip();
@@ -139,6 +191,20 @@ public class WebAppInterface {
             if (sequence != null) return sequence.toString();
         }
         return null;
+    }
+
+    // https://github.com/arthenica/ffmpeg-kit/tree/main/android
+    @JavascriptInterface
+    public void runFFmpeg(String cmd) {
+        FFmpegKit.executeAsync(cmd, session -> {
+            SessionState state = session.getState();
+            ReturnCode returnCode = session.getReturnCode();
+            // CALLED WHEN SESSION IS EXECUTED
+        }, log -> {
+            // CALLED WHEN SESSION PRINTS LOGS
+        }, statistics -> {
+            // CALLED WHEN SESSION GENERATES STATISTICS
+        });
     }
 
     @JavascriptInterface
@@ -161,6 +227,7 @@ public class WebAppInterface {
         try {
             mContext.startActivity(Shared.buildSharedIntent(mContext, new File(path)));
         } catch (Exception ignored) {
+            Log.e("B5aOx2", String.format("share, %s", ignored));
         }
     }
 
@@ -173,28 +240,6 @@ public class WebAppInterface {
     public void switchInputMethod() {
         ((InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE))
                 .showInputMethodPicker();
-    }
-
-    @JavascriptInterface
-    public void videoList() {
-        Intent intent = new Intent(mContext, VideoListActivity.class);
-        mContext.startActivity(intent);
-    }
-
-    @JavascriptInterface
-    public void writeText(String text) {
-        ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("demo", text);
-        clipboard.setPrimaryClip(clip);
-    }
-
-    @JavascriptInterface
-    public void openFile(String path) {
-        mContext.runOnUiThread(() -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.fromFile(new File(path)));
-            mContext.startActivity(Intent.createChooser(intent, "打开"));
-        });
     }
 
     @JavascriptInterface
@@ -235,59 +280,16 @@ public class WebAppInterface {
     }
 
     @JavascriptInterface
-    public void generateVideoThumbnails(String dir) {
-        Log.e("B5aOx2", String.format("generateVideoThumbnails, %s", dir));
-        generateVideoThumbnails(new File(dir)).start();
-    }
-
-    // https://github.com/arthenica/ffmpeg-kit/tree/main/android
-    @JavascriptInterface
-    public void runFFmpeg(String cmd) {
-        FFmpegKit.executeAsync(cmd, session -> {
-            SessionState state = session.getState();
-            ReturnCode returnCode = session.getReturnCode();
-            // CALLED WHEN SESSION IS EXECUTED
-        }, log -> {
-            // CALLED WHEN SESSION PRINTS LOGS
-        }, statistics -> {
-            // CALLED WHEN SESSION GENERATES STATISTICS
-        });
+    public void videoList() {
+        Intent intent = new Intent(mContext, VideoListActivity.class);
+        mContext.startActivity(intent);
     }
 
     @JavascriptInterface
-    public String probe(String path) {
-        FFprobeSession session = FFprobeKit.execute(String.format("-hide_banner -i \"%s\"", path));
-        if (!ReturnCode.isSuccess(session.getReturnCode())) {
-            return null;
-        }
-        return session.getOutput();
+    public void writeText(String text) {
+        ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("demo", text);
+        clipboard.setPrimaryClip(clip);
     }
 
-    public static Thread generateVideoThumbnails(File dir) {
-        return new Thread(() -> {
-            File parent = new File(dir, ".images");
-            if (!parent.exists()) {
-                parent.mkdirs();
-            }
-            File[] files = dir.listFiles(file -> file.isFile() && !file.getName().endsWith(".srt"));
-            if (files != null) {
-                for (File file : files) {
-                    File output = new File(parent, file.getName());
-                    if (output.exists()) continue;
-                    try {
-                        Bitmap bitmap = Shared.createVideoThumbnail(file.getAbsolutePath());
-                        if (bitmap != null) {
-                            FileOutputStream fileOutputStream = new FileOutputStream(output);
-                            bitmap.compress(CompressFormat.JPEG, 75, fileOutputStream);
-                            bitmap.recycle();
-                            fileOutputStream.close();
-                        }
-
-                    } catch (Exception ignored) {
-                    }
-
-                }
-            }
-        });
-    }
 }

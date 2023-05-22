@@ -285,3 +285,37 @@ shuffle.addEventListener('click', evt => {
     index = getRandomInt(0, videos.length);
     playWithIndex();
 });
+const contentCopy = document.querySelector('#content_copy');
+contentCopy.addEventListener('click', evt => {
+    writeText(video.currentTime.toFixed(3));
+});
+const fps = (localStorage.getItem('fps') && parseFloat(localStorage.getItem('fps'))) || 29.97;
+document.getElementById('forward_10')
+    .addEventListener('click', evt => {
+        video.currentTime += 1 / fps;
+    });
+document.getElementById('replay_10')
+    .addEventListener('click', evt => {
+        video.currentTime -= 1 / fps;
+    });
+
+document.getElementById('30fps_select')
+    .addEventListener('click', evt => {
+        const dialog = document.createElement('custom-dialog');
+        dialog.title = "设置帧率";
+        const div = document.createElement('input');
+        div.type = 'text';
+        div.style.width = "100%";
+        div.value = fps;
+        dialog.appendChild(div);
+        dialog.addEventListener('submit', async () => {
+            if (parseFloat(div.value))
+                localStorage.setItem('fps', div.value)
+        });
+        document.body.appendChild(dialog);
+    });
+document.getElementById('video_file')
+    .addEventListener('click', evt => {
+        const url = new URL(video.src);
+        writeText(url.searchParams('path'));
+    });

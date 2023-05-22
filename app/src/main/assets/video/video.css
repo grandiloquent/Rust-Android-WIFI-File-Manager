@@ -429,3 +429,23 @@ input:focus {
     z-index: 1;
     overflow-y: auto;
 }
+
+#top {
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    right: 0;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    user-select: none;
+}
+
+#top>span {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
