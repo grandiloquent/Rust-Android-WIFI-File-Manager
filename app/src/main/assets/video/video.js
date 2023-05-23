@@ -99,10 +99,18 @@ function initializeSeekDialog(video) {
             dialogContainer.style.display = 'flex';
         })
 }
-function formatSeconds(value) {
-    const seconds = value % 60;
-    const minutes = value / 60 | 10;
-    return `${minutes}m${seconds}s`;
+function formatDuration(ms) {
+    if (isNaN(ms)) return '0:00';
+    if (ms < 0) ms = -ms;
+    const time = {
+        hour: Math.floor(ms / 3600) % 24,
+        minute: Math.floor(ms / 60) % 60,
+        second: Math.floor(ms) % 60,
+    };
+    return Object.entries(time)
+        .filter((val, index) => index || val[1])
+        .map(val => (val[1] + '').padStart(2, '0'))
+        .join(':');
 }
 async function loadVideoList() {
     const res = await fetch(`${baseUri}/api/files?path=${encodeURIComponent(substringBeforeLast(path, '/'))}`);
@@ -233,15 +241,32 @@ if (typeof NativeAndroid !== 'undefined') {
 }
 const forward_10 = document.querySelector('.forward_10');
 forward_10.addEventListener('click', evt => {
-    startTimer();
-    if (video.currentTime + 10 <= video.duration)
-        video.currentTime = video.currentTime + 10;
+    const dialog = document.createElement('custom-dialog');
+    dialog.title = "跳转";
+    const div = document.createElement('input');
+    div.type = 'text';
+    div.style.width = "100%";
+    div.value = formatDuration(video.duration);
+    dialog.appendChild(div);
+    dialog.addEventListener('submit', async () => {
+            console.log(div.value,durationToSeconds(div.value));
+        video.currentTime = durationToSeconds(div.value);
+    });
+    document.body.appendChild(dialog);
 });
 const replay_10 = document.querySelector('.replay_10');
 replay_10.addEventListener('click', evt => {
-    startTimer();
-    if (video.currentTime - 10 > 0)
-        video.currentTime = video.currentTime - 10;
+    const dialog = document.createElement('custom-dialog');
+    dialog.title = "跳转";
+    const div = document.createElement('input');
+    div.type = 'text';
+    div.style.width = "100%";
+    div.value = formatDuration(video.currentTime);
+    dialog.appendChild(div);
+    dialog.addEventListener('submit', async () => {
+        video.currentTime = durationToSeconds(div.value);
+    });
+    document.body.appendChild(dialog);
 });
 const moveGroup = document.querySelector('.move_group');
 moveGroup.addEventListener('click', async evt => {
@@ -269,16 +294,24 @@ playlistPlay.addEventListener('click', evt => {
 
 
 document.getElementById('back').addEventListener('click', evt => {
-    if (index > 0) {
-        index--;
-    }
-    playWithIndex();
+    // if (index > 0) {
+    //     index--;
+    // }
+    // playWithIndex();
+    startTimer();
+    if (video.currentTime - 10 > 0)
+        video.currentTime = video.currentTime - 10;
+
 })
 document.getElementById('forward').addEventListener('click', evt => {
-    if (index + 1 < videos.length) {
-        index++;
-    }
-    playWithIndex();
+    // if (index + 1 < videos.length) {
+    //     index++;
+    // }
+    // playWithIndex();
+
+    startTimer();
+    if (video.currentTime + 10 < video.duration)
+        video.currentTime = video.currentTime + 10;
 })
 const shuffle = document.querySelector('.shuffle');
 shuffle.addEventListener('click', evt => {
@@ -370,3 +403,19 @@ document.getElementById('forward_media')
     .addEventListener('click', evt => {
         video.currentTime += 1;
     });
+
+function durationToSeconds(duration) {
+    let result = 0;
+    if (/(\d{1,2}:){1,2}\d{1,2}/.test(duration)) {
+        const pieces = duration.split(':');
+        for (let i = pieces.length - 1; i > -1; i--) {
+            result += Math.pow(60, i) * parseInt(pieces[pieces.length - i - 1]);
+        }
+        return result;
+    }
+    result = parseInt(duration);
+    if (isNaN(result)) {
+        result = 0;
+    }
+    return result;
+}
