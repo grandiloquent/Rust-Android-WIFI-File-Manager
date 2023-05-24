@@ -317,6 +317,12 @@ function onMenu(evt) {
         url.searchParams.set('size', true);
         window.location = url;
     });
+    addContextMenuItem(bottomSheet, '合并图片', () => {
+        bottomSheet.remove();
+        if (typeof NativeAndroid !== 'undefined') {
+            NativeAndroid(path, 400, "湖南省桃江县花果山水帘洞齐天大圣孙悟空防伪")
+        }
+    });
     document.body.appendChild(bottomSheet);
 }
 function addFavoriteItem(bottomSheet, path) {

@@ -302,6 +302,7 @@ public class WebAppInterface {
         ClipData clip = ClipData.newPlainText("demo", text);
         clipboard.setPrimaryClip(clip);
     }
+
     @JavascriptInterface
     public void combineImages(String dir, int size, String message) throws IOException {
         Pattern pattern = Pattern.compile(".+\\.(?:jpg|png)$");
@@ -363,8 +364,7 @@ public class WebAppInterface {
         File file;
         do {
             file = new File(Environment.getExternalStorageDirectory(), String.format("/Download/%02d.jpg", i));
-            break;
-            //i++;
+            i++;
         } while (file.exists());
         if (message != null) {
             TextPaint paint = new TextPaint();
@@ -382,12 +382,13 @@ public class WebAppInterface {
             paint.setStrokeCap(Paint.Cap.ROUND);
             paint.setStrokeWidth(2f);
             canvas.drawTextOnPath(message, path, 0, 0, paint);
-
+            mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.fromFile(file)));
         }
         FileOutputStream outputStream = new FileOutputStream(file);
         bitmap.compress(CompressFormat.JPEG, 80, outputStream);
         outputStream.close();
         bitmap.recycle();
+
     }
 
 }
