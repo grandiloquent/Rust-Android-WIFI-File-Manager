@@ -7,13 +7,36 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Bitmap.Config;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Paint.Style;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.text.TextPaint;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static psycho.euphoria.killer.utils.AroundFileUriExposedException.aroundFileUriExposedException;
 import static psycho.euphoria.killer.utils.InitializeWebView.initializeWebView;
@@ -36,6 +59,7 @@ public class MainActivity extends Activity {
     SharedPreferences mSharedPreferences;
     WebView mWebView;
     BroadcastReceiver mBroadcastReceiver;
+    private String mAddress;
 
     public SharedPreferences getSharedPreferences() {
         return mSharedPreferences;
@@ -49,20 +73,6 @@ public class MainActivity extends Activity {
     启动使用 Rust 编写的服务器。host由主机名和端口组成。例如192.168.8.55:3000。其中主机名是设备在局域网中的IP，使用它可以在局域网的设备之间共享数据。例如连接到一个Wi-Fi的电脑和手机
       */
     public static native void startServer(ServerService service, AssetManager assetManager, String host, int port);
-
-    private String mAddress;
-
-    private void loadStartPage(MainActivity context, boolean isHomePage) {
-        if (isHomePage) {
-            Log.e("B5aOx2", String.format("loadStartPage, %s", mAddress));
-            context.getWebView().loadUrl(mAddress);
-        } else {
-            String lastedAddress = context.getSharedPreferences().getString("address", mAddress);
-            if (lastedAddress != null) {
-                context.getWebView().loadUrl(lastedAddress);
-            }
-        }
-    }
 
     private void initialize() {
         mBroadcastReceiver = new BroadcastReceiver() {
@@ -81,9 +91,20 @@ public class MainActivity extends Activity {
         mWebView = initializeWebView(this);
         //Secret.populateSettings(this);
         launchServer(this);
-//        String dir = mSharedPreferences.getString("video_directory", null);
-//        if (dir != null)
-//            Utils.generateVideoThumbnails(new File(dir)).start();
+
+    }
+
+
+    private void loadStartPage(MainActivity context, boolean isHomePage) {
+        if (isHomePage) {
+            Log.e("B5aOx2", String.format("loadStartPage, %s", mAddress));
+            context.getWebView().loadUrl(mAddress);
+        } else {
+            String lastedAddress = context.getSharedPreferences().getString("address", mAddress);
+            if (lastedAddress != null) {
+                context.getWebView().loadUrl(lastedAddress);
+            }
+        }
     }
 
     @Override

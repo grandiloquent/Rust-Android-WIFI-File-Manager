@@ -9,9 +9,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Bitmap.Config;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Paint.Style;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.text.TextPaint;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
@@ -33,12 +42,18 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Proxy.Type;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import psycho.euphoria.killer.video.PlayerActivity;
@@ -286,6 +301,93 @@ public class WebAppInterface {
         ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("demo", text);
         clipboard.setPrimaryClip(clip);
+    }
+    @JavascriptInterface
+    public void combineImages(String dir, int size, String message) throws IOException {
+        Pattern pattern = Pattern.compile(".+\\.(?:jpg|png)$");
+        List<String> files = Files.list(Paths.get(dir))
+                .filter(p -> Files.isRegularFile(p) && pattern.matcher(p.getFileName().toString()).matches())
+                .map(p -> p.toAbsolutePath().toString())
+                .collect(Collectors.toList());
+        BitmapFactory.Options bounds = new BitmapFactory.Options();
+        bounds.inJustDecodeBounds = true;
+        float gap = 12f;
+        float leftHeight = 0f;
+        float rightHeight = 0f;
+        for (String p : files) {
+            BitmapFactory.decodeFile(p, bounds);
+            float width = (size - gap * 1.5f);
+            width = bounds.outWidth > width ? width : bounds.outWidth;
+            float height = bounds.outHeight / (bounds.outWidth / width);
+            if (leftHeight <= rightHeight) {
+                leftHeight += Math.floor(height) + gap;
+            } else {
+                rightHeight += Math.floor(height) + gap;
+            }
+
+        }
+        Bitmap bitmap = Bitmap.createBitmap(size * 2, ((int) Math.max(
+                leftHeight, rightHeight
+        )) + (int) gap, Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        bounds.inJustDecodeBounds = false;
+        leftHeight = 0f;
+        rightHeight = 0f;
+        int offset = 0;
+        for (String p : files) {
+            Bitmap b = BitmapFactory.decodeFile(p, bounds);
+            float width = (size - gap * 1.5f);
+            width = b.getWidth() > width ? width : b.getWidth();
+            int height = (int) Math.floor(b.getHeight() / (b.getWidth() / width));
+            if (leftHeight <= rightHeight) {
+                offset = (int) (Math.min(leftHeight, rightHeight) + gap);
+                int x = (int) ((size - width) / 2);
+                canvas.drawBitmap(b, new Rect(0, 0, b.getWidth(), b.getHeight()),
+                        new Rect(x, offset, x + (int) width, offset + height), null);
+//                Log.e("B5aOx2", String.format("1, %s, %s, %s, %s, %s, %s", b.getWidth(), b.getHeight(),
+//                        x, offset, x + (int) width, offset + height
+//                ));
+                leftHeight += height + gap;
+
+            } else {
+                offset = (int) (Math.min(leftHeight, rightHeight) + gap);
+                int x = (int) ((size - width) / 2) + size;
+                canvas.drawBitmap(b, new Rect(0, 0, b.getWidth(), b.getHeight()),
+                        new Rect(x, offset, x + (int) width, offset + height), null);
+                rightHeight += height + gap;
+            }
+            b.recycle();
+
+        }
+        int i = 1;
+        File file;
+        do {
+            file = new File(Environment.getExternalStorageDirectory(), String.format("/Download/%02d.jpg", i));
+            break;
+            //i++;
+        } while (file.exists());
+        if (message != null) {
+            TextPaint paint = new TextPaint();
+            paint.setStyle(Style.FILL);
+            paint.setFakeBoldText(true);
+            paint.setColor(Color.RED);
+            paint.setTextSize(60f);
+            RectF enclosingRect = new RectF(bitmap.getWidth() - 460, bitmap.getHeight() - 460, bitmap.getWidth() - 60, bitmap.getHeight() - 60);
+            android.graphics.Path path = new android.graphics.Path();
+            path.addArc(enclosingRect, -180f, 360f);
+            //canvas.drawPath(path, paint);
+            canvas.drawTextOnPath(message, path, 0, 0, paint);
+            paint.setStyle(Style.STROKE);
+            paint.setColor(Color.YELLOW);
+            paint.setStrokeCap(Paint.Cap.ROUND);
+            paint.setStrokeWidth(2f);
+            canvas.drawTextOnPath(message, path, 0, 0, paint);
+
+        }
+        FileOutputStream outputStream = new FileOutputStream(file);
+        bitmap.compress(CompressFormat.JPEG, 80, outputStream);
+        outputStream.close();
+        bitmap.recycle();
     }
 
 }
