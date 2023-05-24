@@ -320,7 +320,9 @@ function onMenu(evt) {
     addContextMenuItem(bottomSheet, '合并图片', () => {
         bottomSheet.remove();
         if (typeof NativeAndroid !== 'undefined') {
-            NativeAndroid(path, 400, "湖南省桃江县花果山水帘洞齐天大圣孙悟空防伪")
+            const url = new URL(window.location);
+            const path=url.searchParams.get('path');
+            NativeAndroid.combineImages(path, 400, "湖南省桃江县花果山水帘洞齐天大圣孙悟空防伪")
         }
     });
     document.body.appendChild(bottomSheet);

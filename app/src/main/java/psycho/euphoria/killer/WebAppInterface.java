@@ -17,6 +17,7 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -221,10 +222,7 @@ public class WebAppInterface {
     @JavascriptInterface
     public void serverHome() {
         mContext.runOnUiThread(() -> {
-            mContext.getWebView().loadUrl("http://" + Shared.getDeviceIP(mContext) + ":" +
-                    mSharedPreferences.getInt(
-                            KEY_PORT, DEFAULT_PORT
-                    ));
+            mContext.getWebView().loadUrl("http://" + Shared.getDeviceIP(mContext) + ":" + mSharedPreferences.getInt(KEY_PORT, DEFAULT_PORT));
         });
     }
 
@@ -249,8 +247,7 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public void switchInputMethod() {
-        ((InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE))
-                .showInputMethodPicker();
+        ((InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE)).showInputMethodPicker();
     }
 
     @JavascriptInterface
@@ -258,18 +255,13 @@ public class WebAppInterface {
         final StringBuilder sb = new StringBuilder();
         try {
             Thread thread = new Thread(() -> {
-                String uri = "http://translate.google.com/translate_a/single?client=gtx&sl=auto&tl="
-                        + "zh" + "&dt=t&dt=bd&ie=UTF-8&oe=UTF-8&dj=1&source=icon&q=" + Uri.encode(s);
+                String uri = "http://translate.google.com/translate_a/single?client=gtx&sl=auto&tl=" + "zh" + "&dt=t&dt=bd&ie=UTF-8&oe=UTF-8&dj=1&source=icon&q=" + Uri.encode(s);
                 try {
-                    HttpURLConnection h = (HttpURLConnection) new URL(uri).openConnection(
-                            new Proxy(Type.HTTP, new InetSocketAddress("127.0.0.1", 10809))
-                    );
+                    HttpURLConnection h = (HttpURLConnection) new URL(uri).openConnection(new Proxy(Type.HTTP, new InetSocketAddress("127.0.0.1", 10809)));
                     h.addRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Edg/88.0.705.74");
                     h.addRequestProperty("Accept-Encoding", "gzip, deflate, br");
                     String line = null;
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(
-                            new GZIPInputStream(h.getInputStream())
-                    ));
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(h.getInputStream())));
                     StringBuilder sb1 = new StringBuilder();
                     while ((line = reader.readLine()) != null) {
                         sb1.append(line).append('\n');
@@ -305,11 +297,10 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public void combineImages(String dir, int size, String message) throws IOException {
+        Log.e("B5aOx2", String.format("combineImages, %s %s %s",
+                dir,size,message));
         Pattern pattern = Pattern.compile(".+\\.(?:jpg|png)$");
-        List<String> files = Files.list(Paths.get(dir))
-                .filter(p -> Files.isRegularFile(p) && pattern.matcher(p.getFileName().toString()).matches())
-                .map(p -> p.toAbsolutePath().toString())
-                .collect(Collectors.toList());
+        List<String> files = Files.list(Paths.get(dir)).filter(p -> Files.isRegularFile(p) && pattern.matcher(p.getFileName().toString()).matches()).map(p -> p.toAbsolutePath().toString()).collect(Collectors.toList());
         BitmapFactory.Options bounds = new BitmapFactory.Options();
         bounds.inJustDecodeBounds = true;
         float gap = 12f;
@@ -327,9 +318,7 @@ public class WebAppInterface {
             }
 
         }
-        Bitmap bitmap = Bitmap.createBitmap(size * 2, ((int) Math.max(
-                leftHeight, rightHeight
-        )) + (int) gap, Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(size * 2, ((int) Math.max(leftHeight, rightHeight)) + (int) gap, Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         bounds.inJustDecodeBounds = false;
         leftHeight = 0f;
@@ -343,8 +332,7 @@ public class WebAppInterface {
             if (leftHeight <= rightHeight) {
                 offset = (int) (Math.min(leftHeight, rightHeight) + gap);
                 int x = (int) ((size - width) / 2);
-                canvas.drawBitmap(b, new Rect(0, 0, b.getWidth(), b.getHeight()),
-                        new Rect(x, offset, x + (int) width, offset + height), null);
+                canvas.drawBitmap(b, new Rect(0, 0, b.getWidth(), b.getHeight()), new Rect(x, offset, x + (int) width, offset + height), null);
 //                Log.e("B5aOx2", String.format("1, %s, %s, %s, %s, %s, %s", b.getWidth(), b.getHeight(),
 //                        x, offset, x + (int) width, offset + height
 //                ));
@@ -353,8 +341,7 @@ public class WebAppInterface {
             } else {
                 offset = (int) (Math.min(leftHeight, rightHeight) + gap);
                 int x = (int) ((size - width) / 2) + size;
-                canvas.drawBitmap(b, new Rect(0, 0, b.getWidth(), b.getHeight()),
-                        new Rect(x, offset, x + (int) width, offset + height), null);
+                canvas.drawBitmap(b, new Rect(0, 0, b.getWidth(), b.getHeight()), new Rect(x, offset, x + (int) width, offset + height), null);
                 rightHeight += height + gap;
             }
             b.recycle();
@@ -382,7 +369,13 @@ public class WebAppInterface {
             paint.setStrokeCap(Paint.Cap.ROUND);
             paint.setStrokeWidth(2f);
             canvas.drawTextOnPath(message, path, 0, 0, paint);
-            mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.fromFile(file)));
+            MediaScannerConnection.scanFile(mContext, new String[]{
+                    file.getAbsolutePath()
+            }, new String[]{"image/*"}, new MediaScannerConnection.OnScanCompletedListener() {
+                @Override
+                public void onScanCompleted(String s, Uri uri) {
+                }
+            });
         }
         FileOutputStream outputStream = new FileOutputStream(file);
         bitmap.compress(CompressFormat.JPEG, 80, outputStream);
