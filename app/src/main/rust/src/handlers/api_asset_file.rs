@@ -5,6 +5,8 @@ use crate::strings::StringExt;
 use rocket::fs::NamedFile;
 use std::path::PathBuf;
 use urlencoding::decode;
+use android_logger::log;
+
 #[get("/api/<sub_path..>?<path>")]
 pub async fn api_asset_file(
     sub_path: PathBuf,
@@ -14,6 +16,8 @@ pub async fn api_asset_file(
     match referer {
         None => NamedFile::open("'").await.ok(),
         Some(v) => {
+
+
             let query = v.0.substring_after("path=").substring_before("&");
             let file_path = decode(query.as_str())
                 .unwrap()

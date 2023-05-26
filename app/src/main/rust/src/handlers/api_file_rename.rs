@@ -6,6 +6,7 @@ use std::path::Path;
 pub async fn api_file_rename(path: String, dst: String) -> Value {
     // https://doc.rust-lang.org/std/path/struct.Path.html
     let p = Path::new(path.as_str());
+    log::error!("{}",path);
     if !p.exists() {
         json!({
             "error":1

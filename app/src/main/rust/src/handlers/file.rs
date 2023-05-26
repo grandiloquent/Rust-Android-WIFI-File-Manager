@@ -10,7 +10,7 @@ pub fn file<'a>(b: PathBuf, cache: &State<Arc<Cache>>) -> Asset {
     match cache.get(b.to_str().unwrap_or("")) {
         None => Asset::default(),
         Some(data) => {
-            log::error!("{}", b.to_str().unwrap_or(""));
+
             Asset {
                 data,
                 content_type: extension_to_mime(
